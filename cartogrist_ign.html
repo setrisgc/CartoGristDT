@@ -446,31 +446,6 @@ fetch(urlCommunes)
 });
 
 
-// ======================================
-// RECHERCHE COMMUNE
-// ======================================
-
-const recherche = L.control({
-    position:'topleft'
-});
-
-recherche.onAdd = function(){
-
-    const div = L.DomUtil.create('div','legend');
-
-    div.innerHTML = `
-        <input
-            id="rechercheCommune"
-            type="text"
-            placeholder="Rechercher une commune..."
-            style="width:180px;padding:5px;">
-    `;
-
-    return div;
-};
-
-recherche.addTo(map);
-
 
 
 // ======================================
