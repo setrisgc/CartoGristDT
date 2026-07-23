@@ -259,6 +259,16 @@ grist.ready({
 
 grist.onRecords(function(records){
 
+records.forEach(record => {
+
+    console.log(
+        "Coordonnées :",
+        record.Longitude,
+        record.Latitude
+    );
+
+});
+
 
 console.log("Nombre de lignes reçues :", records.length);
 console.log("Première ligne Grist :", records[0]);
