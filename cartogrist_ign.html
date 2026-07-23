@@ -144,7 +144,7 @@ const coucheProjets = L.layerGroup().addTo(map);
 
     const coucheDT = L.layerGroup().addTo(map);
 
-const couchecommunes = L.layerGroup();
+const coucheCommunes = L.layerGroup();
     
 const coucheEPCI = L.layerGroup();
 
@@ -328,7 +328,7 @@ function couleurAvis(Avis){
 
 const urlDT = "limites_DT.geojson";
 const urlEPCI = "limites_epci.geojson";
-const urlcommunes = "communes.geojson";
+const urlCommunes = "communes.geojson";
 
 
 
@@ -402,7 +402,7 @@ fetch(urlEPCI)
 // communes
 
 
-fetch(urlcommunes)
+fetch(urlCommunes)
 
 .then(response => response.json())
 
