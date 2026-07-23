@@ -116,12 +116,12 @@ function couleurAvis(Avis){
     Avis = Avis.toLowerCase();
 
 
-    if(Avis.includes("Favorable")){
+    if(Avis.includes("favorable")){
         return "#2E8B57";
     }
 
 
-    if(Avis.includes("Défavorable")){
+    if(Avis.includes("défavorable")){
         return "#D93025";
     }
 
@@ -141,9 +141,8 @@ function couleurAvis(Avis){
 
 // A remplacer par tes futures URL
 
-const urlDT = "data/DT.geojson";
-
-const urlCommunes = "data/communes.geojson";
+const urlDT = "limites_DT.geojson";
+const urlCommunes = "communes.geojson";
 
 
 
@@ -259,7 +258,8 @@ grist.ready({
 grist.onRecords(function(records){
 
 
-
+ console.log(records[0]);
+console.log("Clés :", Object.keys(records[0]));
     coucheProjets.clearLayers();
 
 
@@ -273,13 +273,13 @@ grist.onRecords(function(records){
 
 
         if(
-            row.Latitude2 &&
+            row.Latitude &&
             row.Longitude
         ){
 
 
 
-            let lat=parseFloat(row.Latitude2);
+            let lat=parseFloat(row.Latitude);
 
             let lon=parseFloat(row.Longitude);
 
