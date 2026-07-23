@@ -129,27 +129,6 @@ const fond = L.tileLayer(
     }
 );
 
-const recherche = L.control({position:'topleft'});
-
-recherche.onAdd = function(){
-
-    const div = L.DomUtil.create('div','legend');
-
-    div.innerHTML = `
-        <input
-            id="rechercheCommune"
-            type="text"
-            placeholder="Rechercher une commune..."
-            style="width:180px;padding:5px;">
-    `;
-
-    return div;
-};
-
-recherche.addTo(map);
-
-
-
 fond.addTo(map);
 
 
@@ -422,7 +401,6 @@ fetch(urlEPCI)
 
 // communes
 
-let coucheGeoCommunes;
 
 fetch(urlCommunes)
 
@@ -430,20 +408,26 @@ fetch(urlCommunes)
 
 .then(data => {
 
-    coucheGeoCommunes = L.geoJSON(
+
+    L.geoJSON(
         data,
         {
-            pane:'communesPane',
+
+              pane:'communesPane',
             style:{
                 color:"#b6b6b6",
                 weight:1,
                 fillOpacity:0
             }
+
         }
 
-    ).addTo(couchecommunes);
+    )
+    .addTo(couchecommunes);
+
 
 });
+
 
 
 
