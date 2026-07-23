@@ -99,8 +99,8 @@ const map = L.map('map');
 // ORDRE DES COUCHES
 // ======================================
 
-map.createPane('communesPane');
-map.getPane('communesPane').style.zIndex = 400;
+map.createPane('epciPane');
+map.getPane('epciPane').style.zIndex = 400;
 
 map.createPane('dtPane');
 map.getPane('dtPane').style.zIndex = 450;
@@ -305,7 +305,7 @@ fetch(urlDT)
         data,
         {
 
-              pane:'DTPane',
+              pane:'dtPane',
 
             style:{
                 color:"#494949",
@@ -353,7 +353,7 @@ fetch(urlEPCI)
         data,
         {
 
-              pane:'EPCIPane',
+              pane:'epciPane',
             style:{
                 color:"#9a009b",
                 weight:1,
@@ -567,3 +567,4 @@ console.log("Clés :", Object.keys(records[0]));
 </body>
 
 </html>
+
