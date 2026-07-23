@@ -311,12 +311,7 @@ fetch(urlDT)
                 color:"#494949",
                 weight:3,
                 fillOpacity:0
-            },
-
-
-            onEachFeature:function(feature,layer){
-
-}
+            }
 
         }
 
@@ -349,19 +344,6 @@ fetch(urlEPCI)
                 color:"#9a009b",
                 weight:1,
                 fillOpacity:0
-            },
-
-
-            onEachFeature:function(feature,layer){
-
-                if(feature.properties.NOM_EPCI){
-
-                    layer.bindTooltip(
-                    feature.properties.NOM_EPCI
-                    );
-
-                }
-
             }
 
         }
