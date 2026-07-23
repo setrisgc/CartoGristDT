@@ -221,17 +221,23 @@ function couleurAvis(Avis){
     Avis = Avis.toLowerCase();
 
 
+
+    if(Avis.includes("défavorable")){
+        return "#D93025";
+    }
+
+
     if(Avis.includes("favorable")){
         return "#2E8B57";
     }
 
 
-    if(Avis.includes("defavorable")){
-        return "#D93025";
+    if(Avis.includes("en cours")){
+        return "#F4B400";
     }
 
 
-    return "#F4B400";
+    return "#808080";
 
 }
 
