@@ -212,27 +212,28 @@ legend.addTo(map);
 
 function couleurAvis(Avis){
 
-
     if(!Avis){
         return "#808080";
     }
 
 
-    Avis = Avis.toLowerCase();
+    Avis = Avis
+        .toString()
+        .trim()
+        .toLowerCase();
 
 
-
-    if(Avis.includes("defavorable")){
+    if(Avis === "défavorable"){
         return "#D93025";
     }
 
 
-    if(Avis.includes("favorable")){
+    if(Avis === "favorable"){
         return "#2E8B57";
     }
 
 
-    if(Avis.includes("en cours")){
+    if(Avis === "en cours"){
         return "#F4B400";
     }
 
@@ -240,8 +241,6 @@ function couleurAvis(Avis){
     return "#808080";
 
 }
-
-
 
 
 // ======================================
