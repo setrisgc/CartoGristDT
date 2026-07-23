@@ -31,6 +31,25 @@ html, body {
     line-height:1.4;
 }
 
+.legend {
+    background:white;
+    padding:10px;
+    border-radius:6px;
+    box-shadow:0 0 10px rgba(0,0,0,0.25);
+    line-height:1.8;
+    font-size:14px;
+}
+
+.legend span {
+    display:inline-block;
+    width:14px;
+    height:14px;
+    margin-right:6px;
+    border-radius:50%;
+}
+
+
+
 </style>
 
 </head>
@@ -98,7 +117,62 @@ const coucheDT = L.layerGroup().addTo(map);
 
 const coucheProjets = L.layerGroup().addTo(map);
 
+// ======================================
+// LEGENDE
+// ======================================
 
+const legend = L.control({
+    position:'bottomright'
+});
+
+
+legend.onAdd = function(){
+
+    const div = L.DomUtil.create(
+        'div',
+        'legend'
+    );
+
+
+    div.innerHTML = `
+    
+    <b>Avis des projets</b><br>
+
+    <span style="
+    background:#2E8B57">
+    </span>
+    Favorable
+    <br>
+
+
+    <span style="
+    background:#F4B400">
+    </span>
+    En cours
+    <br>
+
+
+    <span style="
+    background:#D93025">
+    </span>
+    Défavorable
+    <br>
+
+
+    <span style="
+    background:#808080">
+    </span>
+    Sans avis
+
+    `;
+
+
+    return div;
+
+};
+
+
+legend.addTo(map);
 
 // ======================================
 // STYLE AVIS
