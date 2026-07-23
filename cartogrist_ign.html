@@ -151,11 +151,13 @@ const urlCommunes = "communes.geojson";
 // DT
 
 fetch(urlDT)
-
-.then(response => response.json())
-
+.then(response => {
+    console.log("Réponse GeoJSON DT :", response.status);
+    return response.json();
+})
 .then(data => {
 
+    console.log("GeoJSON DT chargé :", data);
 
     L.geoJSON(
         data,
