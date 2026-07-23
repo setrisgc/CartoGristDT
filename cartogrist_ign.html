@@ -260,6 +260,9 @@ grist.ready({
 grist.onRecords(function(records){
 
 
+console.log("Nombre de lignes reçues :", records.length);
+console.log("Première ligne Grist :", records[0]);
+
  console.log(records[0]);
 console.log("Clés :", Object.keys(records[0]));
     coucheProjets.clearLayers();
