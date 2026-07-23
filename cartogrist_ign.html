@@ -128,7 +128,7 @@ L.tileLayer(
 // ======================================
 
 
-const coucheCommunes = L.layerGroup();
+const coucheEPCI = L.layerGroup();
 
 const coucheDT = L.layerGroup().addTo(map);
 
@@ -148,7 +148,7 @@ const overlays = {
 
     "⬛ Limites DT": coucheDT,
 
-    "▫️ Communes": coucheCommunes
+    "▫️ EPCI": coucheEPCI
 
 };
 
@@ -223,7 +223,7 @@ legend.onAdd = function(){
 
 
     <span class="line-com"></span>
-    Communes
+    Limites EPCI
 
 
     `;
@@ -283,7 +283,7 @@ function couleurAvis(Avis){
 // A remplacer par tes futures URL
 
 const urlDT = "limites_DT.geojson";
-const urlCommunes = "communes.geojson";
+const urlEPCI = "limites_epci.geojson";
 
 
 
@@ -336,10 +336,10 @@ fetch(urlDT)
 
 
 
-// Communes
+// EPCI
 
 
-fetch(urlCommunes)
+fetch(urlEPCI)
 
 .then(response => response.json())
 
@@ -351,7 +351,7 @@ fetch(urlCommunes)
         {
 
             style:{
-                color:"#999",
+                color:"#82d982",
                 weight:1,
                 fillOpacity:0
             },
@@ -359,10 +359,10 @@ fetch(urlCommunes)
 
             onEachFeature:function(feature,layer){
 
-                if(feature.properties.NOM_COMM){
+                if(feature.properties.NOM_EPCI){
 
                     layer.bindTooltip(
-                    feature.properties.NOM_COMM
+                    feature.properties.NOM_EPCI
                     );
 
                 }
@@ -372,7 +372,7 @@ fetch(urlCommunes)
         }
 
     )
-    .addTo(coucheCommunes);
+    .addTo(coucheEPCI);
 
 
 });
