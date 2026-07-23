@@ -212,9 +212,6 @@ legend.addTo(map);
 
 function couleurAvis(Avis){
 
-    console.log("TEST COULEUR AVIS =", Avis);
-
-
     if(!Avis){
         return "#808080";
     }
@@ -223,31 +220,31 @@ function couleurAvis(Avis){
     Avis = Avis
         .toString()
         .trim()
-        .toLowerCase();
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 
 
-    console.log("AVIS NETTOYE =", Avis);
+
+    console.log("AVIS NORMALISE :", Avis);
 
 
-    if(Avis === "défavorable"){
-        console.log("=> ROUGE");
+
+    if(Avis === "defavorable"){
         return "#D93025";
     }
 
 
     if(Avis === "favorable"){
-        console.log("=> VERT");
         return "#2E8B57";
     }
 
 
     if(Avis === "en cours"){
-        console.log("=> ORANGE");
         return "#F4B400";
     }
 
 
-    console.log("=> GRIS");
     return "#808080";
 
 }
