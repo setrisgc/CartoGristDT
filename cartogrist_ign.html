@@ -244,42 +244,6 @@ legend.onAdd = function(){
 
 legend.addTo(map);
 
-const controleOpacity = L.control({position:'topright'});
-
-controleOpacity.onAdd = function(){
-
-    const div = L.DomUtil.create('div','legend');
-
-    div.innerHTML = `
-        <b>Fond de carte</b><br>
-        <input id="opacitySlider"
-               type="range"
-               min="0"
-               max="100"
-               value="70">
-    `;
-
-    return div;
-};
-
-controleOpacity.addTo(map);
-
-setTimeout(function(){
-
-    document.getElementById("opacitySlider")
-        .addEventListener("input", function(){
-
-            fond.setOpacity(this.value/100);
-
-        });
-
-},500);
-
-
-
-
-
-
 // ======================================
 // STYLE AVIS
 // ======================================
@@ -328,7 +292,6 @@ function couleurAvis(Avis){
 
 const urlDT = "limites_DT.geojson";
 const urlEPCI = "limites_epci.geojson";
-const urlCommunes = "communes.geojson";
 
 
 
@@ -402,7 +365,7 @@ fetch(urlEPCI)
 // communes
 
 
-fetch(urlCommunes)
+fetch(urlcommunes)
 
 .then(response => response.json())
 
