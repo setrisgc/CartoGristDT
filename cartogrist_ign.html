@@ -33,22 +33,39 @@ html, body {
 
 .legend {
     background:white;
-    padding:10px;
-    border-radius:6px;
-    box-shadow:0 0 10px rgba(0,0,0,0.25);
-    line-height:1.8;
+    padding:12px;
+    border-radius:8px;
+    box-shadow:0 0 12px rgba(0,0,0,0.3);
     font-size:14px;
+    line-height:1.8;
 }
 
-.legend span {
+.legend h4 {
+    margin:0 0 8px 0;
+    font-size:15px;
+}
+
+.legend .circle {
     display:inline-block;
-    width:14px;
-    height:14px;
-    margin-right:6px;
+    width:12px;
+    height:12px;
     border-radius:50%;
+    margin-right:6px;
 }
 
+.legend .line-dt {
+    display:inline-block;
+    width:22px;
+    border-top:3px solid #333;
+    margin-right:6px;
+}
 
+.legend .line-com {
+    display:inline-block;
+    width:22px;
+    border-top:1px solid #999;
+    margin-right:6px;
+}
 
 </style>
 
@@ -117,8 +134,9 @@ const coucheDT = L.layerGroup().addTo(map);
 
 const coucheProjets = L.layerGroup().addTo(map);
 
+
 // ======================================
-// LEGENDE
+// LEGENDE CARTOGRIST
 // ======================================
 
 const legend = L.control({
@@ -135,34 +153,47 @@ legend.onAdd = function(){
 
 
     div.innerHTML = `
-    
-    <b>Avis des projets</b><br>
 
-    <span style="
-    background:#2E8B57">
+    <h4>CartoGrist DT</h4>
+
+
+    <span class="circle"
+    style="background:#2E8B57">
     </span>
     Favorable
     <br>
 
 
-    <span style="
-    background:#F4B400">
+    <span class="circle"
+    style="background:#F4B400">
     </span>
     En cours
     <br>
 
 
-    <span style="
-    background:#D93025">
+    <span class="circle"
+    style="background:#D93025">
     </span>
     Défavorable
     <br>
 
 
-    <span style="
-    background:#808080">
+    <span class="circle"
+    style="background:#808080">
     </span>
     Sans avis
+
+    <hr>
+
+
+    <span class="line-dt"></span>
+    Limites DT
+    <br>
+
+
+    <span class="line-com"></span>
+    Communes
+
 
     `;
 
