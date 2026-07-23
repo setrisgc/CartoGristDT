@@ -129,6 +129,27 @@ const fond = L.tileLayer(
     }
 );
 
+const recherche = L.control({position:'topleft'});
+
+recherche.onAdd = function(){
+
+    const div = L.DomUtil.create('div','legend');
+
+    div.innerHTML = `
+        <input
+            id="rechercheCommune"
+            type="text"
+            placeholder="Rechercher une commune..."
+            style="width:180px;padding:5px;">
+    `;
+
+    return div;
+};
+
+recherche.addTo(map);
+
+
+
 fond.addTo(map);
 
 
@@ -144,7 +165,7 @@ const coucheProjets = L.layerGroup().addTo(map);
 
     const coucheDT = L.layerGroup().addTo(map);
 
-const coucheCommunes = L.layerGroup();
+const couchecommunes = L.layerGroup();
     
 const coucheEPCI = L.layerGroup();
 
@@ -401,6 +422,7 @@ fetch(urlEPCI)
 
 // communes
 
+let coucheGeoCommunes;
 
 fetch(urlCommunes)
 
@@ -408,25 +430,61 @@ fetch(urlCommunes)
 
 .then(data => {
 
-
-    L.geoJSON(
+    coucheGeoCommunes = L.geoJSON(
         data,
         {
-
-              pane:'communesPane',
+            pane:'communesPane',
             style:{
                 color:"#b6b6b6",
                 weight:1,
                 fillOpacity:0
             }
-
         }
 
-    )
-    .addTo(couchecommunes);
-
+    ).addTo(couchecommunes);
 
 });
+
+
+// =========================
+// RECHERCHE COMMUNE
+// =========================
+
+setTimeout(function(){
+
+    document
+        .getElementById("rechercheCommune")
+        .addEventListener("keyup",function(){
+
+            let recherche = this.value.toLowerCase();
+
+            coucheGeoCommunes.eachLayer(function(layer){
+
+                let nom = layer.feature.properties.NOM_COMM.toLowerCase();
+
+                if(nom.includes(recherche) && recherche!=""){
+
+                    map.fitBounds(layer.getBounds());
+
+                    layer.setStyle({
+                        color:"#ff0000",
+                        weight:4
+                    });
+
+                }else{
+
+                    layer.setStyle({
+                        color:"#b6b6b6",
+                        weight:1
+                    });
+
+                }
+
+            });
+
+        });
+
+},500);
 
 
 
@@ -613,4 +671,3 @@ console.log("Clés :", Object.keys(records[0]));
 </body>
 
 </html>
-
