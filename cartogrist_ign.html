@@ -135,6 +135,37 @@ const coucheDT = L.layerGroup().addTo(map);
 const coucheProjets = L.layerGroup().addTo(map);
 
 
+
+// ======================================
+// CONTROLE DES COUCHES
+// ======================================
+
+const fonds = {};
+
+const overlays = {
+
+    "🟢 Projets": coucheProjets,
+
+    "⬛ Limites DT": coucheDT,
+
+    "▫️ Communes": coucheCommunes
+
+};
+
+
+L.control.layers(
+    fonds,
+    overlays,
+    {
+        collapsed:false
+    }
+)
+.addTo(map);
+
+
+
+
+
 // ======================================
 // LEGENDE CARTOGRIST
 // ======================================
@@ -220,17 +251,10 @@ function couleurAvis(Avis){
     Avis = Avis
         .toString()
         .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+        .toLowerCase();
 
 
-
-    console.log("AVIS NORMALISE :", Avis);
-
-
-
-    if(Avis === "defavorable"){
+    if(Avis === "défavorable"){
         return "#D93025";
     }
 
@@ -248,6 +272,7 @@ function couleurAvis(Avis){
     return "#808080";
 
 }
+
 
 // ======================================
 // CHARGEMENT DES GEOJSON
