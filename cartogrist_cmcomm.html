@@ -284,17 +284,17 @@ function couleurcontractualisation(contractualisation){
         .toLowerCase();
 
 
-    if(Avis === "PVD"){
+    if(contractualisation === "PVD"){
         return "#9842b7";
     }
 
 
-    if(Avis === "VA"){
+    if(contractualisation === "VA"){
         return "#10df08";
     }
 
 
-    if(Avis === "ACV"){
+    if(contractualisation === "ACV"){
         return "#ff9a3b";
     }
 
@@ -499,7 +499,7 @@ console.log("Clés :", Object.keys(records[0]));
 
 
                         fillColor:
-                        couleurcmcomm(row.contractualisation),
+                        couleurcontractualisation(row.contractualisation),
 
 
                         fillOpacity:0.9
@@ -586,3 +586,4 @@ console.log("Clés :", Object.keys(records[0]));
 </body>
 
 </html>
+
