@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>CartoGrist IGN</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
+<style>
+
+html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+}
+
+
+#map {
+    width:100%;
+    height:100%;
+}
+
+
+.leaflet-popup-content {
+    font-size:14px;
+    line-height:1.4;
+}
+
+.legend {
+    background:white;
+    padding:12px;
+    border-radius:8px;
+    box-shadow:0 0 12px rgba(0,0,0,0.3);
+    font-size:14px;
+    line-height:1.8;
+}
+
+.legend h4 {
+    margin:0 0 8px 0;
+    font-size:15px;
+}
+
+.legend .circle {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+}
+
+.legend .line-dt {
+    display:inline-block;
+    width:22px;
+    border-top:3px solid #333;
+    margin-right:6px;
+}
+
+.legend .line-com {
+    display:inline-block;
+    width:22px;
+    border-top:1px solid #999;
+    margin-right:6px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="map"></div>
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- API Grist -->
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+
+<script>
+
+
+// ======================================
+// INITIALISATION CARTE
+// ======================================
+
+
+const map = L.map('map');
+
+
+// ======================================
+// ORDRE DES COUCHES
+// ======================================
+
+map.createPane('communesPane');
+map.getPane('communesPane').style.zIndex = 350;
+
+map.createPane('epciPane');
+map.getPane('epciPane').style.zIndex = 400;
+
+map.createPane('dtPane');
+map.getPane('dtPane').style.zIndex = 450;
+
+map.createPane('cmcommPane');
+map.getPane('cmcommPane').style.zIndex = 500;
+
+    
+// ======================================
+// FOND IGN CLASSIQUE
+// ======================================
+
+
+// Version provisoire.
+// On remplacera ensuite par le flux Plan IGN officiel.
+
+const fond = L.tileLayer(
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        maxZoom:19,
+        opacity:0.7,
+        attribution:"© CartoGrist"
+    }
+);
+
+fond.addTo(map);
+
+
+// ======================================
+// COUCHES
+// ======================================
+
+
+
+
+
+const couchecmcomm = L.layerGroup().addTo(map);
+
+    const coucheDT = L.layerGroup().addTo(map);
+
+const couchecommunes = L.layerGroup();
+    
+const coucheEPCI = L.layerGroup();
+
+
+
+// ======================================
+// CONTROLE DES COUCHES
+// ======================================
+
+const fonds = {};
+
+const overlays = {
+
+     '<span style="color:#494949">▬</span> Limites des DT': coucheDT,
+
+     '<span style="color:#9a009b">▬</span> Limites des EPCI': coucheEPCI,
+
+	'<span style="color:#b6b6b6">▬</span> Limites des communes': couchecommunes
+
+};
+
+
+L.control.layers(
+    fonds,
+    overlays,
+    {
+        collapsed:false
+    }
+)
+.addTo(map);
+
+
+
+
+
+// ======================================
+// LEGENDE CARTOGRIST
+// ======================================
+
+const legend = L.control({
+    position:'bottomright'
+});
+
+
+legend.onAdd = function(){
+
+    const div = L.DomUtil.create(
+        'div',
+        'legend'
+    );
+
+
+    div.innerHTML = `
+
+    <h4>Contractualisation</h4>
+
+
+    <span class="circle"
+    style="background:#9842b7">
+    </span>
+    PVD
+    <br>
+
+
+    <span class="circle"
+    style="background:#10df08">
+    </span>
+    VA
+    <br>
+
+
+    <span class="circle"
+    style="background:#ff9a3b">
+    </span>
+    ACV
+    <br>
+
+
+
+    `;
+
+
+    return div;
+
+};
+
+
+legend.addTo(map);
+
+const controleOpacity = L.control({position:'topright'});
+
+controleOpacity.onAdd = function(){
+
+    const div = L.DomUtil.create('div','legend');
+
+    div.innerHTML = `
+        <b>Fond de carte</b><br>
+        <input id="opacitySlider"
+               type="range"
+               min="0"
+               max="100"
+               value="70">
+    `;
+
+    return div;
+};
+
+controleOpacity.addTo(map);
+
+setTimeout(function(){
+
+    document.getElementById("opacitySlider")
+        .addEventListener("input", function(){
+
+            fond.setOpacity(this.value/100);
+
+        });
+
+},500);
+
+
+
+
+
+
+// ======================================
+// STYLE AVIS
+// ======================================
+
+
+function couleurcontractualisation(contractualisation){
+
+
+    contractualisation = contractualisation
+        .toString()
+        .trim()
+        .toLowerCase();
+
+
+    if(Avis === "PVD"){
+        return "#9842b7";
+    }
+
+
+    if(Avis === "VA"){
+        return "#10df08";
+    }
+
+
+    if(Avis === "ACV"){
+        return "#ff9a3b";
+    }
+
+
+
+}
+
+
+// ======================================
+// CHARGEMENT DES GEOJSON
+// ======================================
+
+
+
+// A remplacer par tes futures URL
+
+const urlDT = "limites_DT.geojson";
+const urlEPCI = "limites_epci.geojson";
+const urlCommunes = "communes.geojson";
+
+
+
+
+
+// DT
+
+fetch(urlDT)
+.then(response => {
+    console.log("Réponse GeoJSON DT :", response.status);
+    return response.json();
+})
+.then(data => {
+
+    console.log("GeoJSON DT chargé :", data);
+
+    L.geoJSON(
+        data,
+        {
+
+              pane:'dtPane',
+
+            style:{
+                color:"#494949",
+                weight:3,
+                fillOpacity:0
+            }
+
+        }
+
+    )
+    .addTo(coucheDT);
+
+
+});
+
+
+
+
+
+// EPCI
+
+
+fetch(urlEPCI)
+
+.then(response => response.json())
+
+.then(data => {
+
+
+    L.geoJSON(
+        data,
+        {
+
+              pane:'epciPane',
+            style:{
+                color:"#9a009b",
+                weight:2,
+                fillOpacity:0
+            }
+
+        }
+
+    )
+    .addTo(coucheEPCI);
+
+
+});
+
+
+// communes
+
+
+fetch(urlCommunes)
+
+.then(response => response.json())
+
+.then(data => {
+
+
+    L.geoJSON(
+        data,
+        {
+
+              pane:'communesPane',
+            style:{
+                color:"#b6b6b6",
+                weight:1,
+                fillOpacity:0
+            }
+
+        }
+
+    )
+    .addTo(couchecommunes);
+
+
+});
+
+
+
+
+
+// ======================================
+// CONNEXION GRIST
+// ======================================
+
+
+
+grist.ready({
+
+    requiredAccess:'read table'
+
+});
+
+
+
+
+
+grist.onRecords(function(records){
+
+records.forEach(record => {
+
+    console.log(
+        "Coordonnées :",
+        record.longitude,
+        record.latitude
+    );
+
+});
+
+
+console.log("Nombre de lignes reçues :", records.length);
+console.log("Première ligne Grist :", records[0]);
+
+ console.log(records[0]);
+console.log("Clés :", Object.keys(records[0]));
+    coucheProjets.clearLayers();
+
+
+
+    let bounds=[];
+
+
+
+    records.forEach(row=>{
+
+
+
+        if(
+            row.latitude &&
+            row.Longitude
+        ){
+
+
+
+            let lat=parseFloat(row.Latitude);
+
+            let lon=parseFloat(row.Longitude);
+
+
+
+            if(
+                !isNaN(lat)
+                &&
+                !isNaN(lon)
+            ){
+
+
+
+                let point=L.circleMarker(
+
+                    [lat,lon],
+
+                    {
+                          pane:'cmcommPane',
+
+                        radius:9,
+
+                        color:"#ffffff",
+
+                        weight:2,
+
+
+                        fillColor:
+                        couleurcmcomm(row.contractualisation),
+
+
+                        fillOpacity:0.9
+
+                    }
+
+                );
+
+
+
+
+
+                point.bindPopup(`
+
+                <b>Commune :</b>
+                ${row.commune || ""}
+
+                <br>
+
+
+                <b>DT :</b>
+                ${row.DT || ""}
+
+                <br><br>
+
+
+                <b>contractualisation :</b>
+                ${row["contractualisation"] || ""}
+
+                <br>
+
+
+                <b>nom :</b>
+                ${row["nom"] || ""}
+
+                <br>
+
+			  <b>prenom :</b>
+                ${row["prenom"] || ""}
+
+                <br>
+             
+
+
+                `);
+
+
+
+                point.addTo(couchecmcomm);
+
+
+                bounds.push([lat,lon]);
+
+            }
+
+
+        }
+
+
+
+    });
+
+
+
+
+    // zoom automatique
+
+    if(bounds.length>0){
+
+        map.fitBounds(bounds);
+
+    }
+
+
+
+});
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
