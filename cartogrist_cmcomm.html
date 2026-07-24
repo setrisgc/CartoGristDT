@@ -435,6 +435,8 @@ grist.ready({
 
 grist.onRecords(function(records){
 
+
+
 records.forEach(record => {
 
     console.log(
@@ -458,16 +460,19 @@ console.log("Clés :", Object.keys(records[0]));
     let bounds=[];
 
 
-
-    records.forEach(row=>{
-
+records.forEach(row=>{
 
 
-        if(
-            row.latitude &&
-            row.longitude
-        ){
+    // Ignore les communes sans contractualisation
+    if (!row.contractualisation || row.contractualisation.trim() === "") {
+        return;
+    }
 
+
+    if(
+        row.latitude &&
+        row.longitude
+    ){
 
 
             let lat=parseFloat(row.latitude);
