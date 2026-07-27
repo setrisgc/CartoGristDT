@@ -190,55 +190,6 @@ L.control.layers(
 // LEGENDE CARTOGRIST
 // ======================================
 
-const legend = L.control({
-    position:'bottomright'
-});
-
-
-legend.onAdd = function(){
-
-    const div = L.DomUtil.create(
-        'div',
-        'legend'
-    );
-
-
-    div.innerHTML = `
-
-    <h4>Contractualisation</h4>
-
-
-    <span class="circle"
-    style="background:#9842b7">
-    </span>
-    PVD
-    <br>
-
-
-    <span class="circle"
-    style="background:#10df08">
-    </span>
-    VA
-    <br>
-
-
-    <span class="circle"
-    style="background:#ff9a3b">
-    </span>
-    ACV
-    <br>
-
-
-
-    `;
-
-
-    return div;
-
-};
-
-
-legend.addTo(map);
 
 const controleOpacity = L.control({position:'topright'});
 
