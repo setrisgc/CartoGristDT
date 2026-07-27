@@ -140,12 +140,9 @@ fond.addTo(map);
 
 
 
+const couchecmcomm = L.layerGroup().addTo(map);
 
-const coucheACV = L.layerGroup().addTo(map);
-const couchePVD = L.layerGroup().addTo(map);
-const coucheVA = L.layerGroup().addTo(map);
-
-const coucheDT = L.layerGroup().addTo(map);
+    const coucheDT = L.layerGroup().addTo(map);
 
 const couchecommunes = L.layerGroup();
     
@@ -157,39 +154,27 @@ const coucheEPCI = L.layerGroup();
 // CONTROLE DES COUCHES
 // ======================================
 
-
-let controleCouches;
-
-
 const fonds = {};
 
 const overlays = {
 
-'<span style="color:#494949">▬</span> Limites des DT': coucheDT,
+     '<span style="color:#494949">▬</span> Limites des DT': coucheDT,
 
-'<span style="color:#9a009b">▬</span> Limites des EPCI': coucheEPCI,
+     '<span style="color:#9a009b">▬</span> Limites des EPCI': coucheEPCI,
 
-'<span style="color:#b6b6b6">▬</span> Limites des communes': couchecommunes,
-
-'<span style="color:#ff9a3b">●</span> ACV' : coucheACV,
-
-'<span style="color:#9842b7">●</span> PVD' : couchePVD,
-
-'<span style="color:#10df08">●</span> VA' : coucheVA
-
+	'<span style="color:#b6b6b6">▬</span> Limites des communes': couchecommunes
 
 };
 
 
-controleCouches = L.control.layers(
+L.control.layers(
     fonds,
     overlays,
     {
         collapsed:false
     }
-);
-
-controleCouches.addTo(map);
+)
+.addTo(map);
 
 
 
@@ -199,6 +184,55 @@ controleCouches.addTo(map);
 // LEGENDE CARTOGRIST
 // ======================================
 
+const legend = L.control({
+    position:'bottomright'
+});
+
+
+legend.onAdd = function(){
+
+    const div = L.DomUtil.create(
+        'div',
+        'legend'
+    );
+
+
+    div.innerHTML = `
+
+    <h4>Contractualisation</h4>
+
+
+    <span class="circle"
+    style="background:#9842b7">
+    </span>
+    PVD
+    <br>
+
+
+    <span class="circle"
+    style="background:#10df08">
+    </span>
+    VA
+    <br>
+
+
+    <span class="circle"
+    style="background:#ff9a3b">
+    </span>
+    ACV
+    <br>
+
+
+
+    `;
+
+
+    return div;
+
+};
+
+
+legend.addTo(map);
 
 const controleOpacity = L.control({position:'topright'});
 
@@ -419,18 +453,11 @@ console.log("Première ligne Grist :", records[0]);
 
  console.log(records[0]);
 console.log("Clés :", Object.keys(records[0]));
-couchePVD.clearLayers();
-coucheACV.clearLayers();
-coucheVA.clearLayers();
+    couchecmcomm.clearLayers();
 
 
 
     let bounds=[];
-
-let nbPVD = 0;
-let nbACV = 0;
-let nbVA = 0;
-
 
 
 records.forEach(row=>{
@@ -529,23 +556,7 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 
 
 
-               switch(row.contractualisation.trim().toUpperCase()){  
-
-  case "PVD":
-        nbPVD++;
-        point.addTo(couchePVD);
-        break;
-
-    case "ACV":
-        nbACV++;
-        point.addTo(coucheACV);
-        break;
-
-    case "VA":
-        nbVA++;
-        point.addTo(coucheVA);
-        break;
-};
+                point.addTo(couchecmcomm);
 
 
                 bounds.push([lat,lon]);
