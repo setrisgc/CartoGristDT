@@ -385,6 +385,34 @@ grist.ready({
 });
 
 
+function creerEtoile(lat, lon) {
+
+    return L.marker([lat, lon], {
+
+        pane: 'cmcommPane',
+
+        icon: L.divIcon({
+
+            className: '',
+
+            html: `
+                <svg width="28" height="28" viewBox="0 0 100 100">
+                    <polygon
+                        points="50,5 61,38 95,38 67,58 78,91 50,71 22,91 33,58 5,38 39,38"
+                        fill="none"
+                        stroke="#000000"
+                        stroke-width="7"/>
+                </svg>
+            `,
+
+            iconSize:[28,28],
+            iconAnchor:[14,14]
+
+        })
+
+    });
+
+}
 
 
 
@@ -528,9 +556,14 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
         break;
 }
 
+if (
+    row.communes_interessees &&
+    row.communes_interessees.trim().toLowerCase() === "oui"
+) {
+    creerEtoile(lat, lon).addTo(map);
+}
 
-
-                bounds.push([lat,lon]);
+bounds.push([lat,lon]);
 
             }
 
