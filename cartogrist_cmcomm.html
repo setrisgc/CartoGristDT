@@ -512,6 +512,11 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 
                 <br>
 
+				 <b>Arrondissement:</b>
+                ${row.arrondissement || ""}
+
+                <br>
+
 
                 <b>DT :</b>
                 ${row.DT || ""}
@@ -525,16 +530,23 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
                 <br>
 
 
-                <b>nom :</b>
+                <b>Nom :</b>
                 ${row["nom"] || ""}
 
                 <br>
 
-			  <b>prenom :</b>
+			  <b>Prénom :</b>
                 ${row["prenom"] || ""}
 
                 <br>
+
+				<b>Retour questionnaire :</b>
+                ${row["retour_questionnaire"] || ""}
+
+                <br>
              
+				<b>Contact sous-préfets :</b>
+                ${row["contact_sous_prefet"] || ""}
 
 
                 `);
