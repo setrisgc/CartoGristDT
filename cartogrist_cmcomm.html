@@ -116,20 +116,18 @@ map.getPane('cmcommPane').style.zIndex = 500;
 // FOND IGN CLASSIQUE
 // ======================================
 
-
-// Version provisoire.
-// On remplacera ensuite par le flux Plan IGN officiel.
-
-const fond = L.tileLayer(
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+	const fond = L.tileLayer(
+    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
     {
-        maxZoom:19,
-        opacity:0.7,
-        attribution:"© CartoGrist"
+        maxZoom:22,
+        maxNativeZoom:19,
+        attribution:'© IGN - Géoplateforme'
     }
 );
 
 fond.addTo(map);
+
+
 
 
 // ======================================
