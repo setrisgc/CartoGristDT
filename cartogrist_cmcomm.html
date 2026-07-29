@@ -111,9 +111,11 @@ map.getPane('dtPane').style.zIndex = 450;
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex=500;
 
+map.createPane('interesseesPane');
+map.getPane('interesseesPane').style.zIndex = 550;
 
 map.createPane('cmcommPane');
-map.getPane('cmcommPane').style.zIndex = 550;
+map.getPane('cmcommPane').style.zIndex = 600;
 
     
 // ======================================
@@ -144,6 +146,8 @@ const couchePVD = L.layerGroup().addTo(map);
 const coucheACV = L.layerGroup().addTo(map);
 const coucheVA  = L.layerGroup().addTo(map);
 
+const coucheCommunesInteressees = L.layerGroup().addTo(map);
+
 const couchearrondissement = L.layerGroup().addTo(map);
 
 const coucheDT = L.layerGroup();
@@ -167,6 +171,8 @@ const overlays = {
     '<span style="color:#ff9a3b">●</span> Action Cœur de Ville' : coucheACV,
 
     '<span style="color:#10df08">●</span> Village d Avenir' : coucheVA,
+
+    '<span style="color:#ff0000">●</span> Communes intéressées' : couchecommunesinteressees,
 
 	'<span style="color:#bf4bb5">●</span> Limites des arrondissements' : couchearrondissement,
 
@@ -452,10 +458,11 @@ console.log("Première ligne Grist :", records[0]);
 
  console.log(records[0]);
 console.log("Clés :", Object.keys(records[0]));
+
 couchePVD.clearLayers();
 coucheACV.clearLayers();
 coucheVA.clearLayers();
-
+couchecommunesinteressees.clearLayers();
 
 
     let bounds=[];
@@ -490,6 +497,38 @@ records.forEach(row=>{
 
 
 
+// Cercle rouge communes intéressées
+
+if(
+    row.communes_interessees &&
+    row.communes_interessees.toString().trim().toLowerCase() === "oui"
+){
+
+    L.circleMarker(
+        [lat,lon],
+        {
+            pane:'interesseesPane',
+
+            radius:12,
+
+            color:"#ff0000",
+
+            weight:3,
+
+            fillColor:"#ffffff",
+
+            fillOpacity:0.5
+
+        }
+
+    )
+    .addTo(coucheCommunesInteressees);
+
+}
+
+//////
+
+
 console.log("Valeur contractualisation :", row.contractualisation);
 console.log("Couleur calculée :", couleurcontractualisation(row.contractualisation));
 
@@ -500,7 +539,7 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
                     {
                           pane:'cmcommPane',
 
-                        radius:9,
+                        radius:7,
 
                         color:"#ffffff",
 
