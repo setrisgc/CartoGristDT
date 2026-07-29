@@ -557,12 +557,17 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 }
 
 
-console.log(Object.keys(row));
+console.log(
+    row.commune,
+    row.communes_interessees
+);
 
 if (
-    row.communes_interessees &&
-    row.communes_interessees.trim().toLowerCase() === "oui"
+    String(row.communes_interessees)
+        .trim()
+        .toLowerCase() === "oui"
 ) {
+    console.log("⭐ étoile :", row.commune);
     creerEtoile(lat, lon).addTo(map);
 }
 
