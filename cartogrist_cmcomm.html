@@ -167,31 +167,6 @@ const couchecommunesinteressees = L.layerGroup().addTo(map);
 // CONTROLE DES COUCHES
 // ======================================
 
-const overlayMaps = {
-
-    "Arrondissements": couchearrondissement,
-
-    "DT": coucheDT,
-
-    "EPCI": coucheEPCI,
-
-    "Communes": couchecommunes,
-
-    "PVD": couchePVD,
-
-    "ACV": coucheACV,
-
-    "VA": coucheVA,
-
-    "Communes intéressées": couchecommunesinteressees
-
-};
-
-
-L.control.layers(null, overlayMaps)
-.addTo(map);
-
-
 
 
 // ======================================
