@@ -197,7 +197,7 @@ const coucheCommunesInteressees = L.layerGroup().addTo(map);
 
 grist.onRecords(function(records){
 
-    console.log(records[0]);
+console.log(Object.keys(records[0]));
 
 console.log("Nombre de lignes Grist :", records.length);
 
