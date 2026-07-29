@@ -515,7 +515,7 @@ if(
         }
 
     )
-    .addTo(coucheCommunesInteressees);
+    .addTo(couchecommunesinteressees);
 
 }
 
@@ -589,7 +589,7 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 
 
 
-                switch (row.contractualisation.trim().toUpperCase()) {
+                switch ((row.contractualisation || "").trim().toUpperCase()) {
 
     case "PVD":
         point.addTo(couchePVD);
