@@ -534,21 +534,27 @@ function contenuPopup(row){
 let couleur = couleurcontractualisation(row.contractualisation);
 
 
+let titre = row.contractualisation 
+    ? row.contractualisation
+    : "Commune intéressée";
+
+
 return `
 
 <div style="
 background:${couleur};
 color:white;
-padding:5px;
+padding:6px;
 border-radius:5px;
 font-weight:bold;
-margin-bottom:8px;
+margin-bottom:10px;
+text-align:center;
 ">
 
-${row.contractualisation || "Commune intéressée"}
+${titre}
 
 </div>
-`
+
 
 <b>Commune :</b>
 ${row.commune || ""}
@@ -581,7 +587,6 @@ ${row.prenom || ""}
 `;
 
 }
-
 
 // ======================================
 // RECEPTION DES DONNEES GRIST
