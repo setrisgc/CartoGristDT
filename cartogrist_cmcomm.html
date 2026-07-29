@@ -108,8 +108,12 @@ map.getPane('epciPane').style.zIndex = 400;
 map.createPane('dtPane');
 map.getPane('dtPane').style.zIndex = 450;
 
+map.createPane("arrondissementPane");
+map.getPane("arrondissementPane").style.zIndex=500;
+
+
 map.createPane('cmcommPane');
-map.getPane('cmcommPane').style.zIndex = 500;
+map.getPane('cmcommPane').style.zIndex = 550;
 
     
 // ======================================
@@ -140,7 +144,9 @@ const couchePVD = L.layerGroup().addTo(map);
 const coucheACV = L.layerGroup().addTo(map);
 const coucheVA  = L.layerGroup().addTo(map);
 
-const coucheDT = L.layerGroup().addTo(map);
+const couchearrondissement = L.layerGroup().addTo(map);
+
+const coucheDT = L.layerGroup();
 
 const couchecommunes = L.layerGroup();
     
@@ -161,6 +167,8 @@ const overlays = {
     '<span style="color:#ff9a3b">●</span> Action Cœur de Ville' : coucheACV,
 
     '<span style="color:#10df08">●</span> Village d Avenir' : coucheVA,
+
+	'<span style="color:#bf4bb5">●</span> Limites des arrondissements' : couchearrondissement,
 
     '<span style="color:#494949">▬</span> Limites des DT' : coucheDT,
 
@@ -264,11 +272,47 @@ function couleurcontractualisation(contractualisation){
 
 
 
-// A remplacer par tes futures URL
-
+const urlarrondissement = "arrondissement.geojson";
 const urlDT = "limites_DT.geojson";
 const urlEPCI = "limites_epci.geojson";
 const urlCommunes = "communes.geojson";
+
+
+
+// arrondissement
+
+fetch(urlarrondissement)
+.then(response => {
+    console.log("Réponse GeoJSON arrondissement :", response.status);
+    return response.json();
+})
+.then(data => {
+
+    console.log("GeoJSON arrondissemenent chargé :", data);
+
+    L.geoJSON(
+        data,
+        {
+
+              pane:'arrondissementPane',
+
+            style:{
+                color:"#bf4bb5",
+                weight:4,
+                fillOpacity:0
+            }
+
+        }
+
+    )
+    .addTo(couchearrondissement);
+
+
+});
+
+
+
+
 
 
 
@@ -385,34 +429,6 @@ grist.ready({
 });
 
 
-function creerEtoile(lat, lon) {
-
-    return L.marker([lat, lon], {
-
-        pane: 'cmcommPane',
-
-        icon: L.divIcon({
-
-            className: '',
-
-            html: `
-                <svg width="28" height="28" viewBox="0 0 100 100">
-                    <polygon
-                        points="50,5 61,38 95,38 67,58 78,91 50,71 22,91 33,58 5,38 39,38"
-                        fill="none"
-                        stroke="#000000"
-                        stroke-width="7"/>
-                </svg>
-            `,
-
-            iconSize:[28,28],
-            iconAnchor:[14,14]
-
-        })
-
-    });
-
-}
 
 
 
@@ -512,41 +528,29 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 
                 <br>
 
-				 <b>Arrondissement:</b>
-                ${row.arrondissement || ""}
-
-                <br>
-
 
                 <b>DT :</b>
                 ${row.DT || ""}
 
+                <br><br>
+
+
+                <b>contractualisation :</b>
+                ${row["contractualisation"] || ""}
+
                 <br>
 
 
-                <b>EPCI :</b>
-                ${row["EPCI"] || ""}
-
-                <br>  <br>
-
-
-                <b>Nom :</b>
+                <b>nom :</b>
                 ${row["nom"] || ""}
 
                 <br>
 
-			  <b>Prénom :</b>
+			  <b>prenom :</b>
                 ${row["prenom"] || ""}
-
-                <br>  <br>
-
-				<b>Retour questionnaire :</b>
-                ${row["retour_questionnaire"] || ""}
 
                 <br>
              
-				<b>Contact sous-préfets :</b>
-                ${row["contact_sous_prefet"] || ""}
 
 
                 `);
@@ -568,14 +572,9 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
         break;
 }
 
-if (
-    row.communes_interessees &&
-    row.communes_interessees.trim().toLowerCase() === "oui"
-) {
-    creerEtoile(lat, lon).addTo(map);
-}
 
-bounds.push([lat,lon]);
+
+                bounds.push([lat,lon]);
 
             }
 
