@@ -101,47 +101,55 @@ fetch(urlCommunes)
 
 .then(data => {
 
-    // Calcul de l'emprise pour le zoom
+    // Zoom sur toutes les communes
     const limites = L.geoJSON(data);
-
     map.fitBounds(limites.getBounds());
 
-    // Affichage des communes
-    L.geoJSON(data, {
+    // Couche des communes
+    const communes = L.geoJSON(data, {
 
         pane: "communesPane",
 
-        style: function(feature){
-
-            return {
-
-                color:"#666666",
-                weight:1,
-                fillColor:"#f7f7f7",
-                fillOpacity:0.35
-
-            };
-
+        style: {
+            color: "#666666",
+            weight: 1,
+            fillColor: "#f7f7f7",
+            fillOpacity: 0.35
         },
 
         onEachFeature: function(feature, layer){
 
-            // Nom de la commune
             layer.bindTooltip(
-
                 feature.properties.NOM_COMM,
-
                 {
-                    permanent:true,
-                    direction:"center",
-                    className:"labelCommune"
+                    permanent: true,
+                    direction: "center",
+                    className: "labelCommune"
                 }
-
             );
 
         }
 
-    }).addTo(coucheCommunes);
+    });
+
+    communes.addTo(coucheCommunes);
+
+    // Affiche ou masque les étiquettes selon le zoom
+    function majEtiquettes(){
+
+        const afficher = map.getZoom() >= 11;
+
+        document.querySelectorAll(".labelCommune").forEach(function(etiquette){
+
+            etiquette.style.display = afficher ? "" : "none";
+
+        });
+
+    }
+
+    majEtiquettes();
+
+    map.on("zoomend", majEtiquettes);
 
 })
 
@@ -151,7 +159,10 @@ fetch(urlCommunes)
 
 });
 
+
 </script>
 
+
 </body>
+
 </html>
