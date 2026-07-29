@@ -53,6 +53,18 @@ html, body {
     margin-right:6px;
 }
 
+.legend .circle-interesse {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+    background:rgba(255,0,0,0.15);
+    border:3px solid #ff0000;
+    box-sizing:border-box;
+}
+
+
 .legend .line-dt {
     display:inline-block;
     width:22px;
@@ -204,10 +216,7 @@ controleLegende.onAdd = function(){
                 Village d'Avenir
             </div>
 
-            <div>
-                <span class="circle" style="background:#ff0000"></span>
-                Commune intéressée
-            </div>
+<div> <span class="circle-interesse"></span> Commune intéressée </div>
 
             <hr>
 
@@ -453,7 +462,7 @@ ${row.commune || "Commune"}
 
 </div>
 
-<b>Arrondissement :</b>
+<b>arrondissement :</b>
 ${row.arrondissement || ""}
 
 <br>
