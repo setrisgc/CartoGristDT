@@ -102,12 +102,6 @@ const map = L.map('map');
 map.createPane('communesPane');
 map.getPane('communesPane').style.zIndex = 350;
 
-map.createPane('epciPane');
-map.getPane('epciPane').style.zIndex = 400;
-
-map.createPane('dtPane');
-map.getPane('dtPane').style.zIndex = 450;
-
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex=500;
 
@@ -147,9 +141,6 @@ const couchearrondissement = L.layerGroup().addTo(map);
 
 const couchecommunes = L.layerGroup();
 
-const coucheDT = L.layerGroup().addTo(map);
-
-const coucheEPCI = L.layerGroup().addTo(map);
 
 const couchePVD = L.layerGroup().addTo(map);
 
@@ -329,8 +320,6 @@ controleLegende.addTo(map);
 
 
 const urlarrondissement = "arrondissement.geojson";
-const urlDT = "limites_DT.geojson";
-const urlEPCI = "limites_epci.geojson";
 const urlCommunes = "communes.geojson";
 
 
@@ -366,77 +355,6 @@ fetch(urlarrondissement)
 
 });
 
-
-
-
-
-
-
-
-
-// DT
-
-fetch(urlDT)
-.then(response => {
-    console.log("Réponse GeoJSON DT :", response.status);
-    return response.json();
-})
-.then(data => {
-
-    console.log("GeoJSON DT chargé :", data);
-
-    L.geoJSON(
-        data,
-        {
-
-              pane:'dtPane',
-
-            style:{
-                color:"#494949",
-                weight:3,
-                fillOpacity:0
-            }
-
-        }
-
-    )
-    .addTo(coucheDT);
-
-
-});
-
-
-
-
-
-// EPCI
-
-
-fetch(urlEPCI)
-
-.then(response => response.json())
-
-.then(data => {
-
-
-    L.geoJSON(
-        data,
-        {
-
-              pane:'epciPane',
-            style:{
-                color:"#9a009b",
-                weight:2,
-                fillOpacity:0
-            }
-
-        }
-
-    )
-    .addTo(coucheEPCI);
-
-
-});
 
 
 // communes
@@ -622,7 +540,7 @@ records.forEach(row=>{
                     {
                         pane:'interesseesPane',
 
-                        radius:11,
+                        radius:8,
 
                         color:"#ff0000",
 
