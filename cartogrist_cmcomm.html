@@ -246,6 +246,10 @@ setTimeout(function(){
 
 function couleurcontractualisation(contractualisation){
 
+    if(!contractualisation){
+        return "#999999";
+    }
+
 
     contractualisation = contractualisation
         .toString()
@@ -268,6 +272,7 @@ function couleurcontractualisation(contractualisation){
     }
 
 
+    return "#999999";
 
 }
 
