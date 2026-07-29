@@ -12,38 +12,58 @@ href="https://unpkg.com/leaflet/dist/leaflet.css">
 <style>
 
 html, body {
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
+ margin:0;
+ padding:0;
+ width:100%;
+ height:100%;
 }
 
 #map{
-    width:100%;
-    height:100%;
+ width:100%;
+ height:100%;
 }
 
 /* Etiquettes des communes */
 
 .labelCommune{
 
-    background:transparent !important;
-    border:none !important;
-    box-shadow:none !important;
+ background:transparent !important;
+ border:none !important;
+ box-shadow:none !important;
 
-    color:#444;
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:7px;
-    font-weight:bold;
+ color:#444;
+ font-family:Arial, Helvetica, sans-serif;
+ font-size:7px;
+ font-weight:bold;
 
-    text-shadow:
-        1px 1px 2px white,
-       -1px -1px 2px white,
-        1px -1px 2px white,
-       -1px 1px 2px white;
+ text-shadow:
+ 1px 1px 2px white,
+ -1px -1px 2px white,
+ 1px -1px 2px white,
+ -1px 1px 2px white;
 
-    pointer-events:none;
+ pointer-events:none;
 }
+
+.legend .circle-interesse {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+    background:rgba(255,0,0,0.15);
+    border:3px solid #ff0000;
+    box-sizing:border-box;
+}
+
+.legend .circle {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+}
+
 
 </style>
 
@@ -290,6 +310,7 @@ controleLegende.addTo(map);
 
 
 const urlarrondissement = "arrondissement.geojson";
+const urlCommunes = "communes.geojson";
 
 
 // arrondissement
@@ -368,7 +389,7 @@ fetch(urlCommunes)
 
     });
 
-    communes.addTo(coucheCommunes);
+    communes.addTo(couchecommunes);
 
 
 ///-------------ETIQUETTES---//////
@@ -379,7 +400,7 @@ fetch(urlCommunes)
     // Affiche ou masque les étiquettes selon le zoom
     function majEtiquettes(){
 
-        const afficher = map.getZoom() >= 11;
+        const afficher = map.getZoom() >= 12;
 
         document.querySelectorAll(".labelCommune").forEach(function(etiquette){
 
@@ -409,11 +430,7 @@ fetch(urlCommunes)
 // ======================================
 
 
-grist.ready({
 
-    requiredAccess:'read table'
-
-});
 
 
 // ======================================
