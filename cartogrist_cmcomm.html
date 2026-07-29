@@ -146,6 +146,18 @@ const couchearrondissement = L.layerGroup().addTo(map);
 
 
 const couchecommunes = L.layerGroup();
+
+const coucheDT = L.layerGroup().addTo(map);
+
+const coucheEPCI = L.layerGroup().addTo(map);
+
+const couchePVD = L.layerGroup().addTo(map);
+
+const coucheACV = L.layerGroup().addTo(map);
+
+const coucheVA = L.layerGroup().addTo(map);
+
+const couchecommunesinteressees = L.layerGroup().addTo(map);
     
 
 
@@ -155,7 +167,29 @@ const couchecommunes = L.layerGroup();
 // CONTROLE DES COUCHES
 // ======================================
 
+const overlayMaps = {
 
+    "Arrondissements": couchearrondissement,
+
+    "DT": coucheDT,
+
+    "EPCI": coucheEPCI,
+
+    "Communes": couchecommunes,
+
+    "PVD": couchePVD,
+
+    "ACV": coucheACV,
+
+    "VA": coucheVA,
+
+    "Communes intéressées": couchecommunesinteressees
+
+};
+
+
+L.control.layers(null, overlayMaps)
+.addTo(map);
 
 
 
@@ -165,6 +199,13 @@ const couchecommunes = L.layerGroup();
 // LEGENDE CARTOGRIST REPLIABLE
 // ======================================
 
+const controleLegende = L.control({
+    position:'topright'
+});
+
+
+
+
 controleLegende.onAdd = function(){
 
     const div = L.DomUtil.create('div','legend');
@@ -173,7 +214,7 @@ controleLegende.onAdd = function(){
 
         <div id="titreLegende"
              style="cursor:pointer;font-weight:bold;">
-            📌 Légende ▼
+             📌 Légende ▼
         </div>
 
         <div id="contenuLegende"
@@ -204,14 +245,18 @@ controleLegende.onAdd = function(){
             <b>Couches</b><br>
 
             <label>
-                <input type="checkbox" id="chkArrondissement" checked>
+                <input type="checkbox"
+                       id="chkArrondissement"
+                       checked>
                 Arrondissements
             </label>
 
             <br>
 
             <label>
-                <input type="checkbox" id="chkCommunes" checked>
+                <input type="checkbox"
+                       id="chkCommunes"
+                       checked>
                 Communes
             </label>
 
@@ -233,10 +278,6 @@ controleLegende.onAdd = function(){
     // Empêche les clics de se propager à la carte
     L.DomEvent.disableClickPropagation(div);
 
-    // ==========================
-    // Ouverture / fermeture
-    // ==========================
-
     const titre = div.querySelector("#titreLegende");
     const contenu = div.querySelector("#contenuLegende");
 
@@ -256,61 +297,51 @@ controleLegende.onAdd = function(){
 
     };
 
-    // ==========================
-    // Transparence du fond IGN
-    // ==========================
-
+    // Curseur de transparence
     div.querySelector("#opacitySlider")
-    .addEventListener("input", function(){
+        .addEventListener("input",function(){
 
-        fond.setOpacity(this.value/100);
+            fond.setOpacity(this.value/100);
 
-    });
+        });
 
-    // ==========================
-    // Arrondissements
-    // ==========================
-
+    // Case Arrondissements
     div.querySelector("#chkArrondissement")
-    .addEventListener("change", function(){
+        .addEventListener("change",function(){
 
-        if(this.checked){
+            if(this.checked){
 
-            map.addLayer(couchearrondissement);
+                map.addLayer(couchearrondissement);
 
-        }else{
+            }else{
 
-            map.removeLayer(couchearrondissement);
+                map.removeLayer(couchearrondissement);
 
-        }
+            }
 
-    });
+        });
 
-    // ==========================
-    // Communes
-    // ==========================
-
+    // Case Communes
     div.querySelector("#chkCommunes")
-    .addEventListener("change", function(){
+        .addEventListener("change",function(){
 
-        if(this.checked){
+            if(this.checked){
 
-            map.addLayer(couchecommunes);
+                map.addLayer(couchecommunes);
 
-        }else{
+            }else{
 
-            map.removeLayer(couchecommunes);
+                map.removeLayer(couchecommunes);
 
-        }
+            }
 
-    });
+        });
 
     return div;
 
 };
 
 controleLegende.addTo(map);
-
 
 
 // ======================================
@@ -479,6 +510,33 @@ grist.ready({
 // CONTENU DES INFOS BULLES
 // ======================================
 
+function couleurcontractualisation(valeur){
+
+    let v = (valeur || "")
+        .toString()
+        .trim()
+        .toUpperCase();
+
+
+    if(v==="PVD"){
+        return "#9842b7";
+    }
+
+    if(v==="ACV"){
+        return "#ff9a3b";
+    }
+
+    if(v==="VA"){
+        return "#10df08";
+    }
+
+
+    return "#777777";
+
+}
+
+
+
 
 function contenuPopup(row){
 
@@ -516,8 +574,12 @@ ${row.commune || ""}
 <b>arrondissement :</b>
 ${row.arrondissement || ""}
 
+<br>
+
 <b>DT :</b>
 ${row.DT || ""}
+
+<br>
 
 <b>EPCI :</b>
 ${row.EPCI || ""}
@@ -697,15 +759,15 @@ records.forEach(row=>{
 
 // zoom automatique
 
-if(bounds.length>0){
+if(bounds.length>0 && !map._initialZoom){
 
     map.fitBounds(bounds);
 
+    map._initialZoom=true;
+
 }
 
-
-});
-
+}); // <-- fermeture grist.onRecords </script> 
 
 
 </script>
