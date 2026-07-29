@@ -154,7 +154,7 @@ fetch(urlArrondissements)
             color:"#0055aa",
             weight:4,
             fillColor:"#a500a7",
-            fillOpacity:0
+            fillOpacity:0.10
         },
 
 
@@ -199,10 +199,23 @@ grist.onRecords(function(records){
 
     console.log(records[0]);
 
+console.log("Nombre de lignes Grist :", records.length);
+
+console.log("Valeur communes_interessees :", records.map(r => r.communes_interessees));
+
+
+
     coucheCommunesInteressees.clearLayers();
 
 
     records.forEach(function(record){
+
+  console.log(
+        record.Commune,
+        record.communes_interessees,
+        record.latitude,
+        record.longitude
+    );
 
 
         if(String(record.communes_interessees).toLowerCase().trim() === "oui"){
@@ -262,7 +275,7 @@ fetch(urlCommunes)
             color: "#666666",
             weight: 1,
             fillColor: "#f7f7f7",
-            fillOpacity: 0
+            fillOpacity: 0.35
         },
 
         onEachFeature: function(feature, layer){
