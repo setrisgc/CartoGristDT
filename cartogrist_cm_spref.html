@@ -33,7 +33,7 @@ html, body {
 
     color:#444;
     font-family:Arial, Helvetica, sans-serif;
-    font-size:8px;
+    font-size:10px;
     font-weight:bold;
 
     text-shadow:
@@ -73,9 +73,12 @@ const map = L.map("map",{
 // PANES
 // ======================================
 
+map.createPane("arrondissementsPane");
+map.getPane("arrondissementsPane").style.zIndex=450;
+
+
 map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex=400;
-
 // ======================================
 // COUCHE COMMUNES
 // ======================================
@@ -88,6 +91,63 @@ const coucheCommunes=L.layerGroup().addTo(map);
 
 
 const urlCommunes="communes.geojson";
+
+const urlArrondissements = "arrondissement.geojson";
+
+
+// ======================================
+// CHARGEMENT DES ARRONDISSEMENTS
+// ======================================
+
+fetch(urlArrondissements)
+
+.then(response => response.json())
+
+.then(data => {
+
+
+    const arrondissements = L.geoJSON(data, {
+
+        pane:"arrondissementsPane",
+
+        style:{
+            color:"#0055aa",
+            weight:2,
+            fillColor:"#4da6ff",
+            fillOpacity:0.10
+        },
+
+
+        onEachFeature:function(feature, layer){
+
+
+            layer.bindTooltip(
+                feature.properties.NOM,
+                {
+                    permanent:false,
+                    direction:"center"
+                }
+            );
+
+
+        }
+
+
+    });
+
+
+    arrondissements.addTo(map);
+
+
+})
+
+.catch(function(error){
+
+    console.log("Erreur GeoJSON arrondissements :",error);
+
+});
+
+
 
 
 
