@@ -142,19 +142,12 @@ fond.addTo(map);
 
 
 
-const couchePVD = L.layerGroup().addTo(map);
-const coucheACV = L.layerGroup().addTo(map);
-const coucheVA  = L.layerGroup().addTo(map);
-
-const couchecommunesinteressees = L.layerGroup().addTo(map);
-
 const couchearrondissement = L.layerGroup().addTo(map);
 
-const coucheDT = L.layerGroup();
 
 const couchecommunes = L.layerGroup();
     
-const coucheEPCI = L.layerGroup();
+
 
 
 
@@ -162,25 +155,6 @@ const coucheEPCI = L.layerGroup();
 // CONTROLE DES COUCHES
 // ======================================
 
-const fonds = {};
-
-const overlays = {
-
-	'<span style="color:#141f72">▬</span> Arrondissements' : couchearrondissement,
-
-    '<span style="color:#b6b6b6">▬</span> Communes' : couchecommunes
-
-};
-
-
-L.control.layers(
-    fonds,
-    overlays,
-    {
-        collapsed:false
-    }
-)
-.addTo(map);
 
 
 
@@ -191,162 +165,152 @@ L.control.layers(
 // LEGENDE CARTOGRIST REPLIABLE
 // ======================================
 
-
-const controleLegende = L.control({
-    position:'topright'
-});
-
-
 controleLegende.onAdd = function(){
 
     const div = L.DomUtil.create('div','legend');
 
-
     div.innerHTML = `
 
-        <div id="titreLegende" 
+        <div id="titreLegende"
              style="cursor:pointer;font-weight:bold;">
-             
-             📌 Légende
-             
+            📌 Légende ▼
         </div>
 
-
-        <div id="contenuLegende" style="display:none;margin-top:8px;">
-
-
-            <div>
-            <span class="circle"
-            style="background:#9842b7"></span>
-            Petite Ville de Demain
-            </div>
-
+        <div id="contenuLegende"
+             style="display:none;margin-top:8px;">
 
             <div>
-            <span class="circle"
-            style="background:#ff9a3b"></span>
-            Action Cœur de Ville
+                <span class="circle" style="background:#9842b7"></span>
+                Petite Ville de Demain
             </div>
-
 
             <div>
-            <span class="circle"
-            style="background:#10df08"></span>
-            Village d'Avenir
+                <span class="circle" style="background:#ff9a3b"></span>
+                Action Cœur de Ville
             </div>
-
 
             <div>
-            <span class="circle"
-            style="background:#ff0000"></span>
-            Commune intéressée
+                <span class="circle" style="background:#10df08"></span>
+                Village d'Avenir
             </div>
 
+            <div>
+                <span class="circle" style="background:#ff0000"></span>
+                Commune intéressée
+            </div>
 
             <hr>
 
+            <b>Couches</b><br>
+
+            <label>
+                <input type="checkbox" id="chkArrondissement" checked>
+                Arrondissements
+            </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox" id="chkCommunes" checked>
+                Communes
+            </label>
+
+            <hr>
 
             <b>Fond de carte</b><br>
 
-            <input id="opacitySlider"
-                   type="range"
-                   min="0"
-                   max="100"
-                   value="70">
+            <input
+                id="opacitySlider"
+                type="range"
+                min="0"
+                max="100"
+                value="70">
 
         </div>
 
     `;
 
-
-    // évite que le clic se propage à la carte
+    // Empêche les clics de se propager à la carte
     L.DomEvent.disableClickPropagation(div);
 
-
-    // ouverture / fermeture
+    // ==========================
+    // Ouverture / fermeture
+    // ==========================
 
     const titre = div.querySelector("#titreLegende");
-
     const contenu = div.querySelector("#contenuLegende");
 
+    titre.onclick = function(){
 
-titre.onclick = function(){
+        if(contenu.style.display==="none"){
 
-    if(contenu.style.display === "none"){
+            contenu.style.display="block";
+            titre.innerHTML="📌 Légende ▲";
 
-        contenu.style.display="block";
-        titre.innerHTML="📌 Légende ▲";
+        }else{
 
-    }
-    else{
+            contenu.style.display="none";
+            titre.innerHTML="📌 Légende ▼";
 
-        contenu.style.display="none";
-        titre.innerHTML="📌 Légende ▼";
+        }
 
-    }
+    };
 
-};
+    // ==========================
+    // Transparence du fond IGN
+    // ==========================
 
+    div.querySelector("#opacitySlider")
+    .addEventListener("input", function(){
 
-    // curseur transparence IGN
+        fond.setOpacity(this.value/100);
 
-    setTimeout(function(){
+    });
 
-        document.getElementById("opacitySlider")
-        .addEventListener("input", function(){
+    // ==========================
+    // Arrondissements
+    // ==========================
 
-            fond.setOpacity(this.value/100);
+    div.querySelector("#chkArrondissement")
+    .addEventListener("change", function(){
 
-        });
+        if(this.checked){
 
+            map.addLayer(couchearrondissement);
 
-    },500);
+        }else{
 
+            map.removeLayer(couchearrondissement);
+
+        }
+
+    });
+
+    // ==========================
+    // Communes
+    // ==========================
+
+    div.querySelector("#chkCommunes")
+    .addEventListener("change", function(){
+
+        if(this.checked){
+
+            map.addLayer(couchecommunes);
+
+        }else{
+
+            map.removeLayer(couchecommunes);
+
+        }
+
+    });
 
     return div;
 
 };
 
-
 controleLegende.addTo(map);
 
-
-// ======================================
-// STYLE AVIS
-// ======================================
-
-
-function couleurcontractualisation(contractualisation){
-
-    if(!contractualisation){
-        return "#999999";
-    }
-
-
-    contractualisation = contractualisation
-        .toString()
-        .trim()
-        .toLowerCase();
-
-
-    if(contractualisation === "pvd"){
-        return "#9842b7";
-    }
-
-
-    if(contractualisation === "va"){
-        return "#10df08";
-    }
-
-
-    if(contractualisation === "acv"){
-        return "#ff9a3b";
-    }
-
-
-    return "#999999";
-
-}
 
 
 // ======================================
