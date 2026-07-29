@@ -21,6 +21,7 @@ html, body {
 #map{
  width:100%;
  height:100%;
+background:white; 
 }
 
 /* Etiquettes des communes */
@@ -145,7 +146,7 @@ fond.addTo(map);
 const couchearrondissement = L.layerGroup().addTo(map);
 
 
-const couchecommunes = L.layerGroup();
+const couchecommunes = L.layerGroup().addTo(map); 
 
 
 const couchePVD = L.layerGroup().addTo(map);
@@ -371,7 +372,7 @@ fetch(urlCommunes)
             color: "#666666",
             weight: 1,
             fillColor: "#f7f7f7",
-            fillOpacity: 0.35
+            fillOpacity: 0.7
         },
 
         onEachFeature: function(feature, layer){
@@ -400,7 +401,7 @@ fetch(urlCommunes)
     // Affiche ou masque les étiquettes selon le zoom
     function majEtiquettes(){
 
-        const afficher = map.getZoom() >= 12;
+        const afficher = map.getZoom() >= 10;
 
         document.querySelectorAll(".labelCommune").forEach(function(etiquette){
 
