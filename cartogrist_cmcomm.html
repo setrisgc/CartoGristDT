@@ -112,7 +112,7 @@ map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex=500;
 
 map.createPane('interesseesPane');
-map.getPane('interesseesPane').style.zIndex = 650;
+map.getPane('interesseesPane').style.zIndex = 550;
 
 map.createPane('cmcommPane');
 map.getPane('cmcommPane').style.zIndex = 600;
@@ -199,44 +199,128 @@ L.control.layers(
 
 
 // ======================================
-// LEGENDE CARTOGRIST
+// ======================================
+// LEGENDE CARTOGRIST REPLIABLE
 // ======================================
 
 
-const controleOpacity = L.control({position:'topright'});
+const controleLegende = L.control({
+    position:'topright'
+});
 
-controleOpacity.onAdd = function(){
+
+controleLegende.onAdd = function(){
 
     const div = L.DomUtil.create('div','legend');
 
+
     div.innerHTML = `
-        <b>Fond de carte</b><br>
-        <input id="opacitySlider"
-               type="range"
-               min="0"
-               max="100"
-               value="70">
+
+        <div id="titreLegende" 
+             style="cursor:pointer;font-weight:bold;">
+             
+             📌 Légende
+             
+        </div>
+
+
+        <div id="contenuLegende" style="display:none;margin-top:8px;">
+
+
+            <div>
+            <span class="circle"
+            style="background:#9842b7"></span>
+            Petite Ville de Demain
+            </div>
+
+
+            <div>
+            <span class="circle"
+            style="background:#ff9a3b"></span>
+            Action Cœur de Ville
+            </div>
+
+
+            <div>
+            <span class="circle"
+            style="background:#10df08"></span>
+            Village d'Avenir
+            </div>
+
+
+            <div>
+            <span class="circle"
+            style="background:#ff0000"></span>
+            Commune intéressée
+            </div>
+
+
+            <hr>
+
+
+            <b>Fond de carte</b><br>
+
+            <input id="opacitySlider"
+                   type="range"
+                   min="0"
+                   max="100"
+                   value="70">
+
+        </div>
+
     `;
 
-    return div;
+
+    // évite que le clic se propage à la carte
+    L.DomEvent.disableClickPropagation(div);
+
+
+    // ouverture / fermeture
+
+    const titre = div.querySelector("#titreLegende");
+
+    const contenu = div.querySelector("#contenuLegende");
+
+
+titre.onclick = function(){
+
+    if(contenu.style.display === "none"){
+
+        contenu.style.display="block";
+        titre.innerHTML="📌 Légende ▲";
+
+    }
+    else{
+
+        contenu.style.display="none";
+        titre.innerHTML="📌 Légende ▼";
+
+    }
+
 };
 
-controleOpacity.addTo(map);
 
-setTimeout(function(){
+    // curseur transparence IGN
 
-    document.getElementById("opacitySlider")
+    setTimeout(function(){
+
+        document.getElementById("opacitySlider")
         .addEventListener("input", function(){
 
             fond.setOpacity(this.value/100);
 
         });
 
-},500);
+
+    },500);
 
 
+    return div;
+
+};
 
 
+controleLegende.addTo(map);
 
 
 // ======================================
@@ -432,7 +516,6 @@ fetch(urlCommunes)
 // ======================================
 
 
-
 grist.ready({
 
     requiredAccess:'read table'
@@ -440,29 +523,72 @@ grist.ready({
 });
 
 
+// ======================================
+// CONTENU DES INFOS BULLES
+// ======================================
 
+
+function contenuPopup(row){
+
+
+let couleur = couleurcontractualisation(row.contractualisation);
+
+
+return `
+
+<div style="
+background:${couleur};
+color:white;
+padding:5px;
+border-radius:5px;
+font-weight:bold;
+margin-bottom:8px;
+">
+
+${row.contractualisation || "Commune intéressée"}
+
+</div>
+`
+
+<b>Commune :</b>
+${row.commune || ""}
+
+<br>
+
+<b>DT :</b>
+${row.DT || ""}
+
+<br><br>
+
+<b>Contractualisation :</b>
+${row.contractualisation || "Aucune"}
+
+<br>
+
+<b>Commune intéressée :</b>
+${row.communes_interessees || "Non"}
+
+<br><br>
+
+<b>Nom :</b>
+${row.nom || ""}
+
+<br>
+
+<b>Prénom :</b>
+${row.prenom || ""}
+
+`;
+
+}
+
+
+// ======================================
+// RECEPTION DES DONNEES GRIST
+// ======================================
 
 
 grist.onRecords(function(records){
-
-
-
-records.forEach(record => {
-
-    console.log(
-        "Coordonnées :",
-        record.longitude,
-        record.latitude
-    );
-
-});
-
-
-console.log("Nombre de lignes reçues :", records.length);
-console.log("Première ligne Grist :", records[0]);
-
- console.log(records[0]);
-console.log("Clés :", Object.keys(records[0]));
 
 couchePVD.clearLayers();
 coucheACV.clearLayers();
@@ -470,7 +596,7 @@ coucheVA.clearLayers();
 couchecommunesinteressees.clearLayers();
 
 
-    let bounds=[];
+let bounds=[];
 
 
 records.forEach(row=>{
@@ -481,61 +607,76 @@ records.forEach(row=>{
         row.longitude
     ){
 
-            let lat=parseFloat(row.latitude);
+        let lat=parseFloat(row.latitude);
+        let lon=parseFloat(row.longitude);
 
-            let lon=parseFloat(row.longitude);
+
+        if(
+            !isNaN(lat) &&
+            !isNaN(lon)
+        ){
+
+
+            // ================================
+            // COMMUNE INTERESSEE
+            // ================================
+
+            if(
+                row.communes_interessees &&
+                row.communes_interessees.toString().trim().toLowerCase() === "oui"
+            ){
+
+
+                let interesse = L.circleMarker(
+                    [lat,lon],
+                    {
+                        pane:'interesseesPane',
+
+                        radius:11,
+
+                        color:"#ff0000",
+
+                        weight:3,
+
+                        fillColor:"#ff0000",
+
+                        fillOpacity:0.15
+                    }
+                );
+
+
+                interesse.bindPopup(contenuPopup(row));
+
+
+                interesse.addTo(couchecommunesinteressees);
+
+            }
+
+
+
+            // ================================
+            // COMMUNE CONTRACTUALISEE
+            // ================================
+
+
+            let contrat = (row.contractualisation || "")
+                .trim()
+                .toUpperCase();
 
 
 
             if(
-                !isNaN(lat)
-                &&
-                !isNaN(lon)
+                contrat==="PVD" ||
+                contrat==="ACV" ||
+                contrat==="VA"
             ){
 
 
-
-// Cercle rouge communes intéressées
-
-if(
-    row.communes_interessees &&
-    row.communes_interessees.toString().trim().toLowerCase() === "oui"
-){
-
-    L.circleMarker(
-        [lat,lon],
-        {
-            pane:'interesseesPane',
-
-            radius:7,
-
-            color:"#ff0000",
-
-            weight:2,
-
-            fillColor:"#ffffff",
-
-            fillOpacity:0
-
-        }
-
-    )
-    .addTo(couchecommunesinteressees);
-
-}
-
-//////
-
-
-console.log("Valeur contractualisation :", row.contractualisation);
-console.log("Couleur calculée :", couleurcontractualisation(row.contractualisation));
-
-                let point=L.circleMarker(
-
+                let point = L.circleMarker(
                     [lat,lon],
-
                     {
-                          pane:'cmcommPane',
+
+                        pane:'cmcommPane',
 
                         radius:7,
 
@@ -543,100 +684,63 @@ console.log("Couleur calculée :", couleurcontractualisation(row.contractualisat
 
                         weight:2,
 
-
                         fillColor:
                         couleurcontractualisation(row.contractualisation),
-
 
                         fillOpacity:0.9
 
                     }
-
                 );
 
 
+                point.bindPopup(contenuPopup(row));
 
 
 
-                point.bindPopup(`
+                switch(contrat){
 
-                <b>Commune :</b>
-                ${row.commune || ""}
-
-                <br>
-
-
-                <b>DT :</b>
-                ${row.DT || ""}
-
-                <br><br>
+                    case "PVD":
+                        point.addTo(couchePVD);
+                        break;
 
 
-                <b>contractualisation :</b>
-                ${row["contractualisation"] || ""}
-
-                <br>
-
-
-                <b>nom :</b>
-                ${row["nom"] || ""}
-
-                <br>
-
-			  <b>prenom :</b>
-                ${row["prenom"] || ""}
-
-                <br>
-             
+                    case "ACV":
+                        point.addTo(coucheACV);
+                        break;
 
 
-                `);
+                    case "VA":
+                        point.addTo(coucheVA);
+                        break;
 
-
-
-                switch ((row.contractualisation || "").trim().toUpperCase()) {
-
-    case "PVD":
-        point.addTo(couchePVD);
-        break;
-
-    case "ACV":
-        point.addTo(coucheACV);
-        break;
-
-    case "VA":
-        point.addTo(coucheVA);
-        break;
-}
-
-
-
-                bounds.push([lat,lon]);
+                }
 
             }
+
+
+
+            bounds.push([lat,lon]);
 
 
         }
 
 
-
-    });
-
-
-
-
-    // zoom automatique
-
-    if(bounds.length>0){
-
-        map.fitBounds(bounds);
-
     }
-
 
 
 });
 
+
+// zoom automatique
+
+if(bounds.length>0){
+
+    map.fitBounds(bounds);
+
+}
+
+
+});
 
 
 
