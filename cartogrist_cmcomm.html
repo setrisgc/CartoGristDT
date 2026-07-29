@@ -146,7 +146,7 @@ const couchePVD = L.layerGroup().addTo(map);
 const coucheACV = L.layerGroup().addTo(map);
 const coucheVA  = L.layerGroup().addTo(map);
 
-const coucheCommunesInteressees = L.layerGroup().addTo(map);
+const couchecommunesinteressees = L.layerGroup().addTo(map);
 
 const couchearrondissement = L.layerGroup().addTo(map);
 
@@ -471,17 +471,10 @@ couchecommunesinteressees.clearLayers();
 records.forEach(row=>{
 
 
-    // Ignore les communes sans contractualisation
-    if (!row.contractualisation || row.contractualisation.trim() === "") {
-        return;
-    }
-
-
     if(
         row.latitude &&
         row.longitude
     ){
-
 
             let lat=parseFloat(row.latitude);
 
@@ -517,7 +510,7 @@ if(
 
             fillColor:"#ffffff",
 
-            fillOpacity:0.5
+            fillOpacity:0
 
         }
 
