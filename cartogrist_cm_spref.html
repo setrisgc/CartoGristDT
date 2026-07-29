@@ -58,6 +58,18 @@ html, body {
 
 <script>
 
+	grist.ready({
+    requiredAccess:'read table'
+});
+
+
+
+
+
+
+
+
+
 // ======================================
 // INITIALISATION
 // ======================================
@@ -105,6 +117,11 @@ fond.addTo(map);
 // ======================================
 
 const coucheCommunes=L.layerGroup().addTo(map);
+
+
+
+
+
 
 // ======================================
 // URL DU GEOJSON
@@ -171,6 +188,54 @@ fetch(urlArrondissements)
 });
 
 
+// ======================================
+// COUCHE COMMUNES INTERESSEES
+// ======================================
+
+const coucheCommunesInteressees = L.layerGroup().addTo(map);
+
+
+grist.onRecords(function(records){
+
+    console.log(records[0]);
+
+    coucheCommunesInteressees.clearLayers();
+
+
+    records.forEach(function(record){
+
+
+        if(String(record.communes_interessees).toLowerCase().trim() === "oui"){
+
+
+            if(record.latitude && record.longitude){
+
+
+                L.circleMarker(
+                    [
+                        Number(record.latitude),
+                        Number(record.longitude)
+                    ],
+                    {
+                        radius:8,
+                        color:"#ff0000",
+                        fillColor:"#ff0000",
+                        fillOpacity:0.8,
+                        weight:2
+                    }
+                )
+                .addTo(coucheCommunesInteressees);
+
+
+            }
+
+        }
+
+
+    });
+
+
+});
 
 
 
@@ -217,6 +282,12 @@ fetch(urlCommunes)
 
     communes.addTo(coucheCommunes);
 
+
+
+
+
+
+	
     // Affiche ou masque les étiquettes selon le zoom
     function majEtiquettes(){
 
