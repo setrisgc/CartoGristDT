@@ -530,56 +530,7 @@ div.querySelector("#chkAutres")
 
 controleLegende.addTo(map);
 
-const controleZoom = L.control({
-    position:'topleft'
-});
 
-controleZoom.onAdd = function(){
-
-    const div = L.DomUtil.create('div','legend');
-
-    div.innerHTML = `
-
-<b>📍 Zoom</b><br><br>
-
-<button id="btnTous">Manche</button><br><br>
-
-<button id="btnCherbourg">Cherbourg</button><br><br>
-
-<button id="btnCoutances">Coutances</button><br><br>
-
-<button id="btnSaintLo">Saint-Lô</button><br><br>
-
-<button id="btnAvranches">Avranches</button>
-
-`;
-
-    L.DomEvent.disableClickPropagation(div);
-
-    div.querySelector("#btnTous").onclick = function(){
-        map.fitBounds(bounds);
-    };
-
-    div.querySelector("#btnCherbourg").onclick = function(){
-        map.fitBounds(emprisesArrondissements["2"], {padding:[20,20]});
-    };
-
-    div.querySelector("#btnCoutances").onclick = function(){
-        map.fitBounds(emprisesArrondissements["3"], {padding:[20,20]});
-    };
-
-    div.querySelector("#btnSaintLo").onclick = function(){
-        map.fitBounds(emprisesArrondissements["4"], {padding:[20,20]});
-    };
-
-    div.querySelector("#btnAvranches").onclick = function(){
-        map.fitBounds(emprisesArrondissements["1"], {padding:[20,20]});
-    };
-
-    return div;
-};
-
-controleZoom.addTo(map);
 
 
 // ======================================
