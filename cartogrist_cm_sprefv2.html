@@ -126,17 +126,7 @@ const map = L.map("map",{
 
     let bounds=[];
 
-const centresArrondissements = {
-
-    "Cherbourg":[49.63,-1.62],
-
-    "Coutances":[49.05,-1.44],
-
-    "Saint-Lo":[49.12,-1.09],
-
-    "Avranches":[48.68,-1.36]
-
-};
+const emprisesArrondissements = {}; 
 
 // ======================================
 // PANES ORDRE DES COUCHES
@@ -259,25 +249,11 @@ controleLegende.onAdd = function(){
 
 <select id="choixArrondissement">
 
-    <option value="Tous">
-        Tous les arrondissements
-    </option>
-
-    <option value="Cherbourg">
-        Cherbourg
-    </option>
-
-    <option value="Coutances">
-        Coutances
-    </option>
-
-    <option value="Saint-Lo">
-        Saint-Lô
-    </option>
-
-    <option value="Avranches">
-        Avranches
-    </option>
+    <option value="Tous">Tous les arrondissements</option>
+    <option value="2">Cherbourg</option>
+    <option value="3">Coutances</option>
+    <option value="4">Saint-Lô</option>
+    <option value="1">Avranches</option>
 
 </select>
 <label>
@@ -328,17 +304,15 @@ div.querySelector("#choixArrondissement")
 
     let choix = this.value;
 
-
     if(choix !== "Tous"){
 
-        map.setView(
-            centresArrondissements[choix],
-            10
-        );
+map.fitBounds(emprisesArrondissements[choix], {
+    padding: [20, 20]
+});
 
     }else{
 
-        if(bounds.length>0){
+        if(bounds.length > 0){
 
             map.fitBounds(bounds);
 
@@ -347,7 +321,6 @@ div.querySelector("#choixArrondissement")
     }
 
 });
-
 
 
     titre.onclick = function(){
@@ -453,27 +426,26 @@ fetch(urlarrondissement)
 
     console.log("GeoJSON arrondissemenent chargé :", data);
 
-    L.geoJSON(
-        data,
-        {
+   L.geoJSON(data, {
 
-              pane:'arrondissementPane',
+    pane:'arrondissementPane',
 
-            style:{
-                color:"#141f72",
-                weight:4,
-                fillOpacity:0
-            }
+    style:{
+        color:"#141f72",
+        weight:4,
+        fillOpacity:0
+    },
 
-        }
+    onEachFeature:function(feature, layer){
 
-    )
-    .addTo(couchearrondissement);
+        // adapte NOM si besoin
+emprisesArrondissements[
+    feature.properties.INSEE_ARR
+] = layer.getBounds();
 
+    }
 
-});
-
-
+}).addTo(couchearrondissement);
 
 
 
