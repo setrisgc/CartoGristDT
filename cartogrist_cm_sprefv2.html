@@ -1,194 +1,802 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+<title>CartoGrist - Communes</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<style>
+
+html, body {
+ margin:0;
+ padding:0;
+ width:100%;
+ height:100%;
+}
+
+#map{
+ width:100%;
+ height:100%;
+background:white; 
+}
+
+/* Etiquettes des communes */
+
+.labelCommune{
+
+ background:transparent !important;
+ border:none !important;
+ box-shadow:none !important;
+
+ color:#444;
+ font-family:Arial, Helvetica, sans-serif;
+ font-size:7px;
+ font-weight:bold;
+
+ text-shadow:
+ 1px 1px 2px white,
+ -1px -1px 2px white,
+ 1px -1px 2px white,
+ -1px 1px 2px white;
+
+ pointer-events:none;
+}
+
+.leaflet-tooltip.labelCommune::before{ display:none !important; } 
+
+.legend .circle-interesse {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+    background:rgba(255,0,0,0.15);
+    border:3px solid #ff0000;
+    box-sizing:border-box;
+}
+
+.legend .circle {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+}
+
+.legend .circle-autre{
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    margin-right:6px;
+
+    background:transparent;
+    border:2px solid #000;
+
+    box-sizing:border-box;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+<script>
+
+ grist.ready({
+    requiredAccess:'read table'
+});
+
+
+
+
+
+
+
+
+
+// ======================================
+// INITIALISATION
+// ======================================
+
+const map = L.map("map",{
+
+    zoomControl:true,
+    attributionControl:false
+
+});
+
+// ======================================
+// PANES ORDRE DES COUCHES
+// ======================================
+
+map.createPane('communesPane');
+map.getPane('communesPane').style.zIndex = 350;
+
+map.createPane("arrondissementPane");
+map.getPane("arrondissementPane").style.zIndex=500;
+
+map.createPane('interesseesPane');
+map.getPane('interesseesPane').style.zIndex = 580;
+
+map.createPane('cmcommPane');
+map.getPane('cmcommPane').style.zIndex = 600;
+
+map.createPane('autresPane'); map.getPane('autresPane').style.zIndex = 570; 
+
+
+
+// ======================================
+// FOND IGN CLASSIQUE
+// ======================================
+
+const fond = L.tileLayer(
+    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    {
+        maxZoom:22,
+        maxNativeZoom:19,
+		   opacity:0,
+        attribution:'© IGN - Géoplateforme'
+    }
+);
+
+fond.addTo(map);
+
+
+
+
+// ======================================
+// COUCHES
+// ======================================
+
+const couchearrondissement = L.layerGroup().addTo(map);
+
+
+const couchecommunes = L.layerGroup().addTo(map); 
+
+
+const couchePVD = L.layerGroup().addTo(map);
+
+const coucheACV = L.layerGroup().addTo(map);
+
+const coucheVA = L.layerGroup().addTo(map);
+
+const couchecommunesinteressees = L.layerGroup().addTo(map);
+
+const coucheAutres = L.layerGroup().addTo(map);
+
+
+// ======================================
+// LEGENDE CARTOGRIST REPLIABLE
+// ======================================
+
+const controleLegende = L.control({
+ position:'topright'
+});
+
+
+
+
+controleLegende.onAdd = function(){
+
+ const div = L.DomUtil.create('div','legend');
+
+ div.innerHTML = `
+
+ <div id="titreLegende"
+ style="cursor:pointer;font-weight:bold;">
+ 📌 Légende ▼
+ </div>
+
+ <div id="contenuLegende"
+ style="display:none;margin-top:8px;">
+
+ <div>
+ <span class="circle" style="background:#9842b7"></span>
+ Petite Ville de Demain
+ </div>
+
+            <div>
+                <span class="circle" style="background:#ff9a3b"></span>
+                Action Cœur de Ville
+            </div>
+
+            <div>
+                <span class="circle" style="background:#10df08"></span>
+                Village d'Avenir
+            </div>
+
+<div> <span class="circle-interesse"></span> Commune intéressée </div>
+
+<div>
+    <span class="circle-autre"></span>
+    Autre commune
+</div>
+
+ <hr>
+
+ <b>Couches</b><br>
+
+<label>
+<input type="checkbox"
+       id="chkAutres"
+       checked>
+Autres communes
+</label>
+<label>
+ <input type="checkbox"
+ id="chkArrondissement"
+ checked>
+ Arrondissements
+ </label>
+
+            <br>
+
+            <label>
+                <input type="checkbox"
+                       id="chkCommunes"
+                       checked>
+                Communes
+            </label>
+
+            <hr>
+
+            <b>Fond de carte</b><br>
+
+            <input
+                id="opacitySlider"
+                type="range"
+                min="0"
+                max="100"
+                value="70">
+
+        </div>
+
+    `;
+
+    // Empêche les clics de se propager à la carte
+    L.DomEvent.disableClickPropagation(div);
+
+    const titre = div.querySelector("#titreLegende");
+    const contenu = div.querySelector("#contenuLegende");
+
+    titre.onclick = function(){
+
+        if(contenu.style.display==="none"){
+
+            contenu.style.display="block";
+            titre.innerHTML="📌 Légende ▲";
+
+        }else{
+
+            contenu.style.display="none";
+            titre.innerHTML="📌 Légende ▼";
+
+        }
+
+    };
+
+    // Curseur de transparence
+    div.querySelector("#opacitySlider")
+        .addEventListener("input",function(){
+
+            fond.setOpacity(this.value/100);
+
+        });
+
+    // Case Arrondissements
+    div.querySelector("#chkArrondissement")
+        .addEventListener("change",function(){
+
+            if(this.checked){
+
+                map.addLayer(couchearrondissement);
+
+            }else{
+
+                map.removeLayer(couchearrondissement);
+
+            }
+
+        });
+
+    // Case Communes
+    div.querySelector("#chkCommunes")
+        .addEventListener("change",function(){
+
+            if(this.checked){
+
+                map.addLayer(couchecommunes);
+
+            }else{
+
+                map.removeLayer(couchecommunes);
+
+            }
+
+        });
+
+div.querySelector("#chkAutres")
+.addEventListener("change", function(){
+
+    if(this.checked){
+
+        map.addLayer(coucheAutres);
+
+    }else{
+
+        map.removeLayer(coucheAutres);
+
+    }
+
+});
+
+
+
+
+
+    return div;
+
+};
+
+controleLegende.addTo(map);
+
+
+// ======================================
+// CHARGEMENT DES GEOJSON
+// ======================================
+
+
+
+const urlarrondissement = "arrondissement.geojson";
+const urlCommunes = "communes.geojson";
+
+
+// arrondissement
+
+fetch(urlarrondissement)
+.then(response => {
+    console.log("Réponse GeoJSON arrondissement :", response.status);
+    return response.json();
+})
+.then(data => {
+
+    console.log("GeoJSON arrondissemenent chargé :", data);
+
+    L.geoJSON(
+        data,
+        {
+
+              pane:'arrondissementPane',
+
+            style:{
+                color:"#141f72",
+                weight:4,
+                fillOpacity:0
+            }
+
+        }
+
+    )
+    .addTo(couchearrondissement);
+
+
+});
+
+
+
+
+
+// ======================================
+// CHARGEMENT DES COMMUNES
+// ======================================
+
+fetch(urlCommunes)
+
+.then(response => response.json())
+
+.then(data => {
+
+    // Zoom sur toutes les communes
+    const limites = L.geoJSON(data);
+    map.fitBounds(limites.getBounds());
+
+    // Couche des communes
+    const communes = L.geoJSON(data, {
+
+        pane: "communesPane",
+
+        style: {
+            color: "#666666",
+            weight: 1,
+            fillColor: "#f7f7f7",
+            fillOpacity: 0.7
+        },
+
+        onEachFeature: function(feature, layer){
+
+            layer.bindTooltip(
+                feature.properties.NOM_COMM,
+                {
+                    permanent: true,
+                    direction: "center",
+                    className: "labelCommune"
+                }
+            );
+
+        }
+
+    });
+
+    communes.addTo(couchecommunes);
+
+
+///-------------ETIQUETTES---//////
+	//////////////////////////////////
+
+
+	
+    // Affiche ou masque les étiquettes selon le zoom
+    function majEtiquettes(){
+
+        const afficher = map.getZoom() >= 11;
+
+        document.querySelectorAll(".labelCommune").forEach(function(etiquette){
+
+            etiquette.style.display = afficher ? "" : "none";
+
+        });
+
+    }
+
+    majEtiquettes();
+
+    map.on("zoomend", majEtiquettes);
+
+})
+
+.catch(function(error){
+
+    console.log("Erreur GeoJSON :", error);
+
+});
+
+
+
+
+// ======================================
+// CONNEXION GRIST
+// ======================================
+
+
+
+
+
+// ======================================
+// CONTENU DES INFOS BULLES
+// ======================================
+
+function couleurcontractualisation(valeur){
+
+    let v = (valeur || "")
+        .toString()
+        .trim()
+        .toUpperCase();
+
+
+    if(v==="PVD"){
+        return "#9842b7";
+    }
+
+    if(v==="ACV"){
+        return "#ff9a3b";
+    }
+
+    if(v==="VA"){
+        return "#10df08";
+    }
+
+
+    return "#777777";
+
+}
+
+
+
+
+function contenuPopup(row){
+
+
+return `
+
+<div style="
+background:#1f5fae;
+color:white;
+padding:6px;
+border-radius:5px;
+font-weight:bold;
+margin-bottom:10px;
+text-align:center;
+">
+
+${row.commune || "Commune"}
+
+</div>
+
+<b>Arrondissement :</b>
+${row.arrondissement || ""}
+
+<br>
+
+<b>DT :</b>
+${row.DT || ""}
+
+<br>
+
+<b>EPCI :</b>
+${row.EPCI || ""}
+
+
+<br><br>
+
+<b>Contractualisation :</b>
+${row.contractualisation || "Aucune"}
+
+<br>
+
+<b>Commune intéressée :</b>
+${row.communes_interessees || ""}
+
+<br>
+
+<b>Commune réseau alerte :</b>
+${row.communes_reseau_alerte || ""}
+
+<br>
+
+<b>Retour questionnaire :</b>
+${row.retour_questionnaire || ""}
+
+<br>
+
+<b>Démarche numérique :</b>
+${row.demarche_numerique || ""}
+
+<br><br>
+
+<b>Nom :</b>
+${row.nom || ""}
+
+<br>
+
+<b>Prénom :</b>
+${row.prenom || ""}
+
+`;
+
+}
+
 // ======================================
 // RECEPTION DES DONNEES GRIST
 // ======================================
 
-
 grist.onRecords(function(records){
 
-couchePVD.clearLayers();
-coucheACV.clearLayers();
-coucheVA.clearLayers();
-couchecommunesinteressees.clearLayers();
-coucheAutres.clearLayers();
+    couchePVD.clearLayers();
+    coucheACV.clearLayers();
+    coucheVA.clearLayers();
+    couchecommunesinteressees.clearLayers();
+    coucheAutres.clearLayers();
 
 
-let bounds=[];
+    let bounds=[];
 
 
-records.forEach(row=>{
+    records.forEach(row=>{
 
 
- if(
- row.latitude &&
- row.longitude
- ){
-
- let lat=parseFloat(row.latitude);
- let lon=parseFloat(row.longitude);
+        if(
+            row.latitude &&
+            row.longitude
+        ){
 
 
- if(
- !isNaN(lat) &&
- !isNaN(lon)
- ){
-
-
- // ================================
- // COMMUNE INTERESSEE
- // ================================
-
- if(
- row.communes_interessees &&
-                row.communes_interessees.toString().trim().toLowerCase() === "oui"
-            ){
-
-
-                let interesse = L.circleMarker(
-                    [lat,lon],
-                    {
-                        pane:'interesseesPane',
-
-                        radius:8,
-
-                        color:"#ff0000",
-
-                        weight:3,
-
-                        fillColor:"#ff0000",
-
-                        fillOpacity:0.15
-                    }
-                );
-
-
-                interesse.bindPopup(contenuPopup(row));
-
-
-                interesse.addTo(couchecommunesinteressees);
-
-            }
-
-
-
-            // ================================
-            // COMMUNE CONTRACTUALISEE
-            // ================================
-
-
-            let contrat = (row.contractualisation || "")
-                .trim()
-                .toUpperCase();
-
+            let lat=parseFloat(row.latitude);
+            let lon=parseFloat(row.longitude);
 
 
             if(
-                contrat==="PVD" ||
-                contrat==="ACV" ||
-                contrat==="VA"
+                !isNaN(lat) &&
+                !isNaN(lon)
             ){
 
 
-                let point = L.circleMarker(
-                    [lat,lon],
-                    {
+                // ================================
+                // COMMUNE INTERESSEE
+                // ================================
 
-                        pane:'cmcommPane',
-
-                        radius:7,
-
-color:"transparent",
-weight:0, 
-
-                        fillColor:
-                        couleurcontractualisation(row.contractualisation),
-
-                        fillOpacity:0.9
-
-                    }
-                );
+                if(
+                    row.communes_interessees &&
+                    row.communes_interessees
+                    .toString()
+                    .trim()
+                    .toLowerCase() === "oui"
+                ){
 
 
-                point.bindPopup(contenuPopup(row));
+                    let interesse = L.circleMarker(
+                        [lat,lon],
+                        {
+
+                            pane:'interesseesPane',
+
+                            radius:8,
+
+                            color:"#ff0000",
+
+                            weight:3,
+
+                            fillColor:"#ff0000",
+
+                            fillOpacity:0.15
+
+                        }
+                    );
 
 
-
-                switch(contrat){
-
-                    case "PVD":
-                        point.addTo(couchePVD);
-                        break;
+                    interesse.bindPopup(contenuPopup(row));
 
 
-                    case "ACV":
-                        point.addTo(coucheACV);
-                        break;
-
-
-                    case "VA":
-                        point.addTo(coucheVA);
-                        break;
+                    interesse.addTo(couchecommunesinteressees);
 
                 }
 
+
+
+                // ================================
+                // COMMUNE CONTRACTUALISEE
+                // ================================
+
+
+                let contrat = (row.contractualisation || "")
+                    .trim()
+                    .toUpperCase();
+
+
+
+                if(
+                    contrat==="PVD" ||
+                    contrat==="ACV" ||
+                    contrat==="VA"
+                ){
+
+
+                    let point = L.circleMarker(
+                        [lat,lon],
+                        {
+
+                            pane:'cmcommPane',
+
+                            radius:7,
+
+                            color:"transparent",
+
+                            weight:0,
+
+                            fillColor:
+                            couleurcontractualisation(row.contractualisation),
+
+                            fillOpacity:0.9
+
+                        }
+                    );
+
+
+                    point.bindPopup(contenuPopup(row));
+
+
+                    switch(contrat){
+
+                        case "PVD":
+                            point.addTo(couchePVD);
+                            break;
+
+
+                        case "ACV":
+                            point.addTo(coucheACV);
+                            break;
+
+
+                        case "VA":
+                            point.addTo(coucheVA);
+                            break;
+
+                    }
+
+
+                } else {
+
+
+                    // ================================
+                    // AUTRES COMMUNES
+                    // ================================
+
+
+                    let point = L.circleMarker(
+                        [lat,lon],
+                        {
+
+                            pane:'cmcommPane',
+
+                            radius:6,
+
+                            color:"#000000",
+
+                            weight:2,
+
+                            fillColor:"#ffffff",
+
+                            fillOpacity:0
+
+                        }
+                    );
+
+
+                    point.bindPopup(contenuPopup(row));
+
+
+                    point.addTo(coucheAutres);
+
+
+                }
+
+
+
+                // ================================
+                // AJOUT POUR LE ZOOM
+                // ================================
+
+                bounds.push([lat,lon]);
+
+
             }
 
-else {
-
-    let point = L.circleMarker(
-        [lat, lon],
-        {
-            pane: 'cmcommPane',
-
-            radius: 6,
-
-            color: "#000000",
-
-            weight: 2,
-
-            fillColor: "#ffffff",
-
-            fillOpacity: 0.1
         }
-    );
-
-    point.bindPopup(contenuPopup(row));
-
-    point.addTo(coucheAutres);
-
-}
 
 
-// ================================
-// AJOUT POUR LE ZOOM
-// ================================
-
-bounds.push([lat,lon]);
-
-
-        } // fermeture if !isNaN
-
-    } // fermeture if latitude longitude
-
-}); // fermeture records.forEach
+    }); // fin records.forEach
 
 
 
+    // ================================
+    // ZOOM AUTOMATIQUE
+    // ================================
 
-// zoom automatique
+    if(
+        bounds.length>0 &&
+        !map._initialZoom
+    ){
 
-if(bounds.length>0 && !map._initialZoom){
+        map.fitBounds(bounds);
 
-    map.fitBounds(bounds);
+        map._initialZoom=true;
 
-    map._initialZoom=true;
-
-}
-
-}); // <-- fermeture grist.onRecords 
-
+    }
 
 
-
+}); // fin grist.onRecords
 	
 
 
