@@ -88,6 +88,47 @@ background:white;
     color:#333;
 }
 
+.legend button{
+
+    width:140px;
+    padding:8px;
+    margin:4px 0;
+    border-radius:6px;
+    border:none;
+    background:#1f5fae;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+    margin-bottom:5px;
+
+    padding:6px;
+
+    border:none;
+
+    border-radius:5px;
+
+    background:#1f5fae;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+}
+
+.legend button:hover{
+
+    background:#2c78d2;
+    transform:scale(1.03);
+
+}
+
+
+
 </style>
 
 </head>
@@ -157,7 +198,7 @@ const fond = L.tileLayer(
     {
         maxZoom:22,
         maxNativeZoom:19,
-		   opacity:0,
+        opacity:0,
         attribution:'© IGN - Géoplateforme'
     }
 );
@@ -165,11 +206,131 @@ const fond = L.tileLayer(
 fond.addTo(map);
 
 
+// ======================================
+// BOUTONS DE ZOOM ARRONDISSEMENTS
+// ======================================
+
+const controleZoomArr = L.control({
+    position:'topleft'
+});
 
 
-// ======================================
-// COUCHES
-// ======================================
+controleZoomArr.onAdd = function(){
+
+    const div = L.DomUtil.create("div","legend");
+
+    div.innerHTML = `
+
+<b>📍 Zoom</b><br><br>
+
+<button id="btnTous">Manche</button><br>
+
+<button id="btnCherbourg">Cherbourg</button><br>
+
+<button id="btnCoutances">Coutances</button><br>
+
+<button id="btnSaintLo">Saint-Lô</button><br>
+
+<button id="btnAvranches">Avranches</button>
+
+`;
+
+
+    // Empêche le clic de déplacer la carte
+    L.DomEvent.disableClickPropagation(div);
+
+
+
+    // Zoom département
+    div.querySelector("#btnTous").onclick=function(){
+
+        if(bounds.length>0){
+
+            map.fitBounds(bounds);
+
+        }
+
+    };
+
+
+
+    // Zoom Cherbourg
+    div.querySelector("#btnCherbourg").onclick=function(){
+
+        if(emprisesArrondissements["2"]){
+
+            map.fitBounds(
+                emprisesArrondissements["2"],
+                {
+                    padding:[20,20]
+                }
+            );
+
+        }
+
+    };
+
+
+
+    // Zoom Coutances
+    div.querySelector("#btnCoutances").onclick=function(){
+
+        if(emprisesArrondissements["3"]){
+
+            map.fitBounds(
+                emprisesArrondissements["3"],
+                {
+                    padding:[20,20]
+                }
+            );
+
+        }
+
+    };
+
+
+
+    // Zoom Saint-Lô
+    div.querySelector("#btnSaintLo").onclick=function(){
+
+        if(emprisesArrondissements["4"]){
+
+            map.fitBounds(
+                emprisesArrondissements["4"],
+                {
+                    padding:[20,20]
+                }
+            );
+
+        }
+
+    };
+
+
+
+    // Zoom Avranches
+    div.querySelector("#btnAvranches").onclick=function(){
+
+        if(emprisesArrondissements["1"]){
+
+            map.fitBounds(
+                emprisesArrondissements["1"],
+                {
+                    padding:[20,20]
+                }
+            );
+
+        }
+
+    };
+
+
+    return div;
+
+};
+
+
+controleZoomArr.addTo(map);
 
 const couchearrondissement = L.layerGroup().addTo(map);
 
@@ -243,19 +404,7 @@ controleLegende.onAdd = function(){
 
  <b>Couches</b><br>
 
-<hr>
 
-<b>Zoom arrondissement</b><br>
-
-<select id="choixArrondissement">
-
-    <option value="Tous">Tous les arrondissements</option>
-    <option value="2">Cherbourg</option>
-    <option value="3">Coutances</option>
-    <option value="4">Saint-Lô</option>
-    <option value="1">Avranches</option>
-
-</select>
 <label>
 <input type="checkbox"
  id="chkAutres"
@@ -299,79 +448,56 @@ Autres communes
     const titre = div.querySelector("#titreLegende");
     const contenu = div.querySelector("#contenuLegende");
 
-div.querySelector("#choixArrondissement")
-.addEventListener("change", function(){
 
-    let choix = this.value;
+titre.onclick = function(){
 
-    if(choix !== "Tous"){
+ if(contenu.style.display==="none"){
 
-map.fitBounds(emprisesArrondissements[choix], {
-    padding: [20, 20]
-});
+ contenu.style.display="block";
+ titre.innerHTML="📌 Légende ▲";
 
-    }else{
+ }else{
 
-        if(bounds.length > 0){
+ contenu.style.display="none";
+ titre.innerHTML="📌 Légende ▼";
 
-            map.fitBounds(bounds);
+ }
 
-        }
+ };
 
-    }
+ // Curseur de transparence
+ div.querySelector("#opacitySlider")
+ .addEventListener("input",function(){
 
-});
+ fond.setOpacity(this.value/100);
 
+ });
 
-    titre.onclick = function(){
+ // Case Arrondissements
+ div.querySelector("#chkArrondissement")
+ .addEventListener("change",function(){
 
-        if(contenu.style.display==="none"){
+ if(this.checked){
 
-            contenu.style.display="block";
-            titre.innerHTML="📌 Légende ▲";
+ map.addLayer(couchearrondissement);
 
-        }else{
+ }else{
 
-            contenu.style.display="none";
-            titre.innerHTML="📌 Légende ▼";
+ map.removeLayer(couchearrondissement);
 
-        }
+ }
 
-    };
+ });
 
-    // Curseur de transparence
-    div.querySelector("#opacitySlider")
-        .addEventListener("input",function(){
+ // Case Communes
+ div.querySelector("#chkCommunes")
+ .addEventListener("change",function(){
 
-            fond.setOpacity(this.value/100);
+ if(this.checked){
 
-        });
+ map.addLayer(couchecommunes);
 
-    // Case Arrondissements
-    div.querySelector("#chkArrondissement")
-        .addEventListener("change",function(){
-
-            if(this.checked){
-
-                map.addLayer(couchearrondissement);
-
-            }else{
-
-                map.removeLayer(couchearrondissement);
-
-            }
-
-        });
-
-    // Case Communes
-    div.querySelector("#chkCommunes")
-        .addEventListener("change",function(){
-
-            if(this.checked){
-
-                map.addLayer(couchecommunes);
-
-            }else{
+ }else{
 
                 map.removeLayer(couchecommunes);
 
@@ -403,6 +529,57 @@ div.querySelector("#chkAutres")
 };
 
 controleLegende.addTo(map);
+
+const controleZoom = L.control({
+    position:'topleft'
+});
+
+controleZoom.onAdd = function(){
+
+    const div = L.DomUtil.create('div','legend');
+
+    div.innerHTML = `
+
+<b>📍 Zoom</b><br><br>
+
+<button id="btnTous">Manche</button><br><br>
+
+<button id="btnCherbourg">Cherbourg</button><br><br>
+
+<button id="btnCoutances">Coutances</button><br><br>
+
+<button id="btnSaintLo">Saint-Lô</button><br><br>
+
+<button id="btnAvranches">Avranches</button>
+
+`;
+
+    L.DomEvent.disableClickPropagation(div);
+
+    div.querySelector("#btnTous").onclick = function(){
+        map.fitBounds(bounds);
+    };
+
+    div.querySelector("#btnCherbourg").onclick = function(){
+        map.fitBounds(emprisesArrondissements["2"], {padding:[20,20]});
+    };
+
+    div.querySelector("#btnCoutances").onclick = function(){
+        map.fitBounds(emprisesArrondissements["3"], {padding:[20,20]});
+    };
+
+    div.querySelector("#btnSaintLo").onclick = function(){
+        map.fitBounds(emprisesArrondissements["4"], {padding:[20,20]});
+    };
+
+    div.querySelector("#btnAvranches").onclick = function(){
+        map.fitBounds(emprisesArrondissements["1"], {padding:[20,20]});
+    };
+
+    return div;
+};
+
+controleZoom.addTo(map);
 
 
 // ======================================
@@ -447,7 +624,7 @@ emprisesArrondissements[
 
 }).addTo(couchearrondissement);
 
-
+}); // <-- ferme le .then(data=>...) 
 
 // ======================================
 // CHARGEMENT DES COMMUNES
@@ -856,3 +1033,4 @@ bounds = [];
 </body>
 
 </html>
+
