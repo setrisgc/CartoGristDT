@@ -362,24 +362,12 @@ grist.ready({
 
 grist.onRecords(function(records) {
 
-    console.log(
-        "Nombre de lignes Grist :",
-        records.length
-    );
-
-
-    construireDonneesGrist(records);
-
-
-    /*
-       Une fois les données Grist récupérées,
-       on charge le GeoJSON.
-    */
-
-    chargerCommunes();
+    console.log("========== GRIST ==========");
+    console.log("Nombre de lignes :", records.length);
+    console.log("Première ligne :", records[0]);
+    console.log("Toutes les données :", records);
 
 });
-
 
 /* =====================================================
    8 — CHARGEMENT DU GEOJSON
