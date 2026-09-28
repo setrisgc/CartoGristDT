@@ -24,6 +24,19 @@ html, body {
     height: 100%;
 }
 
+*/ je souhaite que mes étiquettes de communes ne soient visibles qu’à partir d’un certain zoom */
+
+.labelCommune {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #555555;
+    font-size: 10px;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+
 </style>
 
 </head>
@@ -93,19 +106,82 @@ fetch(urlCommunes)
 
 .then(function(data) {
 
-    const communes = L.geoJSON(data, {
+const communes = L.geoJSON(data, {
 
-        style: {
+    style: {
 
-            color: "#b6b6b6",
+        color: "#b6b6b6",
 
-            weight: 1,
+        weight: 1,
 
-            fill: false
+        fill: false
+
+    },
+
+    onEachFeature: function(feature, layer) {
+
+        const nom = feature.properties.NOM_COMM;
+
+        if (nom) {
+
+            layer.bindTooltip(nom, {
+
+                permanent: true,
+
+                direction: "center",
+
+                className: "labelCommune",
+
+                opacity: 1
+
+            });
+
+        }
+
+    }
+
+});
+
+
+communes.addTo(map);
+
+
+/* =========================================
+   AFFICHAGE DES NOMS de COMMUNES SELON LE ZOOM
+   ========================================= */
+
+function gererEtiquettesCommunes() {
+
+    const zoom = map.getZoom();
+
+    communes.eachLayer(function(layer) {
+
+        if (layer.getTooltip()) {
+
+            if (zoom >= 11) {
+
+                layer.openTooltip();
+
+            } else {
+
+                layer.closeTooltip();
+
+            }
 
         }
 
     });
+
+}
+
+
+map.on("zoomend", gererEtiquettesCommunes);
+
+
+/* Vérification au chargement */
+
+gererEtiquettesCommunes();
+
 
 
     communes.addTo(map);
@@ -153,4 +229,3 @@ fetch(urlCommunes)
 </body>
 
 </html>
-
