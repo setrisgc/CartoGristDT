@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -42,10 +41,6 @@ html, body {
 }
 
 
-/* =========================================
-   SUPPRESSION DU FOND BLANC LEAFLET
-   ========================================= */
-
 .leaflet-marker-icon.labelCommune {
     background: transparent !important;
     border: none !important;
@@ -63,6 +58,7 @@ html, body {
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script> 
 
 
 <script>
@@ -95,6 +91,7 @@ const map = L.map("map", {
    FOND IGN
    ========================================= */
 
+/* je choisis de ne pas l'afficher temporairement ----
 const fond = L.tileLayer(
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
     {
@@ -105,12 +102,16 @@ const fond = L.tileLayer(
     }
 );
 
-fond.addTo(map);
+fond.addTo(map); --------*/
 
 
 /* =========================================
    COUCHE COMMUNES
    ========================================= */
+
+
+
+
 
 fetch(urlCommunes)
 
@@ -145,9 +146,14 @@ fetch(urlCommunes)
 
             if (nom) {
 
-                const centre = layer.getBounds().getCenter();
+           const pointInterieur = turf.pointOnFeature(feature);
 
-                const etiquette = L.marker(centre, {
+const centre = [
+    pointInterieur.geometry.coordinates[1],
+    pointInterieur.geometry.coordinates[0]
+];
+
+const etiquette = L.marker(centre, {
 
                     icon: L.divIcon({
 
@@ -261,4 +267,4 @@ fetch(urlCommunes)
 </body>
 
 </html>
-```
+
