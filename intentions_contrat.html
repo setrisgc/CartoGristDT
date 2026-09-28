@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -24,7 +25,10 @@ html, body {
     height: 100%;
 }
 
-*/ je souhaite que mes étiquettes de communes ne soient visibles qu’à partir d’un certain zoom */
+
+/* =========================================
+   ÉTIQUETTES DES COMMUNES
+   ========================================= */
 
 .labelCommune {
     background: transparent !important;
@@ -34,12 +38,19 @@ html, body {
     font-size: 10px;
     font-weight: normal;
     white-space: nowrap;
+    padding: 0;
 }
 
-.labelCommune::before {
-    display: none !important;
-}
 
+/* =========================================
+   SUPPRESSION DU FOND BLANC LEAFLET
+   ========================================= */
+
+.leaflet-marker-icon.labelCommune {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
 
 </style>
 
@@ -87,14 +98,15 @@ const map = L.map("map", {
 const fond = L.tileLayer(
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
     {
-        maxZoom:22,
-        maxNativeZoom:19,
-		   opacity:0.5,
-        attribution:'© IGN - Géoplateforme'
+        maxZoom: 22,
+        maxNativeZoom: 19,
+        opacity: 0.5,
+        attribution: '© IGN - Géoplateforme'
     }
 );
 
 fond.addTo(map);
+
 
 /* =========================================
    COUCHE COMMUNES
@@ -110,65 +122,48 @@ fetch(urlCommunes)
 
 .then(function(data) {
 
-const communes = L.geoJSON(data, {
+    const communes = L.geoJSON(data, {
 
-    style: {
+        style: {
 
-        color: "#b6b6b6",
+            color: "#b6b6b6",
 
-        weight: 1,
+            weight: 1,
 
-        fill: false
+            fill: false
 
-    },
-
-    onEachFeature: function(feature, layer) {
-
-        const nom = feature.properties.NOM_COMM;
-
-        if (nom) {
-
-            layer.bindTooltip(nom, {
-
-                permanent: true,
-
-                direction: "center",
-
-                className: "labelCommune",
-
-                opacity: 1
-
-            });
-
-        }
-
-    }
-
-});
+        },
 
 
-communes.addTo(map);
+        /* =====================================
+           ÉTIQUETTES DES COMMUNES
+           ===================================== */
 
+        onEachFeature: function(feature, layer) {
 
-/* =========================================
-   AFFICHAGE DES NOMS de COMMUNES SELON LE ZOOM
-   ========================================= */
+            const nom = feature.properties.NOM_COMM;
 
-function gererEtiquettesCommunes() {
+            if (nom) {
 
-    const zoom = map.getZoom();
+                const centre = layer.getBounds().getCenter();
 
-    communes.eachLayer(function(layer) {
+                const etiquette = L.marker(centre, {
 
-        if (layer.getTooltip()) {
+                    icon: L.divIcon({
 
-            if (zoom >= 11) {
+                        className: "labelCommune",
 
-                layer.openTooltip();
+                        html: nom,
 
-            } else {
+                        iconSize: null
 
-                layer.closeTooltip();
+                    }),
+
+                    interactive: false
+
+                });
+
+                layer.etiquette = etiquette;
 
             }
 
@@ -176,35 +171,67 @@ function gererEtiquettesCommunes() {
 
     });
 
-}
-
-
-map.on("zoomend", gererEtiquettesCommunes);
-
-
-/* Vérification au chargement */
-
-gererEtiquettesCommunes();
-
-
 
     communes.addTo(map);
 
 
     /* =========================================
+       AFFICHAGE DES NOMS SELON LE ZOOM
+       ========================================= */
+
+    function gererEtiquettesCommunes() {
+
+        const zoom = map.getZoom();
+
+        communes.eachLayer(function(layer) {
+
+            if (layer.etiquette) {
+
+                if (zoom >= 11) {
+
+                    layer.etiquette.addTo(map);
+
+                } else {
+
+                    map.removeLayer(layer.etiquette);
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    /* =========================================
+       SURVEILLER LE ZOOM
+       ========================================= */
+
+    map.on("zoomend", gererEtiquettesCommunes);
+
+
+    /* Vérification au chargement */
+
+    gererEtiquettesCommunes();
+
+
+    /* =========================================
        UNE FOIS LES COMMUNES CHARGÉES,
-       ON CHARGE LES ARRONDISSEMENTS
+       CHARGEMENT DES ARRONDISSEMENTS
        ========================================= */
 
     return fetch(urlArrondissements);
 
 })
 
+
 .then(function(response) {
 
     return response.json();
 
 })
+
 
 .then(function(data) {
 
@@ -223,14 +250,15 @@ gererEtiquettesCommunes();
     });
 
 
+    /* Les arrondissements passent au-dessus */
+
     arrondissements.addTo(map);
 
 });
-
 
 </script>
 
 </body>
 
 </html>
-
+```
