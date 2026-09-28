@@ -38,6 +38,7 @@ html, body {
     font-weight: normal;
     white-space: nowrap;
     padding: 0;
+    transform: translate(-50%, -50%); 
 }
 
 
@@ -91,7 +92,6 @@ const map = L.map("map", {
    FOND IGN
    ========================================= */
 
-/* je choisis de ne pas l'afficher temporairement ----
 const fond = L.tileLayer(
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
     {
@@ -102,7 +102,7 @@ const fond = L.tileLayer(
     }
 );
 
-fond.addTo(map); --------*/
+fond.addTo(map);
 
 
 /* =========================================
@@ -155,15 +155,12 @@ const centre = [
 
 const etiquette = L.marker(centre, {
 
-                    icon: L.divIcon({
-
-                        className: "labelCommune",
-
-                        html: nom,
-
-                        iconSize: null
-
-                    }),
+                 icon: L.divIcon({
+    className: "labelCommune",
+    html: nom,
+    iconSize: null,
+    iconAnchor: [0, 0]
+}),
 
                     interactive: false
 
@@ -267,4 +264,3 @@ const etiquette = L.marker(centre, {
 </body>
 
 </html>
-
