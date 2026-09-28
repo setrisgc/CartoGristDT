@@ -68,18 +68,26 @@ const map = L.map("map", {
    FOND IGN
    ========================================= */
 
-const fond = L.tileLayer(
-    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+const fondIGN = L.tileLayer(
+    "https://data.geopf.fr/wmts?" +
+    "SERVICE=WMTS" +
+    "&REQUEST=GetTile" +
+    "&VERSION=1.0.0" +
+    "&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2" +
+    "&STYLE=normal" +
+    "&TILEMATRIXSET=PM" +
+    "&TILEMATRIX={z}" +
+    "&TILEROW={y}" +
+    "&TILECOL={x}" +
+    "&FORMAT=image/png",
     {
-        maxZoom:22,
-        maxNativeZoom:19,
-        opacity:0,
-        attribution:'© IGN - Géoplateforme'
+        maxZoom: 22,
+        maxNativeZoom: 19,
+        attribution: "© IGN"
     }
 );
 
-fond.addTo(map);
-
+fondIGN.addTo(map);
 
 /* =========================================
    COUCHE COMMUNES
