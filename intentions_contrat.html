@@ -24,6 +24,31 @@ html, body {
     height: 100%;
 }
 
+
+/* =========================================
+   ÉTIQUETTES DES COMMUNES
+   ========================================= */
+
+.labelCommune {
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    color: #555555;
+
+    font-size: 10px;
+    font-weight: normal;
+
+    white-space: nowrap;
+
+    padding: 0;
+
+    transform: translate(-50%, -50%);
+
+}
+
+
 </style>
 
 </head>
@@ -48,6 +73,8 @@ const urlCommunes =
 
 const urlArrondissements =
 "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/arrondissement.geojson";
+
+const urlCommunesPoints = "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson"; 
 
 
 /* =========================================
@@ -109,6 +136,30 @@ fetch(urlCommunes)
 
 
     communes.addTo(map);
+
+
+/* pour les centroides des communes qui servent aux étiquettes */
+/* =========================================
+   POINTS DES COMMUNES
+   ========================================= */
+
+return fetch(urlCommunesPoints)
+
+.then(function(response) {
+
+    return response.json();
+
+})
+
+.then(function(data) {
+
+    const communesPoints = L.geoJSON(data);
+
+    communesPoints.addTo(map);
+
+});
+
+
 
 
     /* =========================================
