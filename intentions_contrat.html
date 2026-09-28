@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -89,6 +90,8 @@ html, body {
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
 
 <script>
 
@@ -98,17 +101,44 @@ html, body {
 
 
 /* -------------------------------------
-   GeoJSON de la couche communes
+   GeoJSON des communes
    ------------------------------------- */
 
-const urlCommunes =
-"https://github.com/setrisgc/CartoGristDT/blob/main/communes.geojson";
+/*
+   IMPORTANT :
+   On utilise ici l'URL RAW de GitHub.
 
+   Ton fichier est actuellement ici :
+
+   https://github.com/setrisgc/CartoGristDT/blob/main/communes.geojson
+
+   L'URL utilisée par fetch() doit être :
+
+   https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson
+*/
+
+const urlCommunes =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson";
 
 
 /* -------------------------------------
-   Fond IGN
+   Couleurs contractualisation
    ------------------------------------- */
+
+const couleurs = {
+
+    ACV: "#ff9a3b",
+
+    PVD: "#9842b7",
+
+    VA: "#10df08"
+
+};
+
+
+/* =====================================================
+   2 — CREATION DE LA CARTE
+   ===================================================== */
 
 const fondIGN = L.tileLayer(
     "https://data.geopf.fr/wmts?" +
@@ -128,10 +158,6 @@ const fondIGN = L.tileLayer(
 );
 
 
-/* =====================================================
-   2 — CREATION DE LA CARTE
-   ===================================================== */
-
 const map = L.map("map", {
 
     center: [49.1, -1.3],
@@ -147,21 +173,29 @@ const map = L.map("map", {
    3 — COUCHE DES COMMUNES
    ===================================================== */
 
-const coucheCommunes = L.layerGroup().addTo(map);
+const coucheCommunes =
+    L.layerGroup().addTo(map);
 
 
 /* =====================================================
    4 — LEGENDE
    ===================================================== */
 
-const controleLegende = L.control({
-    position: "topright"
-});
+const controleLegende =
+    L.control({
+        position: "topright"
+    });
 
 
-controleLegende.onAdd = function() {
+controleLegende.onAdd =
+function() {
 
-    const div = L.DomUtil.create("div", "legend");
+    const div =
+        L.DomUtil.create(
+            "div",
+            "legend"
+        );
+
 
     div.innerHTML = `
 
@@ -169,31 +203,45 @@ controleLegende.onAdd = function() {
             Intentions pour contractualiser
         </div>
 
+
+        <div class="legend-item">
+
+            <div
+                class="legend-symbol"
+                style="
+                    background:#ff9a3b;
+                ">
+            </div>
+
+            ACV
+
+        </div>
+
+
         <div class="legend-item">
 
             <div
                 class="legend-symbol"
                 style="
                     background:#9842b7;
-                    opacity:0.8;
                 ">
             </div>
 
-            Commune concernée
+            PVD
 
         </div>
+
 
         <div class="legend-item">
 
             <div
                 class="legend-symbol"
                 style="
-                    background:#b6b6b6;
-                    opacity:0.4;
+                    background:#10df08;
                 ">
             </div>
 
-            Autres communes
+            VA
 
         </div>
 
@@ -203,94 +251,51 @@ controleLegende.onAdd = function() {
 
 };
 
+
 controleLegende.addTo(map);
 
 
 /* =====================================================
-   5 — CHARGEMENT DU GEOJSON
+   5 — VARIABLES POUR LES DONNEES GRIST
    ===================================================== */
 
-fetch(urlCommunes)
 
-.then(response => {
+/*
+   Cette variable contiendra les données de la table
+   Intentions_pour_contractualiser.
+*/
 
-    if (!response.ok) {
-
-        throw new Error(
-            "Impossible de charger le GeoJSON"
-        );
-
-    }
-
-    return response.json();
-
-})
+let donneesGrist = {};
 
 
-.then(geojson => {
+/*
+   Fonction qui construit un dictionnaire :
+
+   Code commune
+          ↓
+   Contractualisation
+
+   Exemple :
+
+   "50001" → "ACV"
+   "50002" → "PVD"
+   "50003" → "VA"
+*/
+
+function construireDonneesGrist(records) {
+
+    donneesGrist = {};
 
 
-    /* =================================================
-       6 — CHARGEMENT DES DONNEES GRIST
-       ================================================= */
+    records.forEach(record => {
+
+        const code =
+            record["Code commune"];
 
 
+        const contractualisation =
+            record["Contractualisation"];
 
-    grist.ready({
-
-        requiredAccess: "full",
-
-        columns: [
-
-            "Code commune"
-
-        ]
-
-    });
-
-
-    return grist.docApi.fetchTable(
-        "Intentions_pour_contractualiser"
-    )
-
-    .then(table => {
-
-        return {
-
-            geojson: geojson,
-
-            table: table
-
-        };
-
-    });
-
-})
-
-
-.then(({geojson, table}) => {
-
-
-    /* =================================================
-       7 — CONSTRUCTION DE LA LISTE DES CODES INSEE
-       ================================================= */
-
-
-    const communesConcernees = new Set();
-
-
-    /*
-       `table` contient les colonnes sous forme
-       de tableaux.
-
-       On récupère la colonne :
-       Code commune
-    */
-
-    const codes = table["Code commune"] || [];
-
-
-    codes.forEach(code => {
 
         if (
             code !== null &&
@@ -298,9 +303,20 @@ fetch(urlCommunes)
             String(code).trim() !== ""
         ) {
 
-            communesConcernees.add(
-                String(code).trim()
-            );
+            const codeINSEE =
+                String(code).trim();
+
+
+            const valeur =
+                contractualisation
+                ? String(
+                    contractualisation
+                  ).trim().toUpperCase()
+                : "";
+
+
+            donneesGrist[codeINSEE] =
+                valeur;
 
         }
 
@@ -308,202 +324,442 @@ fetch(urlCommunes)
 
 
     console.log(
-        "Codes communes trouvés dans Grist :",
-        communesConcernees
+        "Données Grist :",
+        donneesGrist
+    );
+
+}
+
+
+/* =====================================================
+   6 — INITIALISATION GRIST
+   ===================================================== */
+
+
+/*
+   On demande à Grist les deux colonnes
+   dont nous avons besoin.
+*/
+
+grist.ready({
+
+    requiredAccess: "read table",
+
+    columns: [
+
+        "Code commune",
+
+        "Contractualisation"
+
+    ]
+
+});
+
+
+/* =====================================================
+   7 — RECEPTION DES DONNEES GRIST
+   ===================================================== */
+
+grist.onRecords(function(records) {
+
+    console.log(
+        "Nombre de lignes Grist :",
+        records.length
     );
 
 
-    /* =================================================
-       8 — AFFICHAGE DES COMMUNES
-       ================================================= */
+    construireDonneesGrist(records);
 
 
-    const couche = L.geoJSON(
-        geojson,
-        {
+    /*
+       Une fois les données Grist récupérées,
+       on charge le GeoJSON.
+    */
 
-            style: function(feature) {
+    chargerCommunes();
 
-
-                /*
-                   Code INSEE provenant du GeoJSON
-                */
-
-                const codeINSEE =
-                    String(
-                        feature.properties.INSEE_COMM
-                    ).trim();
+});
 
 
-                /*
-                   Commune présente dans Grist ?
-                */
+/* =====================================================
+   8 — CHARGEMENT DU GEOJSON
+   ===================================================== */
 
-                const estConcernee =
-                    communesConcernees.has(
-                        codeINSEE
-                    );
+function chargerCommunes() {
 
 
-                return {
+    /*
+       On évite de créer plusieurs couches
+       si Grist renvoie plusieurs fois les données.
+    */
 
-                    color:
-                        estConcernee
-                        ? "#9842b7"
-                        : "#b6b6b6",
-
-                    weight:
-                        estConcernee
-                        ? 2
-                        : 1,
-
-                    fillColor:
-                        estConcernee
-                        ? "#9842b7"
-                        : "#b6b6b6",
-
-                    fillOpacity:
-                        estConcernee
-                        ? 0.35
-                        : 0.05
-
-                };
-
-            },
+    coucheCommunes.clear();
 
 
-            /* ==========================================
-               9 — INTERACTION AVEC LES COMMUNES
-               ========================================== */
+    fetch(urlCommunes)
 
-            onEachFeature:
-            function(feature, layer) {
+    .then(response => {
 
+        if (!response.ok) {
 
-                const codeINSEE =
-                    String(
-                        feature.properties.INSEE_COMM
-                    ).trim();
-
-
-                const nomCommune =
-                    feature.properties.NOM_COMM
-                    || "Commune";
-
-
-                const estConcernee =
-                    communesConcernees.has(
-                        codeINSEE
-                    );
-
-
-                /*
-                   Popup
-                */
-
-                layer.bindPopup(`
-
-                    <div class="popup-title">
-                        ${nomCommune}
-                    </div>
-
-                    <div class="popup-row">
-                        <b>Code INSEE :</b>
-                        ${codeINSEE}
-                    </div>
-
-                    <div class="popup-row">
-                        <b>Intention :</b>
-                        ${
-                            estConcernee
-                            ? "Oui"
-                            : "Non"
-                        }
-                    </div>
-
-                `);
-
-
-                /*
-                   Effet au survol
-                */
-
-                layer.on({
-
-                    mouseover: function(e) {
-
-                        const l =
-                            e.target;
-
-                        l.setStyle({
-
-                            weight: 3,
-
-                            fillOpacity:
-                                estConcernee
-                                ? 0.55
-                                : 0.15
-
-                        });
-
-                        l.bringToFront();
-
-                    },
-
-                    mouseout: function(e) {
-
-                        couche.resetStyle(
-                            e.target
-                        );
-
-                    }
-
-                });
-
-            }
+            throw new Error(
+                "Impossible de charger le GeoJSON : "
+                + response.status
+            );
 
         }
 
-    );
+        return response.json();
+
+    })
 
 
-    coucheCommunes.addLayer(couche);
+    .then(geojson => {
 
 
-    /* =================================================
-       10 — ZOOM AUTOMATIQUE
-       ================================================= */
-
-    const limites =
-        couche.getBounds();
+        console.log(
+            "GeoJSON chargé :",
+            geojson
+        );
 
 
-    if (limites.isValid()) {
+        /* =================================================
+           9 — CREATION DE LA COUCHE COMMUNES
+           ================================================= */
 
-        map.fitBounds(
-            limites,
-            {
-                padding: [20, 20]
-            }
+        const couche =
+            L.geoJSON(
+                geojson,
+                {
+
+
+                    /* ======================================
+                       STYLE
+                       ====================================== */
+
+                    style:
+                    function(feature) {
+
+
+                        /*
+                           Code INSEE du GeoJSON
+                        */
+
+                        const codeINSEE =
+                            feature.properties.INSEE_COMM
+                            !== undefined
+                            && feature.properties.INSEE_COMM
+                            !== null
+                            ? String(
+                                feature.properties.INSEE_COMM
+                              ).trim()
+                            : "";
+
+
+                        /*
+                           On récupère la contractualisation
+                           correspondant au code INSEE.
+                        */
+
+                        const contractualisation =
+                            donneesGrist[
+                                codeINSEE
+                            ] || "";
+
+
+                        /*
+                           Couleur correspondante
+                        */
+
+                        const couleur =
+                            couleurs[
+                                contractualisation
+                            ];
+
+
+                        /*
+                           Si ACV / PVD / VA :
+                           on colore.
+
+                           Sinon :
+                           aucune coloration.
+                        */
+
+                        if (couleur) {
+
+                            return {
+
+                                color: couleur,
+
+                                weight: 2,
+
+                                fillColor: couleur,
+
+                                fillOpacity: 0.45
+
+                            };
+
+                        }
+
+
+                        /*
+                           Commune sans contractualisation
+                        */
+
+                        return {
+
+                            color: "#b6b6b6",
+
+                            weight: 1,
+
+                            fillColor: "#ffffff",
+
+                            fillOpacity: 0
+
+                        };
+
+                    },
+
+
+                    /* ======================================
+                       INTERACTIONS
+                       ====================================== */
+
+                    onEachFeature:
+                    function(feature, layer) {
+
+
+                        /*
+                           Code INSEE
+                        */
+
+                        const codeINSEE =
+                            feature.properties.INSEE_COMM
+                            !== undefined
+                            && feature.properties.INSEE_COMM !== null
+                            ? String(
+                                feature.properties.INSEE_COMM
+                              ).trim()
+                            : "";
+
+
+                        /*
+                           Nom commune
+                        */
+
+                        const nomCommune =
+                            feature.properties.NOM_COMM
+                            || feature.properties.NOM
+                            || "Commune";
+
+
+                        /*
+                           Contractualisation
+                        */
+
+                        const contractualisation =
+                            donneesGrist[
+                                codeINSEE
+                            ] || "";
+
+
+                        /* ==================================
+                           POPUP
+                           ================================== */
+
+                        let texteContractualisation;
+
+
+                        if (
+                            contractualisation === "ACV"
+                            ||
+                            contractualisation === "PVD"
+                            ||
+                            contractualisation === "VA"
+                        ) {
+
+                            texteContractualisation =
+                                contractualisation;
+
+                        } else {
+
+                            texteContractualisation =
+                                "Aucune";
+
+                        }
+
+
+                        layer.bindPopup(`
+
+                            <div class="popup-title">
+                                ${nomCommune}
+                            </div>
+
+                            <div class="popup-row">
+                                <b>Code INSEE :</b>
+                                ${codeINSEE}
+                            </div>
+
+                            <div class="popup-row">
+                                <b>Contractualisation :</b>
+                                ${texteContractualisation}
+                            </div>
+
+                        `);
+
+
+                        /* ==================================
+                           SURVOL
+                           ================================== */
+
+                        layer.on({
+
+                            mouseover:
+                            function(e) {
+
+                                const l =
+                                    e.target;
+
+
+                                l.setStyle({
+
+                                    weight: 3,
+
+                                    fillOpacity:
+                                        contractualisation
+                                        ? 0.65
+                                        : 0.10
+
+                                });
+
+
+                                l.bringToFront();
+
+                            },
+
+
+                            mouseout:
+                            function(e) {
+
+                                /*
+                                   On remet le style
+                                   correspondant à la
+                                   contractualisation.
+                                */
+
+                                const couleur =
+                                    couleurs[
+                                        contractualisation
+                                    ];
+
+
+                                if (couleur) {
+
+                                    e.target.setStyle({
+
+                                        color:
+                                            couleur,
+
+                                        weight: 2,
+
+                                        fillColor:
+                                            couleur,
+
+                                        fillOpacity:
+                                            0.45
+
+                                    });
+
+                                } else {
+
+                                    e.target.setStyle({
+
+                                        color:
+                                            "#b6b6b6",
+
+                                        weight: 1,
+
+                                        fillColor:
+                                            "#ffffff",
+
+                                        fillOpacity: 0
+
+                                    });
+
+                                }
+
+                            }
+
+                        });
+
+                    }
+
+                }
+
+            );
+
+
+        /* ================================================
+           AJOUT A LA CARTE
+           ================================================ */
+
+        coucheCommunes.addLayer(
+            couche
+        );
+
+
+        /* ================================================
+           ZOOM AUTOMATIQUE
+           ================================================ */
+
+        const limites =
+            couche.getBounds();
+
+
+        if (limites.isValid()) {
+
+            map.fitBounds(
+                limites,
+                {
+                    padding: [20, 20]
+                }
+            );
+
+        }
+
+
+        console.log(
+            "CartoGrist chargée avec succès."
+        );
+
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            "Erreur CartoGrist :",
+            error
+        );
+
+    });
+
+}
+
+
+/* =====================================================
+   10 — MESSAGE SI GRIST NE RENVOIE AUCUNE DONNEE
+   ===================================================== */
+
+grist.onRecords(function(records) {
+
+    if (!records || records.length === 0) {
+
+        console.log(
+            "Aucune donnée reçue de Grist."
         );
 
     }
-
-
-    console.log(
-        "CartoGrist chargée avec succès."
-    );
-
-
-})
-
-
-.catch(error => {
-
-    console.error(
-        "Erreur CartoGrist :",
-        error
-    );
 
 });
 
@@ -512,3 +768,5 @@ fetch(urlCommunes)
 </body>
 
 </html>
+```
+
