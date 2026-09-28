@@ -138,7 +138,6 @@ fetch(urlCommunes)
     communes.addTo(map);
 
 
-/* pour les centroides des communes qui servent aux étiquettes */
 /* =========================================
    POINTS DES COMMUNES
    ========================================= */
@@ -157,17 +156,15 @@ return fetch(urlCommunesPoints)
 
     communesPoints.addTo(map);
 
-});
-
-
-
 
     /* =========================================
-       UNE FOIS LES COMMUNES CHARGÉES,
+       UNE FOIS LES POINTS CHARGÉS,
        ON CHARGE LES ARRONDISSEMENTS
        ========================================= */
 
     return fetch(urlArrondissements);
+
+});
 
 })
 
