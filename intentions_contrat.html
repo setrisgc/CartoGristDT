@@ -111,22 +111,14 @@ fetch(urlCommunes)
     communes.addTo(map);
 
 
-    /* Zoom automatique sur les communes */
+    /* =========================================
+       UNE FOIS LES COMMUNES CHARGÉES,
+       ON CHARGE LES ARRONDISSEMENTS
+       ========================================= */
 
-    if (communes.getBounds().isValid()) {
+    return fetch(urlArrondissements);
 
-        map.fitBounds(communes.getBounds());
-
-    }
-
-});
-
-
-/* =========================================
-   COUCHE ARRONDISSEMENTS
-   ========================================= */
-
-fetch(urlArrondissements)
+})
 
 .then(function(response) {
 
@@ -151,11 +143,10 @@ fetch(urlArrondissements)
     });
 
 
-arrondissements.addTo(map);
-
-arrondissements.bringToFront();  /* les arrondissements s’affichent après les communes*/
+    arrondissements.addTo(map);
 
 });
+
 
 </script>
 
