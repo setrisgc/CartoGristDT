@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -5,16 +6,12 @@
 
 <meta charset="UTF-8">
 
-<title>CartoGrist - Intentions pour contractualiser</title>
+<title>Carte des communes</title>
 
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-
-/* ======================================
-   PAGE
-   ====================================== */
 
 html, body {
     margin: 0;
@@ -26,55 +23,6 @@ html, body {
 #map {
     width: 100%;
     height: 100%;
-}
-
-
-/* ======================================
-   LEGENDE
-   ====================================== */
-
-.legend {
-    background: white;
-    padding: 10px 12px;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.35);
-    font-size: 13px;
-    line-height: 22px;
-}
-
-.legend-title {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin: 3px 0;
-}
-
-.legend-symbol {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    margin-right: 7px;
-    border: 1px solid #555;
-}
-
-
-/* ======================================
-   POPUP
-   ====================================== */
-
-.popup-title {
-    font-weight: bold;
-    font-size: 15px;
-    color: #1f5fae;
-    margin-bottom: 7px;
-}
-
-.popup-row {
-    margin-bottom: 4px;
 }
 
 </style>
@@ -92,27 +40,40 @@ html, body {
 
 <script>
 
-/* =====================================================
-   1 — CONFIGURATION
-   ===================================================== */
-
-
-/* -------------------------------------
-   GeoJSON de la couche communes
-   ------------------------------------- */
+/* =========================================
+   GEOJSON
+   ========================================= */
 
 const urlCommunes =
-"https://github.com/setrisgc/CartoGristDT/blob/main/communes.geojson";
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson";
+
+const urlArrondissements =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/arrondissement.geojson";
 
 
+/* =========================================
+   CARTE
+   ========================================= */
 
-/* -------------------------------------
-   Fond IGN
-   ------------------------------------- */
+const map = L.map("map", {
+
+    center: [49.1, -1.3],
+
+    zoom: 9
+
+});
+
+
+/* =========================================
+   FOND IGN
+   ========================================= */
 
 const fondIGN = L.tileLayer(
+
     "https://data.geopf.fr/wmts?" +
-    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0" +
+    "SERVICE=WMTS" +
+    "&REQUEST=GetTile" +
+    "&VERSION=1.0.0" +
     "&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2" +
     "&STYLE=normal" +
     "&TILEMATRIXSET=PM" +
@@ -120,390 +81,96 @@ const fondIGN = L.tileLayer(
     "&TILEROW={y}" +
     "&TILECOL={x}" +
     "&FORMAT=image/jpeg",
+
     {
+
         maxZoom: 22,
+
         maxNativeZoom: 19,
+
         attribution: "© IGN"
+
     }
+
 );
 
 
-/* =====================================================
-   2 — CREATION DE LA CARTE
-   ===================================================== */
-
-const map = L.map("map", {
-
-    center: [49.1, -1.3],
-
-    zoom: 9,
-
-    layers: [fondIGN]
-
-});
+fondIGN.addTo(map);
 
 
-/* =====================================================
-   3 — COUCHE DES COMMUNES
-   ===================================================== */
-
-const coucheCommunes = L.layerGroup().addTo(map);
-
-
-/* =====================================================
-   4 — LEGENDE
-   ===================================================== */
-
-const controleLegende = L.control({
-    position: "topright"
-});
-
-
-controleLegende.onAdd = function() {
-
-    const div = L.DomUtil.create("div", "legend");
-
-    div.innerHTML = `
-
-        <div class="legend-title">
-            Intentions pour contractualiser
-        </div>
-
-        <div class="legend-item">
-
-            <div
-                class="legend-symbol"
-                style="
-                    background:#9842b7;
-                    opacity:0.8;
-                ">
-            </div>
-
-            Commune concernée
-
-        </div>
-
-        <div class="legend-item">
-
-            <div
-                class="legend-symbol"
-                style="
-                    background:#b6b6b6;
-                    opacity:0.4;
-                ">
-            </div>
-
-            Autres communes
-
-        </div>
-
-    `;
-
-    return div;
-
-};
-
-controleLegende.addTo(map);
-
-
-/* =====================================================
-   5 — CHARGEMENT DU GEOJSON
-   ===================================================== */
+/* =========================================
+   COUCHE COMMUNES
+   ========================================= */
 
 fetch(urlCommunes)
 
-.then(response => {
-
-    if (!response.ok) {
-
-        throw new Error(
-            "Impossible de charger le GeoJSON"
-        );
-
-    }
+.then(function(response) {
 
     return response.json();
 
 })
 
+.then(function(data) {
 
-.then(geojson => {
+    const communes = L.geoJSON(data, {
 
+        style: {
 
-    /* =================================================
-       6 — CHARGEMENT DES DONNEES GRIST
-       ================================================= */
+            color: "#b6b6b6",
 
+            weight: 1,
 
-
-    grist.ready({
-
-        requiredAccess: "full",
-
-        columns: [
-
-            "Code commune"
-
-        ]
-
-    });
-
-
-    return grist.docApi.fetchTable(
-        "Intentions_pour_contractualiser"
-    )
-
-    .then(table => {
-
-        return {
-
-            geojson: geojson,
-
-            table: table
-
-        };
-
-    });
-
-})
-
-
-.then(({geojson, table}) => {
-
-
-    /* =================================================
-       7 — CONSTRUCTION DE LA LISTE DES CODES INSEE
-       ================================================= */
-
-
-    const communesConcernees = new Set();
-
-
-    /*
-       `table` contient les colonnes sous forme
-       de tableaux.
-
-       On récupère la colonne :
-       Code commune
-    */
-
-    const codes = table["Code commune"] || [];
-
-
-    codes.forEach(code => {
-
-        if (
-            code !== null &&
-            code !== undefined &&
-            String(code).trim() !== ""
-        ) {
-
-            communesConcernees.add(
-                String(code).trim()
-            );
+            fill: false
 
         }
 
     });
 
 
-    console.log(
-        "Codes communes trouvés dans Grist :",
-        communesConcernees
-    );
+    communes.addTo(map);
 
 
-    /* =================================================
-       8 — AFFICHAGE DES COMMUNES
-       ================================================= */
+    /* Zoom automatique sur les communes */
 
+    if (communes.getBounds().isValid()) {
 
-    const couche = L.geoJSON(
-        geojson,
-        {
-
-            style: function(feature) {
-
-
-                /*
-                   Code INSEE provenant du GeoJSON
-                */
-
-                const codeINSEE =
-                    String(
-                        feature.properties.INSEE_COMM
-                    ).trim();
-
-
-                /*
-                   Commune présente dans Grist ?
-                */
-
-                const estConcernee =
-                    communesConcernees.has(
-                        codeINSEE
-                    );
-
-
-                return {
-
-                    color:
-                        estConcernee
-                        ? "#9842b7"
-                        : "#b6b6b6",
-
-                    weight:
-                        estConcernee
-                        ? 2
-                        : 1,
-
-                    fillColor:
-                        estConcernee
-                        ? "#9842b7"
-                        : "#b6b6b6",
-
-                    fillOpacity:
-                        estConcernee
-                        ? 0.35
-                        : 0.05
-
-                };
-
-            },
-
-
-            /* ==========================================
-               9 — INTERACTION AVEC LES COMMUNES
-               ========================================== */
-
-            onEachFeature:
-            function(feature, layer) {
-
-
-                const codeINSEE =
-                    String(
-                        feature.properties.INSEE_COMM
-                    ).trim();
-
-
-                const nomCommune =
-                    feature.properties.NOM_COMM
-                    || "Commune";
-
-
-                const estConcernee =
-                    communesConcernees.has(
-                        codeINSEE
-                    );
-
-
-                /*
-                   Popup
-                */
-
-                layer.bindPopup(`
-
-                    <div class="popup-title">
-                        ${nomCommune}
-                    </div>
-
-                    <div class="popup-row">
-                        <b>Code INSEE :</b>
-                        ${codeINSEE}
-                    </div>
-
-                    <div class="popup-row">
-                        <b>Intention :</b>
-                        ${
-                            estConcernee
-                            ? "Oui"
-                            : "Non"
-                        }
-                    </div>
-
-                `);
-
-
-                /*
-                   Effet au survol
-                */
-
-                layer.on({
-
-                    mouseover: function(e) {
-
-                        const l =
-                            e.target;
-
-                        l.setStyle({
-
-                            weight: 3,
-
-                            fillOpacity:
-                                estConcernee
-                                ? 0.55
-                                : 0.15
-
-                        });
-
-                        l.bringToFront();
-
-                    },
-
-                    mouseout: function(e) {
-
-                        couche.resetStyle(
-                            e.target
-                        );
-
-                    }
-
-                });
-
-            }
-
-        }
-
-    );
-
-
-    coucheCommunes.addLayer(couche);
-
-
-    /* =================================================
-       10 — ZOOM AUTOMATIQUE
-       ================================================= */
-
-    const limites =
-        couche.getBounds();
-
-
-    if (limites.isValid()) {
-
-        map.fitBounds(
-            limites,
-            {
-                padding: [20, 20]
-            }
-        );
+        map.fitBounds(communes.getBounds());
 
     }
 
+});
 
-    console.log(
-        "CartoGrist chargée avec succès."
-    );
 
+/* =========================================
+   COUCHE ARRONDISSEMENTS
+   ========================================= */
+
+fetch(urlArrondissements)
+
+.then(function(response) {
+
+    return response.json();
 
 })
 
+.then(function(data) {
 
-.catch(error => {
+    const arrondissements = L.geoJSON(data, {
 
-    console.error(
-        "Erreur CartoGrist :",
-        error
-    );
+        style: {
+
+            color: "#141f72",
+
+            weight: 3,
+
+            fill: false
+
+        }
+
+    });
+
+
+    arrondissements.addTo(map);
 
 });
 
@@ -512,4 +179,4 @@ fetch(urlCommunes)
 </body>
 
 </html>
-
+```
