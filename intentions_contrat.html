@@ -152,7 +152,9 @@ fetch(urlArrondissements)
     });
 
 
-    arrondissements.addTo(map);
+arrondissements.addTo(map);
+
+arrondissements.bringToFront();  /* les arrondissements s’affichent après les communes*/
 
 });
 
