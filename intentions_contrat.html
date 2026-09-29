@@ -30,22 +30,17 @@ html, body {
    ========================================= */
 
 .labelCommune {
-
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-
     color: #555555;
-
     font-size: 10px;
     font-weight: normal;
-
     white-space: nowrap;
-
     padding: 0;
-
-    transform: translate(-50%, -50%);
-
+    text-align: center;
+    line-height: 20px;
+    pointer-events: none;
 }
 
 
@@ -60,6 +55,7 @@ html, body {
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 
 <script>
 
@@ -98,7 +94,7 @@ const fond = L.tileLayer(
     {
         maxZoom:22,
         maxNativeZoom:19,
-		   opacity:0.7,
+		   opacity:0.4,
         attribution:'© IGN - Géoplateforme'
     }
 );
@@ -151,9 +147,45 @@ return fetch(urlCommunesPoints)
 
 .then(function(data) {
 
-    const communesPoints = L.geoJSON(data);
 
-    communesPoints.addTo(map);
+
+/* ----- Affichage des étiquettes des communes, selon un certain zoom de la carte ----- Le point de communesPoints sert  d’ancrage : iconAnchor: [60, 10] place le centre de la petite zone de texte exactement sur le centroïde. Et on n’affiche plus le symbole du point, seulement le nom.  */
+
+const communesPoints = L.geoJSON(data, {
+    pointToLayer: function(feature, latlng) {
+
+        const nom = feature.properties.NOM_COMM || "";
+
+        return L.marker(latlng, {
+            interactive: false,
+
+            icon: L.divIcon({
+                className: "labelCommune",
+                html: nom,
+                iconSize: [120, 20],
+                iconAnchor: [60, 10]
+            })
+        });
+    }
+});
+
+
+/*---fin--*/
+
+    /* Afficher les étiquettes à partir du zoom 11 
+Cela vérifie le niveau de zoom au chargement de la couche, puis à chaque changement de zoom */
+
+function gererEtiquettesCommunes() {
+
+    if (map.getZoom() >= 11) {
+        communesPoints.addTo(map);
+    } else {
+        map.removeLayer(communesPoints);
+    }
+}
+
+map.on("zoomend", gererEtiquettesCommunes);
+gererEtiquettesCommunes();
 
 
     /* =========================================
@@ -200,3 +232,4 @@ return fetch(urlCommunesPoints)
 </body>
 
 </html>
+
