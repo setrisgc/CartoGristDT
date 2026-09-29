@@ -93,6 +93,25 @@ let contractualisationParCommune = {};
 let coucheCommunes = null;
 
 
+// ======================================
+// TEST DE COLORATION DES COMMUNES
+// ======================================
+
+function styleCommune(feature) {
+
+    return {
+
+        fillColor: "#ff0000",
+
+        fillOpacity: 0.65,
+
+        color: "#b6b6b6",
+
+        weight: 1
+
+    };
+
+}
 
 
 /* =========================================
@@ -119,8 +138,10 @@ fond.addTo(map);
    ========================================= */
 
 fetch(urlCommunes)
-.then(response => response.json())
-.then(data => {
+.then(function(response) {
+    return response.json();
+})
+.then(function(data) {
 
     coucheCommunes = L.geoJSON(data, {
 
@@ -135,74 +156,82 @@ fetch(urlCommunes)
    POINTS DES COMMUNES
    ========================================= */
 
-return fetch(urlCommunesPoints)
-
+fetch(urlCommunesPoints)
 .then(function(response) {
 
     return response.json();
 
 })
-
 .then(function(data) {
 
+    /* =========================================
+       ÉTIQUETTES DES COMMUNES
+       ========================================= */
 
+    const communesPoints = L.geoJSON(data, {
 
-/* ----- Affichage des étiquettes des communes, selon un certain zoom de la carte ----- Le point de communesPoints sert  d’ancrage : iconAnchor: [60, 10] place le centre de la petite zone de texte exactement sur le centroïde. Et on n’affiche plus le symbole du point, seulement le nom.  */
+        pointToLayer: function(feature, latlng) {
 
-const communesPoints = L.geoJSON(data, {
-    pointToLayer: function(feature, latlng) {
+            const nom = feature.properties.NOM_COMM || "";
 
-        const nom = feature.properties.NOM_COMM || "";
+            return L.marker(latlng, {
 
-        return L.marker(latlng, {
-            interactive: false,
+                interactive: false,
 
-            icon: L.divIcon({
-                className: "labelCommune",
-                html: nom,
-                iconSize: [120, 20],
-                iconAnchor: [60, 10]
-            })
-        });
-    }
-});
+                icon: L.divIcon({
 
+                    className: "labelCommune",
 
-/*---fin--*/
+                    html: nom,
 
-    /* Afficher les étiquettes à partir du zoom 11 
-Cela vérifie le niveau de zoom au chargement de la couche, puis à chaque changement de zoom */
+                    iconSize: [120, 20],
 
-function gererEtiquettesCommunes() {
+                    iconAnchor: [60, 10]
 
-    if (map.getZoom() >= 11) {
-        communesPoints.addTo(map);
-    } else {
-        map.removeLayer(communesPoints);
-    }
-}
+                })
 
-map.on("zoomend", gererEtiquettesCommunes);
-gererEtiquettesCommunes();
+            });
+
+        }
+
+    });
 
 
     /* =========================================
-       UNE FOIS LES POINTS CHARGÉS,
-       ON CHARGE LES ARRONDISSEMENTS
+       AFFICHAGE DES ÉTIQUETTES À PARTIR DU ZOOM 11
        ========================================= */
 
-    return fetch(urlArrondissements);
+    function gererEtiquettesCommunes() {
+
+        if (map.getZoom() >= 11) {
+
+            communesPoints.addTo(map);
+
+        } else {
+
+            map.removeLayer(communesPoints);
+
+        }
+
+    }
+
+    map.on("zoomend", gererEtiquettesCommunes);
+
+    gererEtiquettesCommunes();
 
 });
 
-})
 
+/* =========================================
+   ARRONDISSEMENTS
+   ========================================= */
+
+fetch(urlArrondissements)
 .then(function(response) {
 
     return response.json();
 
 })
-
 .then(function(data) {
 
     const arrondissements = L.geoJSON(data, {
@@ -219,96 +248,9 @@ gererEtiquettesCommunes();
 
     });
 
-
     arrondissements.addTo(map);
 
 });
-
-// ======================================
-// CONTRACTUALISATION GRIST
-// ======================================
-
-
-// Réception des données Grist
-grist.onRecords(function(records) {
-
-    contractualisationParCommune = {};
-
-    records.forEach(function(record) {
-
-        const code = String(record["Code commune"] || "").trim();
-        const valeur = String(record["Contractualisation"] || "").trim();
-
-        if (code) {
-            contractualisationParCommune[code] = valeur;
-        }
-
-    });
-
-    // Mise à jour des couleurs si la couche est déjà chargée
-    if (coucheCommunes) {
-        coucheCommunes.setStyle(styleCommune);
-    }
-
-});
-
-
-
-// ======================================
-// STYLE DES COMMUNES SELON GRIST
-// ======================================
-
-/* function styleCommune(feature) {
-
-    const code = String(
-        feature.properties.INSEE_COMM || ""
-    ).trim();
-
-    const contractualisation =
-        contractualisationParCommune[code] || "";
-
-    let couleur = "#ffffff";
-
-    if (contractualisation === "PVD") {
-        couleur = "#9842b7";
-    }
-    else if (contractualisation === "ACV") {
-        couleur = "#ff9a3b";
-    }
-    else if (contractualisation === "VA") {
-        couleur = "#10df08";
-    }
-
-    return {
-        fillColor: couleur,
-        fillOpacity: 0.65,
-        color: "#b6b6b6",
-        weight: 1
-    };
-}
-
-*/
-
-
-function styleCommune(feature) {
-
-    return {
-
-        fillColor: "#ff0000",
-
-        fillOpacity: 0.65,
-
-        color: "#b6b6b6",
-
-        weight: 1
-
-    };
-
-}
-
-
-
-
 
 
 </script>
@@ -316,3 +258,4 @@ function styleCommune(feature) {
 </body>
 
 </html>
+
