@@ -96,13 +96,17 @@ let contractualisationParCommune = {};
 let coucheCommunes = null;
 
 
-/* =========================================
-   TEST DES DONNÉES GRIST
-   ========================================= */
+// ======================================
+// TEST DES DONNÉES GRIST
+// ======================================
+
+console.log("TEST API GRIST :", typeof grist);
 
 grist.onRecords(function(records) {
 
-    console.log("DONNÉES GRIST :", records);
+    console.log("NOMBRE DE LIGNES GRIST :", records.length);
+
+    console.log("PREMIERE LIGNE GRIST :", records[0]);
 
 });
 
