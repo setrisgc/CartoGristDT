@@ -83,6 +83,9 @@ const map = L.map("map", {
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 650;
 
+map.createPane("interesseesPane");
+map.getPane("interesseesPane").style.zIndex = 640;
+
 
 
 /* =========================================
@@ -92,6 +95,7 @@ map.getPane("arrondissementPane").style.zIndex = 650;
 let contractualisationParCommune = {};
 let communesInteressees = {};
 let coucheCommunes = null;
+let coucheCommunesInteressees = null;
 
 /* =========================================
    TEST DES DONNÉES GRIST
@@ -141,11 +145,42 @@ grist.onRecords(function(records) {
          communesInteressees
     );
 
-    if (coucheCommunes) {
+if (coucheCommunes) {
 
-        coucheCommunes.setStyle(styleCommune);
+    coucheCommunes.setStyle(styleCommune);
 
-    }
+}
+
+if (coucheCommunesInteressees) {
+
+    coucheCommunesInteressees.setStyle(function(feature) {
+
+        const code = String(
+            feature.properties.INSEE_COMM || ""
+        ).trim();
+
+        const interessees =
+            communesInteressees[code] || "";
+
+        if (interessees === "X") {
+
+            return {
+                fill: false,
+                color: "#ff0000",
+                weight: 3
+            };
+
+        }
+
+        return {
+            fill: false,
+            color: "transparent",
+            weight: 0
+        };
+
+    });
+
+}
 
 });
 
@@ -220,18 +255,54 @@ function styleCommune(feature) {
    ========================================= */
 
 fetch(urlCommunes)
-
 .then(function(response) {
-
     return response.json();
-
 })
-
 .then(function(data) {
 
-    coucheCommunes = L.geoJSON(data, {
+    /* =========================================
+       COMMUNES
+       ========================================= */
 
-	style: styleCommune
+    coucheCommunes = L.geoJSON(data, {
+        style: styleCommune
+    }).addTo(map);
+
+
+    /* =========================================
+       CONTOURS ROUGES DES COMMUNES INTÉRESSÉES
+       ========================================= */
+
+    coucheCommunesInteressees = L.geoJSON(data, {
+
+        pane: "interesseesPane",
+
+        style: function(feature) {
+
+            const code = String(
+                feature.properties.INSEE_COMM || ""
+            ).trim();
+
+            const interessees =
+                communesInteressees[code] || "";
+
+            if (interessees === "X") {
+
+                return {
+                    fill: false,
+                    color: "#ff0000",
+                    weight: 3
+                };
+
+            }
+
+            return {
+                fill: false,
+                color: "transparent",
+                weight: 0
+            };
+
+        }
 
     }).addTo(map);
 
