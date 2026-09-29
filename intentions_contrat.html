@@ -39,6 +39,36 @@ html, body {
     pointer-events: none;
 }
 
+/* pour la boite d zoom par arrondissement */
+.zoomPanel {
+    background: white;
+    padding: 8px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.35);
+    font-size: 13px;
+}
+
+.zoomPanel strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.zoomPanel button {
+    display: block;
+    width: 120px;
+    margin: 3px 0;
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    background: white;
+    cursor: pointer;
+    border-radius: 3px;
+    text-align: left;
+}
+
+.zoomPanel button:hover {
+    background: #eeeeee;
+}
+
 </style>
 
 </head>
@@ -79,6 +109,49 @@ const map = L.map("map", {
     center: [49.1, -1.3],
     zoom: 8
 });
+
+/* =========================================
+   BOÎTE DE ZOOM PAR ARRONDISSEMENT
+   ========================================= */
+
+const controleZoom = L.control({
+    position: "topright"
+});
+
+controleZoom.onAdd = function() {
+
+    const div = L.DomUtil.create("div", "zoomPanel");
+
+    div.innerHTML = `
+        <strong>📍 Zoom</strong>
+
+        <button id="zoomManche">
+            Manche
+        </button>
+
+        <button id="zoomCherbourg">
+            Cherbourg
+        </button>
+
+        <button id="zoomCoutances">
+            Coutances
+        </button>
+
+        <button id="zoomSaintLo">
+            Saint-Lô
+        </button>
+
+        <button id="zoomAvranches">
+            Avranches
+        </button>
+    `;
+
+    L.DomEvent.disableClickPropagation(div);
+
+    return div;
+};
+
+controleZoom.addTo(map);
 
 
 /* =========================================
@@ -272,30 +345,168 @@ fetch(urlCommunesPoints)
    ARRONDISSEMENTS
    ========================================= */
 
+
 fetch(urlArrondissements)
-
 .then(function(response) {
-
     return response.json();
-
 })
-
 .then(function(data) {
 
-coucheArrondissements = L.geoJSON(data, {
+    coucheArrondissements = L.geoJSON(data, {
+        style: {
+            color: "#141f72",
+            weight: 3,
+            fill: false
+        }
+    });
 
-    style: {
-        color: "#141f72",
-        weight: 3,
-        fill: false
-    }
+    coucheArrondissements.addTo(map);
 
-});
+/* pour remettre la couche des arrondissemenents au dessus des communes*/
 
-coucheArrondissements.addTo(map);
+    coucheArrondissements.bringToFront();
 
-/* On place les arrondissements au-dessus */
-coucheArrondissements.bringToFront();
+
+    /* =========================================
+       BOUTONS DE ZOOM
+       ========================================= */
+
+    const limitesArrondissements = {};
+
+
+    /* On récupère l'emprise de chaque arrondissement
+       grâce à INSEE_ARR */
+
+    data.features.forEach(function(feature) {
+
+        const code = String(
+            feature.properties.INSEE_ARR || ""
+        ).trim();
+
+        const couche = L.geoJSON(feature);
+
+        if (code === "1") {
+            limitesArrondissements.avranches =
+                couche.getBounds();
+        }
+
+        else if (code === "2") {
+            limitesArrondissements.cherbourg =
+                couche.getBounds();
+        }
+
+        else if (code === "3") {
+            limitesArrondissements.coutances =
+                couche.getBounds();
+        }
+
+        else if (code === "4") {
+            limitesArrondissements.saintlo =
+                couche.getBounds();
+        }
+
+    });
+
+
+    /* =========================================
+       MANCHE
+       ========================================= */
+
+    document.getElementById("zoomManche")
+        .addEventListener("click", function() {
+
+            map.fitBounds(
+                coucheArrondissements.getBounds(),
+                {
+                    padding: [20, 20]
+                }
+            );
+
+        });
+
+
+    /* =========================================
+       AVRANCHES
+       ========================================= */
+
+    document.getElementById("zoomAvranches")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.avranches) {
+
+                map.fitBounds(
+                    limitesArrondissements.avranches,
+                    {
+                        padding: [20, 20]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       CHERBOURG
+       ========================================= */
+
+    document.getElementById("zoomCherbourg")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.cherbourg) {
+
+                map.fitBounds(
+                    limitesArrondissements.cherbourg,
+                    {
+                        padding: [20, 20]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       COUTANCES
+       ========================================= */
+
+    document.getElementById("zoomCoutances")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.coutances) {
+
+                map.fitBounds(
+                    limitesArrondissements.coutances,
+                    {
+                        padding: [20, 20]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       SAINT-LÔ
+       ========================================= */
+
+    document.getElementById("zoomSaintLo")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.saintlo) {
+
+                map.fitBounds(
+                    limitesArrondissements.saintlo,
+                    {
+                        padding: [20, 20]
+                    }
+                );
+
+            }
+
+        });
 
 });
 
