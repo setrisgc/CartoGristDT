@@ -72,7 +72,7 @@ const urlCommunesPoints =
 
 
 /* =========================================
-   CARTE ET PANE
+   CARTE
    ========================================= */
 
 const map = L.map("map", {
@@ -80,22 +80,14 @@ const map = L.map("map", {
     zoom: 8
 });
 
-map.createPane("arrondissementPane");
-map.getPane("arrondissementPane").style.zIndex = 650;
-
-map.createPane("interesseesPane");
-map.getPane("interesseesPane").style.zIndex = 640;
-
-
 
 /* =========================================
    DONNÉES GRIST
    ========================================= */
 
 let contractualisationParCommune = {};
-let communesInteressees = {};
 let coucheCommunes = null;
-let coucheCommunesInteressees = null;
+
 
 /* =========================================
    TEST DES DONNÉES GRIST
@@ -109,27 +101,15 @@ grist.onRecords(function(records) {
 
     contractualisationParCommune = {};
 
-    communesInteressees= {};
-
     records.forEach(function(record) {
 
-        const code = String(
-            record["Code_Commune"] || ""
-        ).trim();
+        const code = String(record["Code_Commune"] || "").trim();
 
-        const valeur = String(
-            record["Contractualisation"] || ""
-        ).trim();
-
-        const comminteressees = String(
-            record["Communes_interessees"] || ""
-        ).trim().toUpperCase();
+        const valeur = String(record["Contractualisation"] || "").trim();
 
         if (code) {
 
             contractualisationParCommune[code] = valeur;
-
-            communesInteressees[code] = comminteressees;
 
         }
 
@@ -140,47 +120,11 @@ grist.onRecords(function(records) {
         contractualisationParCommune
     );
 
-    console.log(
-        "TABLEAU COMMUNES INTERESSEES :",
-         communesInteressees
-    );
+    if (coucheCommunes) {
 
-if (coucheCommunes) {
+        coucheCommunes.setStyle(styleCommune);
 
-    coucheCommunes.setStyle(styleCommune);
-
-}
-
-if (coucheCommunesInteressees) {
-
-    coucheCommunesInteressees.setStyle(function(feature) {
-
-        const code = String(
-            feature.properties.INSEE_COMM || ""
-        ).trim();
-
-        const interessees =
-            communesInteressees[code] || "";
-
-        if (interessees === "X") {
-
-            return {
-                fill: false,
-                color: "#ff0000",
-                weight: 3
-            };
-
-        }
-
-        return {
-            fill: false,
-            color: "transparent",
-            weight: 0
-        };
-
-    });
-
-}
+    }
 
 });
 
@@ -197,9 +141,6 @@ function styleCommune(feature) {
     const contractualisation =
         contractualisationParCommune[code] || "";
 
-    const comminteressees =
-        communesInteressees[code] || "";
-
     let couleur = "#ffffff";
 
     if (contractualisation === "PVD") {
@@ -207,32 +148,14 @@ function styleCommune(feature) {
         couleur = "#9842b7";
 
     }
-
     else if (contractualisation === "ACV") {
 
         couleur = "#ff9a3b";
 
     }
-
     else if (contractualisation === "VA") {
 
         couleur = "#10df08";
-
-    }
-
-    /* =========================================
-       CONTOUR COMMUNES INTERESSEES
-       ========================================= */
-
-    let couleurContour = "#b6b6b6";
-
-    let epaisseurContour = 1;
-
-    if (comminteressees === "X") {
-
-        couleurContour = "#ff0000";
-
-        epaisseurContour = 2;
 
     }
 
@@ -242,9 +165,9 @@ function styleCommune(feature) {
 
         fillOpacity: 0.65,
 
-        color: couleurContour,
+        color: "#b6b6b6",
 
-        weight: epaisseurContour
+        weight: 1
 
     };
 
@@ -255,54 +178,18 @@ function styleCommune(feature) {
    ========================================= */
 
 fetch(urlCommunes)
+
 .then(function(response) {
+
     return response.json();
+
 })
+
 .then(function(data) {
 
-    /* =========================================
-       COMMUNES
-       ========================================= */
-
     coucheCommunes = L.geoJSON(data, {
-        style: styleCommune
-    }).addTo(map);
 
-
-    /* =========================================
-       CONTOURS ROUGES DES COMMUNES INTÉRESSÉES
-       ========================================= */
-
-    coucheCommunesInteressees = L.geoJSON(data, {
-
-        pane: "interesseesPane",
-
-        style: function(feature) {
-
-            const code = String(
-                feature.properties.INSEE_COMM || ""
-            ).trim();
-
-            const interessees =
-                communesInteressees[code] || "";
-
-            if (interessees === "X") {
-
-                return {
-                    fill: false,
-                    color: "#ff0000",
-                    weight: 3
-                };
-
-            }
-
-            return {
-                fill: false,
-                color: "transparent",
-                weight: 0
-            };
-
-        }
+	style: styleCommune
 
     }).addTo(map);
 
@@ -393,7 +280,8 @@ fetch(urlArrondissements)
 .then(function(data) {
 
 const arrondissements = L.geoJSON(data, {
-pane: "arrondissementPane", 
+
+    pane: "arrondissementPane",
 
     style: {
 
