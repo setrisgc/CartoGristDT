@@ -81,18 +81,6 @@ const map = L.map("map", {
     zoom: 8
 });
 
-/* =========================================
-   PANES
-   ========================================= */
-
-map.createPane("communesPane");
-map.getPane("communesPane").style.zIndex = 400;
-
-map.createPane("arrondissementPane");
-map.getPane("arrondissementPane").style.zIndex = 500;
-
-
-
 
 /* =========================================
    DONNÉES GRIST
@@ -202,7 +190,6 @@ fetch(urlCommunes)
 
     coucheCommunes = L.geoJSON(data, {
 
-          pane: "communesPane", 
 	style: styleCommune
 
     }).addTo(map);
@@ -306,7 +293,9 @@ const arrondissements = L.geoJSON(data, {
 
 });
 
-    arrondissements.addTo(map);
+arrondissements.addTo(map);
+
+arrondissements.bringToFront();
 
 });
 
