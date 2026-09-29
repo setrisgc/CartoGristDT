@@ -87,6 +87,7 @@ const map = L.map("map", {
 
 let contractualisationParCommune = {};
 let coucheCommunes = null;
+let coucheArrondissements = null;
 
 
 /* =========================================
@@ -178,20 +179,22 @@ function styleCommune(feature) {
    ========================================= */
 
 fetch(urlCommunes)
-
 .then(function(response) {
-
     return response.json();
-
 })
-
 .then(function(data) {
 
     coucheCommunes = L.geoJSON(data, {
 
-	style: styleCommune
+        style: styleCommune
 
     }).addTo(map);
+
+    /* Si les arrondissements sont déjà chargés,
+       on les remet au-dessus des communes */
+    if (coucheArrondissements) {
+        coucheArrondissements.bringToFront();
+    }
 
 });
 
@@ -279,21 +282,20 @@ fetch(urlArrondissements)
 
 .then(function(data) {
 
-const arrondissements = L.geoJSON(data, {
+coucheArrondissements = L.geoJSON(data, {
 
     style: {
-
         color: "#141f72",
         weight: 3,
         fill: false
-
     }
 
 });
 
-arrondissements.addTo(map);
+coucheArrondissements.addTo(map);
 
-arrondissements.bringToFront();
+/* On place les arrondissements au-dessus */
+coucheArrondissements.bringToFront();
 
 });
 
