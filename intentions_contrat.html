@@ -86,7 +86,7 @@ const map = L.map("map", {
    ========================================= */
 
 let contractualisationParCommune = {};
-let reseauAlerteParCommune = {};
+let communesInteressees = {};
 let coucheCommunes = null;
 
 /* =========================================
@@ -101,7 +101,7 @@ grist.onRecords(function(records) {
 
     contractualisationParCommune = {};
 
-    reseauAlerteParCommune = {};
+    communesInteressees= {};
 
     records.forEach(function(record) {
 
@@ -113,15 +113,15 @@ grist.onRecords(function(records) {
             record["Contractualisation"] || ""
         ).trim();
 
-        const alerte = String(
-            record["Commune_reseau_d_alerte"] || ""
+        const comminteressees = String(
+            record["Communes_interessees"] || ""
         ).trim().toUpperCase();
 
         if (code) {
 
             contractualisationParCommune[code] = valeur;
 
-            reseauAlerteParCommune[code] = alerte;
+            communesInteressees[code] = comminteressees;
 
         }
 
@@ -133,8 +133,8 @@ grist.onRecords(function(records) {
     );
 
     console.log(
-        "TABLEAU RÉSEAU D'ALERTE :",
-        reseauAlerteParCommune
+        "TABLEAU COMMUNES INTERESSEES :",
+         communesInteressees
     );
 
     if (coucheCommunes) {
@@ -158,8 +158,8 @@ function styleCommune(feature) {
     const contractualisation =
         contractualisationParCommune[code] || "";
 
-    const reseauAlerte =
-        reseauAlerteParCommune[code] || "";
+    const comminteressees =
+        communesInteressees[code] || "";
 
     let couleur = "#ffffff";
 
@@ -182,14 +182,14 @@ function styleCommune(feature) {
     }
 
     /* =========================================
-       CONTOUR RÉSEAU D'ALERTE
+       CONTOUR COMMUNES INTERESSEES
        ========================================= */
 
     let couleurContour = "#b6b6b6";
 
     let epaisseurContour = 1;
 
-    if (reseauAlerte === "X") {
+    if (comminteressees === "X") {
 
         couleurContour = "#ff0000";
 
