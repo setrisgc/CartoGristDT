@@ -202,7 +202,8 @@ fetch(urlCommunes)
 
     coucheCommunes = L.geoJSON(data, {
 
-        style: styleCommune
+          pane: "communesPane", 
+	style: styleCommune
 
     }).addTo(map);
 
@@ -291,17 +292,19 @@ fetch(urlArrondissements)
 
 .then(function(data) {
 
-    const arrondissements = L.geoJSON(data, {
+const arrondissements = L.geoJSON(data, {
 
-        style: {
+    pane: "arrondissementPane",
 
-            color: "#141f72",
-            weight: 3,
-            fill: false
+    style: {
 
-        }
+        color: "#141f72",
+        weight: 3,
+        fill: false
 
-    });
+    }
+
+});
 
     arrondissements.addTo(map);
 
