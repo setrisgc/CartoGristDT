@@ -85,6 +85,16 @@ const map = L.map("map", {
 });
 
 
+// ======================================
+// DONNÉES GRIST
+// ======================================
+
+let contractualisationParCommune = {};
+let coucheCommunes = null;
+
+
+
+
 /* =========================================
    FOND IGN
    ========================================= */
@@ -218,8 +228,6 @@ gererEtiquettesCommunes();
 // CONTRACTUALISATION GRIST
 // ======================================
 
-let contractualisationParCommune = {};
-let coucheCommunes = null;
 
 // Réception des données Grist
 grist.onRecords(function(records) {
@@ -250,7 +258,7 @@ grist.onRecords(function(records) {
 // STYLE DES COMMUNES SELON GRIST
 // ======================================
 
-function styleCommune(feature) {
+/* function styleCommune(feature) {
 
     const code = String(
         feature.properties.INSEE_COMM || ""
@@ -279,10 +287,24 @@ function styleCommune(feature) {
     };
 }
 
+*/
 
 
+function styleCommune(feature) {
 
+    return {
 
+        fillColor: "#ff0000",
+
+        fillOpacity: 0.65,
+
+        color: "#b6b6b6",
+
+        weight: 1
+
+    };
+
+}
 
 
 
