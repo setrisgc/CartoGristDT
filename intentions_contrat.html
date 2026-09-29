@@ -55,10 +55,14 @@ html, body {
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-/* bibliothèque JavaScript de Grist */
-<script src="https://docs.getgrist.com/grist-plugin-api.js"></script> 
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
 <script>
+
+grist.ready({
+    requiredAccess: "read table"
+});
+
 
 /* =========================================
    GEOJSON
@@ -70,7 +74,8 @@ const urlCommunes =
 const urlArrondissements =
 "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/arrondissement.geojson";
 
-const urlCommunesPoints = "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson"; 
+const urlCommunesPoints =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson";
 
 
 /* =========================================
@@ -78,25 +83,22 @@ const urlCommunesPoints = "https://raw.githubusercontent.com/setrisgc/CartoGrist
    ========================================= */
 
 const map = L.map("map", {
-
     center: [49.1, -1.3],
-
     zoom: 8
+);
 
-});
 
-
-// ======================================
-// DONNÉES GRIST
-// ======================================
+/* =========================================
+   DONNÉES GRIST
+   ========================================= */
 
 let contractualisationParCommune = {};
 let coucheCommunes = null;
 
 
-// ======================================
-// TEST DES DONNÉES GRIST
-// ======================================
+/* =========================================
+   TEST DES DONNÉES GRIST
+   ========================================= */
 
 grist.onRecords(function(records) {
 
