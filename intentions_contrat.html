@@ -48,7 +48,6 @@ html, body {
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
 <script>
@@ -87,8 +86,8 @@ const map = L.map("map", {
    ========================================= */
 
 let contractualisationParCommune = {};
+let reseauAlerteParCommune = {};
 let coucheCommunes = null;
-
 
 /* =========================================
    TEST DES DONNÉES GRIST
@@ -102,15 +101,27 @@ grist.onRecords(function(records) {
 
     contractualisationParCommune = {};
 
+    reseauAlerteParCommune = {};
+
     records.forEach(function(record) {
 
-        const code = String(record["Code_Commune"] || "").trim();
+        const code = String(
+            record["Code_Commune"] || ""
+        ).trim();
 
-        const valeur = String(record["Contractualisation"] || "").trim();
+        const valeur = String(
+            record["Contractualisation"] || ""
+        ).trim();
+
+        const alerte = String(
+            record["Commune_reseau_d_alerte"] || ""
+        ).trim().toUpperCase();
 
         if (code) {
 
             contractualisationParCommune[code] = valeur;
+
+            reseauAlerteParCommune[code] = alerte;
 
         }
 
@@ -119,6 +130,11 @@ grist.onRecords(function(records) {
     console.log(
         "TABLEAU DES CONTRACTUALISATIONS :",
         contractualisationParCommune
+    );
+
+    console.log(
+        "TABLEAU RÉSEAU D'ALERTE :",
+        reseauAlerteParCommune
     );
 
     if (coucheCommunes) {
@@ -142,6 +158,9 @@ function styleCommune(feature) {
     const contractualisation =
         contractualisationParCommune[code] || "";
 
+    const reseauAlerte =
+        reseauAlerteParCommune[code] || "";
+
     let couleur = "#ffffff";
 
     if (contractualisation === "PVD") {
@@ -149,14 +168,32 @@ function styleCommune(feature) {
         couleur = "#9842b7";
 
     }
+
     else if (contractualisation === "ACV") {
 
         couleur = "#ff9a3b";
 
     }
+
     else if (contractualisation === "VA") {
 
         couleur = "#10df08";
+
+    }
+
+    /* =========================================
+       CONTOUR RÉSEAU D'ALERTE
+       ========================================= */
+
+    let couleurContour = "#b6b6b6";
+
+    let epaisseurContour = 1;
+
+    if (reseauAlerte === "X") {
+
+        couleurContour = "#ff0000";
+
+        epaisseurContour = 3;
 
     }
 
@@ -166,9 +203,9 @@ function styleCommune(feature) {
 
         fillOpacity: 0.65,
 
-        color: "#b6b6b6",
+        color: couleurContour,
 
-        weight: 1
+        weight: epaisseurContour
 
     };
 
@@ -238,6 +275,7 @@ fetch(urlCommunesPoints)
         }
 
     });
+
 
 
     /* =========================================
