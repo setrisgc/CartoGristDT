@@ -57,6 +57,7 @@ html, body {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
+
 <script>
 
 grist.ready({
@@ -85,7 +86,7 @@ const urlCommunesPoints =
 const map = L.map("map", {
     center: [49.1, -1.3],
     zoom: 8
-);
+});
 
 
 /* =========================================
@@ -96,9 +97,9 @@ let contractualisationParCommune = {};
 let coucheCommunes = null;
 
 
-// ======================================
-// TEST DES DONNÉES GRIST
-// ======================================
+/* =========================================
+   TEST DES DONNÉES GRIST
+   ========================================= */
 
 console.log("TEST API GRIST :", typeof grist);
 
@@ -111,54 +112,34 @@ grist.onRecords(function(records) {
 });
 
 
-// ======================================
-// TEST DE COLORATION DES COMMUNES
-// ======================================
+/* =========================================
+   TEST DE COLORATION DES COMMUNES
+   ========================================= */
 
 function styleCommune(feature) {
 
     return {
-
         fillColor: "#ff0000",
-
         fillOpacity: 0.65,
-
         color: "#b6b6b6",
-
         weight: 1
-
     };
 
 }
 
 
 /* =========================================
-   FOND IGN
-   ========================================= */
-
-/* je choisis ici de ne pas l'afficher ---- 
-const fond = L.tileLayer(
-    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
-    {
-        maxZoom:22,
-        maxNativeZoom:19,
-		   opacity:0.4,
-        attribution:'© IGN - Géoplateforme'
-    }
-);
-
-fond.addTo(map);
------
-*/
-
-/* =========================================
    COUCHE COMMUNES
    ========================================= */
 
 fetch(urlCommunes)
+
 .then(function(response) {
+
     return response.json();
+
 })
+
 .then(function(data) {
 
     coucheCommunes = L.geoJSON(data, {
@@ -175,12 +156,15 @@ fetch(urlCommunes)
    ========================================= */
 
 fetch(urlCommunesPoints)
+
 .then(function(response) {
 
     return response.json();
 
 })
+
 .then(function(data) {
+
 
     /* =========================================
        ÉTIQUETTES DES COMMUNES
@@ -233,6 +217,7 @@ fetch(urlCommunesPoints)
 
     }
 
+
     map.on("zoomend", gererEtiquettesCommunes);
 
     gererEtiquettesCommunes();
@@ -245,11 +230,13 @@ fetch(urlCommunesPoints)
    ========================================= */
 
 fetch(urlArrondissements)
+
 .then(function(response) {
 
     return response.json();
 
 })
+
 .then(function(data) {
 
     const arrondissements = L.geoJSON(data, {
@@ -269,7 +256,6 @@ fetch(urlArrondissements)
     arrondissements.addTo(map);
 
 });
-
 
 </script>
 
