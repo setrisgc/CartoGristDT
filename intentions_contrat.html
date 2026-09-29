@@ -109,31 +109,16 @@ fond.addTo(map);
    ========================================= */
 
 fetch(urlCommunes)
+.then(response => response.json())
+.then(data => {
 
-.then(function(response) {
+    coucheCommunes = L.geoJSON(data, {
 
-    return response.json();
+        style: styleCommune
 
-})
+    }).addTo(map);
 
-.then(function(data) {
-
-    const communes = L.geoJSON(data, {
-
-        style: {
-
-            color: "#b6b6b6",
-
-            weight: 1,
-
-            fill: false
-
-        }
-
-    });
-
-
-    communes.addTo(map);
+});
 
 
 /* =========================================
@@ -229,10 +214,83 @@ gererEtiquettesCommunes();
 
 });
 
+// ======================================
+// CONTRACTUALISATION GRIST
+// ======================================
+
+let contractualisationParCommune = {};
+let coucheCommunes = null;
+
+// Réception des données Grist
+grist.onRecords(function(records) {
+
+    contractualisationParCommune = {};
+
+    records.forEach(function(record) {
+
+        const code = String(record["Code commune"] || "").trim();
+        const valeur = String(record["Contractualisation"] || "").trim();
+
+        if (code) {
+            contractualisationParCommune[code] = valeur;
+        }
+
+    });
+
+    // Mise à jour des couleurs si la couche est déjà chargée
+    if (coucheCommunes) {
+        coucheCommunes.setStyle(styleCommune);
+    }
+
+});
+
+
+
+// ======================================
+// STYLE DES COMMUNES SELON GRIST
+// ======================================
+
+function styleCommune(feature) {
+
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
+
+    const contractualisation =
+        contractualisationParCommune[code] || "";
+
+    let couleur = "#ffffff";
+
+    if (contractualisation === "PVD") {
+        couleur = "#9842b7";
+    }
+    else if (contractualisation === "ACV") {
+        couleur = "#ff9a3b";
+    }
+    else if (contractualisation === "VA") {
+        couleur = "#10df08";
+    }
+
+    return {
+        fillColor: couleur,
+        fillOpacity: 0.65,
+        color: "#b6b6b6",
+        weight: 1
+    };
+}
+
+
+
+
+
+
+
+
+
+
 
 </script>
 
 </body>
 
 </html>
-
