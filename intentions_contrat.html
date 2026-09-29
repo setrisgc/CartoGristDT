@@ -100,26 +100,79 @@ grist.onRecords(function(records) {
 
     console.log("NOMBRE DE LIGNES GRIST :", records.length);
 
-    console.log("COLONNES GRIST :", Object.keys(records[0]));
+    contractualisationParCommune = {};
+
+    records.forEach(function(record) {
+
+        const code = String(record["Code_Commune"] || "").trim();
+
+        const valeur = String(record["Contractualisation"] || "").trim();
+
+        if (code) {
+
+            contractualisationParCommune[code] = valeur;
+
+        }
+
+    });
+
+    console.log(
+        "TABLEAU DES CONTRACTUALISATIONS :",
+        contractualisationParCommune
+    );
+
+    if (coucheCommunes) {
+
+        coucheCommunes.setStyle(styleCommune);
+
+    }
 
 });
 
-
 /* =========================================
-   TEST DE COLORATION DES COMMUNES
+COLORATION DES COMMUNES
    ========================================= */
 
 function styleCommune(feature) {
 
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
+
+    const contractualisation =
+        contractualisationParCommune[code] || "";
+
+    let couleur = "#ffffff";
+
+    if (contractualisation === "PVD") {
+
+        couleur = "#9842b7";
+
+    }
+    else if (contractualisation === "ACV") {
+
+        couleur = "#ff9a3b";
+
+    }
+    else if (contractualisation === "VA") {
+
+        couleur = "#10df08";
+
+    }
+
     return {
-        fillColor: "#ff0000",
+
+        fillColor: couleur,
+
         fillOpacity: 0.65,
+
         color: "#b6b6b6",
+
         weight: 1
+
     };
 
 }
-
 
 /* =========================================
    COUCHE COMMUNES
