@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 
-<html lang="fr">
+<html lang="fr"> /*« Le contenu de cette page est en français. » */
 
-<head>
+<head> /* en-tête de ta page HTML */
 
-<meta charset="UTF-8">
+<meta charset="UTF-8"> /*indique au navigateur comment lire les caractères */
 
-<title>Carte des intentions de contractualisations</title>
+<title>Carte des intentions de contractualisations</title> /*donne un titre à la page. Il peut apparaître dans l’onglet du navigateur, mais pas directement sur la carte. */
 
 <link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+/*charge la feuille de style de Leaflet, qui définit l’apparence des contrôles, des boutons de zoom et des autres éléments de la carte. */
 
 <style>
 
+
+/* Cette partie  sert à faire en sorte que la carte occupe toute la place disponible dans la fenêtre du widget Grist, sans marges blanches autour. */
+
+/*Le <body> contient ce qui compose la page visible. */
+
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-}
+ /* supprime les marges extérieures que le navigateur ajoute parfois par défaut. */ 
+margin: 0;
+/* supprime les espacements intérieurs. */
+padding: 0;
+/* donne à la page toute la largeur disponible. */
+width: 100%;
+/* donne à la page toute la hauteur disponible. */
+    height: 100%; 
+
+/*
+#map désigne l’élément de ta page qui contient la carte 
+Les deux règles lui demandent de prendre 100 % de la largeur et de la hauteur de son conteneur. Comme la page (html et body) a elle-même une hauteur de 100 %, la carte peut s’étendre sur toute la surface disponible.  */
 
 #map {
     width: 100%;
@@ -30,7 +43,7 @@ html, body {
     border: none !important;
     box-shadow: none !important;
     color: #555555;
-    font-size: 5px;
+    font-size: 6px;
     font-weight: normal;
     white-space: nowrap;
     padding: 0;
@@ -39,7 +52,7 @@ html, body {
     pointer-events: none;
 }
 
-/* pour la boite d zoom par arrondissement */
+/* pour la boite de zoom par arrondissement */
 .zoomPanel {
     background: white;
     padding: 8px;
@@ -123,7 +136,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom</strong>
+        <strong>Zoom par arrondissement</strong>
 
         <button id="zoomManche">
             Manche
@@ -159,6 +172,7 @@ controleZoom.addTo(map);
    ========================================= */
 
 let contractualisationParCommune = {};
+let communesInteressees = {};
 let coucheCommunes = null;
 let coucheArrondissements = null;
 
@@ -173,26 +187,29 @@ grist.onRecords(function(records) {
 
     console.log("NOMBRE DE LIGNES GRIST :", records.length);
 
-    contractualisationParCommune = {};
+contractualisationParCommune = {};
+communesInteressees =  {};
 
     records.forEach(function(record) {
 
         const code = String(record["Code_Commune"] || "").trim();
 
-        const valeur = String(record["Contractualisation"] || "").trim();
+	const valeur = String(record["Contractualisation"] || "").trim();
+
+	const interessee = String(record["communes_interessees"] || "").trim();
 
         if (code) {
 
             contractualisationParCommune[code] = valeur;
-
+	communesInteressees[code]= interessee ;
         }
 
     });
 
     console.log(
         "TABLEAU DES CONTRACTUALISATIONS :",
-        contractualisationParCommune,
-      communesInteressees
+contractualisationParCommune,
+communesInteressees
     );
 
     if (coucheCommunes) {
