@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 
-<html lang="fr"> /*« Le contenu de cette page est en français. » */
+<html lang="fr"> 
 
-<head> /* en-tête de ta page HTML */
+<head> 
 
-<meta charset="UTF-8"> /*indique au navigateur comment lire les caractères */
+<meta charset="UTF-8"> 
 
-<title>Carte des intentions de contractualisations</title> /*donne un titre à la page. Il peut apparaître dans l’onglet du navigateur, mais pas directement sur la carte. */
+<title>Carte des intentions de contractualisations</title> 
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-/*charge la feuille de style de Leaflet, qui définit l’apparence des contrôles, des boutons de zoom et des autres éléments de la carte. */
 
 <style>
 
@@ -136,7 +135,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom par arrondissement</strong>
+        <strong>Zoom</strong>
 
         <button id="zoomManche">
             Manche
@@ -196,7 +195,15 @@ communesInteressees =  {};
 
 	const valeur = String(record["Contractualisation"] || "").trim();
 
-	const interessee = String(record["communes_interessees"] || "").trim();
+const interessee = String(record["communes_interessees"] || "").trim();
+
+console.log(
+"COMMUNE :",
+code,
+"VALEUR BRUTE :",
+interessee,
+"TYPE :",
+typeof interessee ); 
 
         if (code) {
 
