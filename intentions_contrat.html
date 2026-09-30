@@ -135,7 +135,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom</strong>
+        <strong>Zoom par arrondissement</strong>
 
         <button id="zoomManche">
             Manche
@@ -195,7 +195,7 @@ communesInteressees =  {};
 
 	const valeur = String(record["Contractualisation"] || "").trim();
 
-const interessee = String(record["communes_interessees"] || "").trim();
+const interessee = String(record["Communes_interessees"] || "").trim();
 
 console.log(
 "COMMUNE :",
