@@ -24,6 +24,7 @@ height: 100%;
 #map {
  width: 100%;
  height: 100%;
+background:white ;
 }
 
 .labelCommune {
@@ -193,24 +194,6 @@ const map = L.map("map", {
  zoom: 8
 });
 
-/* =========================================
-   FOND IGN
-   ========================================= */
-
-const fond = L.tileLayer(
-    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
-    {
-        maxZoom:22,
-        maxNativeZoom:19,
-		   opacity:0.4,
-        attribution:'© IGN - Géoplateforme'
-    }
-);
-
-fond.addTo(map);
-
-
-
 
 /* =========================================
    PANES CARTOGRAPHIQUES
@@ -229,7 +212,7 @@ map.getPane("communesPointsPane").style.zIndex = 1000;
 
 
 map.createPane("communesLabelsPane");
-map.getPane("communesLabelsPane").style.zIndex = 1100;
+map.getPane("communesLabelsPane").style.zIndex = 2500;
 
 
 /* =========================================
@@ -585,7 +568,7 @@ afficherCommune_reseau_d_alerte &&
 Commune_reseau_d_alerte === "X") {
 
 couleurContour = "#e31a00";
-epaisseurContour = 3; 
+epaisseurContour = 4; 
 
  }
 
