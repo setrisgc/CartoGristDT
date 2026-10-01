@@ -110,6 +110,12 @@ const map = L.map("map", {
     zoom: 8
 });
 
+
+/*---------------- PANES ------------------------------------------------------*/
+map.createPane("communesPointsPane"); map.getPane("communesPointsPane").style.zIndex = 1000; 
+
+
+
 /* =========================================
    BOÎTE DE ZOOM PAR ARRONDISSEMENT
    ========================================= */
@@ -123,7 +129,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom par arrondissement</strong>
+        <strong>Zoom</strong>
 
         <button id="zoomManche">
             Manche
@@ -332,11 +338,6 @@ fetch(urlCommunes)
 
     }).addTo(map);
 
-    /* Si les arrondissements sont déjà chargés,
-       on les remet au-dessus des communes */
-    if (coucheArrondissements) {
-        coucheArrondissements.bringToFront();
-    }
 
 });
 
@@ -361,11 +362,14 @@ fetch(urlCommunesPoints)
 
             const nom = feature.properties.NOM_COMM || "";
 
-            /* Création du point */
-            const point = L.circleMarker(
-                latlng,
-                styleCommunes_points(feature)
-            );
+         /* Création du point */
+const point = L.circleMarker(
+    latlng,
+    {
+        ...styleCommunes_points(feature),
+        pane: "communesPointsPane"
+    }
+);
 
             /* Étiquette de la commune */
             point.bindTooltip(nom, {
@@ -390,7 +394,7 @@ fetch(urlCommunesPoints)
 
 /* Les points sont toujours visibles */
 communesPoints.addTo(map); 
-communesPoints.bringToFront(); 
+
 
 
     /*
@@ -458,9 +462,6 @@ fetch(urlArrondissements)
 
     coucheArrondissements.addTo(map);
 
-/* pour remettre la couche des arrondissemenents au dessus des communes*/
-
-    coucheArrondissements.bringToFront();
 
 
     /* =========================================
