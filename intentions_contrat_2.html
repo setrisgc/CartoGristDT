@@ -102,6 +102,9 @@ background: #ffffff !important;
     vertical-align: -1px;
 }
 
+
+---/* contractualisation */-----------
+
 .pastillePVD {
     background: #9842b7;
 }
@@ -111,17 +114,33 @@ background: #ffffff !important;
 }
 
 .pastilleVA {
-    background: #10df08;
+    background: #07b3e3;
 }
+
+---/* communes intéressées*/-----------
 
 .pastilleInteressees {
-    background: #ff0000;
-}
+display: inline-block;
+width: 14px;
+height: 9px;
+margin-right: 6px;
+background: #66e680;
+border-radius: 1px;
+vertical-align: -1px;
+} 
+
+---/* réseau d’alerte*/-----------
 
 .pastilleAlerte {
-    background: #00f2fb;
-    border: 2px solid #00f2fb;
-    box-sizing: border-box;
+display: inline-block;
+width: 14px;
+height: 9px;
+margin-right: 6px;
+background: transparent;
+border: 2px solid #e31a00;
+box-sizing: border-box;
+border-radius: 1px;
+vertical-align: -1px;
 }
 
 .zoomPanelTitle {
@@ -237,7 +256,20 @@ div.innerHTML = `
     </div>
 
 
-    <div class="zoomPanelButtons">
+<div class="zoomPanelButtons">
+
+
+      <!-- =================================
+             COMMUNES INTÉRESSÉES
+             ================================= -->
+
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkCommunes_interessees"
+	checked>
+	<span class="pastille pastilleInteressees"></span> 
+            Communes intéressées
+        </label>
 
 
         <!-- =================================
@@ -267,18 +299,7 @@ div.innerHTML = `
         </div>
 
 
-        <!-- =================================
-             COMMUNES INTÉRESSÉES
-             ================================= -->
-
-        <label class="legendeCase">
-            <input type="checkbox"
-                   id="chkCommunes_interessees"
-	checked>
-	<span class="pastille pastilleInteressees"></span> 
-            Communes intéressées
-        </label>
-
+  
 
         <!-- =================================
              RÉSEAU D'ALERTE
