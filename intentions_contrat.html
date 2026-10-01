@@ -55,6 +55,11 @@ height: 100%;
     user-select: none;
 }
 
+.zoomArrow {
+    display: inline-block;
+    width: 14px;
+}
+
 .zoomPanelButtons {
     margin-top: 6px;
 }
@@ -154,9 +159,9 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <div class="zoomPanelTitle">
-            📍 Zoom
-        </div>
+     <div class="zoomPanelTitle">
+    <span class="zoomArrow">▼</span> Zoom
+</div>
 
         <div class="zoomPanelButtons">
 
@@ -188,19 +193,23 @@ controleZoom.onAdd = function() {
     const titre = div.querySelector(".zoomPanelTitle");
     const boutons = div.querySelector(".zoomPanelButtons");
 
-    titre.addEventListener("click", function() {
+titre.addEventListener("click", function() {
 
-        if (boutons.style.display === "none") {
+    const fleche = titre.querySelector(".zoomArrow");
 
-            boutons.style.display = "block";
+    if (boutons.style.display === "none") {
 
-        } else {
+        boutons.style.display = "block";
+        fleche.textContent = "▼";
 
-            boutons.style.display = "none";
+    } else {
 
-        }
+        boutons.style.display = "none";
+        fleche.textContent = "▶";
 
-    });
+    }
+
+});
 
     return div;
 };
