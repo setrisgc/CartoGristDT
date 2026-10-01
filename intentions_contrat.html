@@ -160,7 +160,7 @@ controleZoom.onAdd = function() {
 
     div.innerHTML = `
      <div class="zoomPanelTitle">
-    <span class="zoomArrow">▼</span> Zoom
+    <span class="zoomArrow">▶ </span> Zoom
 </div>
 
         <div class="zoomPanelButtons">
@@ -191,7 +191,9 @@ controleZoom.onAdd = function() {
     L.DomEvent.disableClickPropagation(div);
 
     const titre = div.querySelector(".zoomPanelTitle");
-    const boutons = div.querySelector(".zoomPanelButtons");
+const boutons = div.querySelector(".zoomPanelButtons");
+
+boutons.style.display = "none";
 
 titre.addEventListener("click", function() {
 
