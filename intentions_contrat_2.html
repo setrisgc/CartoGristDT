@@ -774,23 +774,23 @@ coucheCommunes = L.geoJSON(data, {
                 return;
             }
 
-            const contenu = `
+        const contenu = `
 
-                <div class="titreCommune">
-                    ${infos.commune}
-                </div>
+    <div class="titreCommune">
+        ${infos.commune}
+    </div>
 
-                <div class="infosCommune">
+    <div class="infosCommune">
 
-                    ${infos.nom}<br>
+        <strong>Nom :</strong> ${infos.nom}<br>
 
-                    ${infos.prenom}<br>
+        <strong>Prénom :</strong> ${infos.prenom}<br>
 
-                    ${infos.epci}
+        <strong>EPCI :</strong> ${infos.epci}
 
-                </div>
+    </div>
 
-            `;
+`;
 
             layer.bindPopup(contenu, {
                 className: "popupCommune"
