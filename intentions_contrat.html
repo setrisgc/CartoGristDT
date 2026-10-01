@@ -95,7 +95,7 @@ height: 100%;
 <script>
 
 grist.ready({
-    requiredAccess: "read table"
+ requiredAccess: "read table"
 });
 
 
@@ -131,17 +131,14 @@ map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex = 350;
 
 
-/* Arrondissements */
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
 
 
-/* Points des communes */
 map.createPane("communesPointsPane");
 map.getPane("communesPointsPane").style.zIndex = 1000;
 
 
-/* Étiquettes des communes */
 map.createPane("communesLabelsPane");
 map.getPane("communesLabelsPane").style.zIndex = 1100;
 
@@ -219,8 +216,8 @@ titre.addEventListener("click", function() {
 controleZoom.addTo(map);
 
 /* =========================================
-   DONNÉES GRIST
-   ========================================= */
+ DONNÉES GRIST
+ ========================================= */
 
 let contractualisationParCommune = {};
 let communesInteressees = {};
@@ -300,7 +297,7 @@ if (communesPoints) {
 }); 
 
 /* =========================================
-COLORATION DES COMMUNES EN FONCTION CONTRACTUALISATION
+STYLE DES POLYGONES DES COMMUNES
  ========================================= */
 
 function styleCommune(feature) {
@@ -308,6 +305,10 @@ function styleCommune(feature) {
  const code = String(
  feature.properties.INSEE_COMM || ""
  ).trim();
+
+/* =========================================
+Coloration en fonction de la contractualisation
+ ========================================= */
 
  const contractualisation =
  contractualisationParCommune[code] || "";
@@ -330,19 +331,49 @@ function styleCommune(feature) {
 
     }
 
+
+
+/* =========================================
+Contour si réseau d’alerte
+ ========================================= */
+
+
+ const Commune_reseau_d_alerte =
+String(communesReseauAlerte[code] || ""
+).trim().toUpperCase();
+
+ let couleurContour = "#b6b6b6";
+let epaisseurContour=1 ;
+
+ if (Commune_reseau_d_alerte === "X") {
+
+couleurContour= "#ffff00";
+epaisseurContour = 3; 
+
+ }
+
+/* =========================================
+Style final de la commune
+ ========================================= */
+
     return {
 
         fillColor: couleur,
 
         fillOpacity: 0.65,
 
-        color: "#b6b6b6",
+        color: couleurContour,
 
-        weight: 1
+        weight: epaisseurContour
 
     };
 
 }
+
+
+
+
+
 
 /* =========================================
    POINT AU CENTRE DES COMMUNES INTERESSEES
@@ -377,6 +408,7 @@ function styleCommunes_points(feature) {
         fillOpacity: 0
     };
 }
+
 
 
 /* =========================================
