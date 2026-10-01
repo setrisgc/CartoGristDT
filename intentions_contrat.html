@@ -123,7 +123,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom arrondissement</strong>
+        <strong>Zoom</strong>
 
         <button id="zoomManche">
             Manche
@@ -388,6 +388,11 @@ fetch(urlCommunesPoints)
 
     });
 
+/* Les points sont toujours visibles */
+communesPoints.addTo(map); 
+
+
+
     /*
        Affichage des noms uniquement à partir
        du zoom 10
@@ -403,23 +408,23 @@ fetch(urlCommunesPoints)
 
 function gererEtiquettesCommunes() {
 
-    /*
-       Tant que la couche n'est pas encore chargée,
-       on ne fait rien
-    */
     if (!communesPoints) {
         return;
     }
 
-    if (map.getZoom() >= 10) {
+    communesPoints.eachLayer(function(layer) {
 
-        communesPoints.addTo(map);
+        if (map.getZoom() >= 10) {
 
-    } else {
+            layer.openTooltip();
 
-        map.removeLayer(communesPoints);
+        } else {
 
-    }
+            layer.closeTooltip();
+
+        }
+
+    });
 
 }
 
