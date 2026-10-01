@@ -111,9 +111,27 @@ const map = L.map("map", {
 });
 
 
-/*---------------- PANES ------------------------------------------------------*/
-map.createPane("communesPointsPane"); map.getPane("communesPointsPane").style.zIndex = 1000; 
+/* =========================================
+   PANES CARTOGRAPHIQUES
+   ========================================= */
 
+map.createPane("communesPane");
+map.getPane("communesPane").style.zIndex = 350;
+
+
+/* Arrondissements */
+map.createPane("arrondissementPane");
+map.getPane("arrondissementPane").style.zIndex = 500;
+
+
+/* Points des communes */
+map.createPane("communesPointsPane");
+map.getPane("communesPointsPane").style.zIndex = 1000;
+
+
+/* Étiquettes des communes */
+map.createPane("communesLabelsPane");
+map.getPane("communesLabelsPane").style.zIndex = 1100;
 
 
 /* =========================================
@@ -321,20 +339,20 @@ function styleCommunes_points(feature) {
 }
 
 
-
 /* =========================================
-   COUCHE COMMUNES
-   ========================================= */
+ COUCHE COMMUNES
+ ========================================= */
 
 fetch(urlCommunes)
 .then(function(response) {
-    return response.json();
+ return response.json();
 })
 .then(function(data) {
 
-    coucheCommunes = L.geoJSON(data, {
+ coucheCommunes = L.geoJSON(data, {
 
-        style: styleCommune
+ style: styleCommune,
+pane: "communesPane" 
 
     }).addTo(map);
 
@@ -382,7 +400,8 @@ const point = L.circleMarker(
 
                 offset: [0, 0],
 
-                interactive: false
+                interactive: false,
+	     pane: "communesLabelsPane" 
 
             });
 
@@ -439,20 +458,19 @@ function gererEtiquettesCommunes() {
    ========================================= */
 
 map.on("zoomend", gererEtiquettesCommunes);
-
-
 /* =========================================
-   ARRONDISSEMENTS
-   ========================================= */
+ ARRONDISSEMENTS
+ ========================================= */
 
 
 fetch(urlArrondissements)
 .then(function(response) {
-    return response.json();
+ return response.json();
 })
 .then(function(data) {
 
-    coucheArrondissements = L.geoJSON(data, {
+ coucheArrondissements = L.geoJSON(data, {
+pane: "arrondissementPane", 
         style: {
             color: "#141f72",
             weight: 3,
