@@ -44,6 +44,25 @@ background: #ffffff !important;
  pointer-events: none;
 }
 
+.popupCommune {
+    padding: 0 !important;
+}
+
+.popupCommune .titreCommune {
+    background: #fff2b2;
+    color: #000000;
+    font-weight: bold;
+    padding: 6px 10px;
+    margin: -13px -20px 8px -20px;
+    text-align: center;
+}
+
+.popupCommune .infosCommune {
+    padding: 0 2px 2px 2px;
+    line-height: 1.5;
+}
+
+
 /* pour la boite de zoom par arrondissement */
 .zoomPanel {
     background: white;
@@ -451,6 +470,7 @@ controleZoom.addTo(map);
 let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
+let informationsCommunes = {};
 
 let coucheCommunes = null;
 let coucheArrondissements = null;
@@ -481,10 +501,15 @@ communesInteressees =  {};
 communesReseauAlerte =  {};
 
  records.forEach(function(record) {
-	const code = String(record["Code_Commune"] || "").trim();
-	const valeur = String(record["Contractualisation"] || "").trim();
-	const interessee = String(record["Communes_interessees"] || "").trim();
-	const alerte  = String(record["Commune_reseau_d_alerte"] || "").trim();
+const code = String(record["Code_Commune"] || "").trim();
+const valeur = String(record["Contractualisation"] || "").trim();
+const interessee = String(record["Communes_interessees"] || "").trim();
+const alerte = String(record["Commune_reseau_d_alerte"] || "").trim();
+
+const nom = String(record["Nom"] || "").trim();
+const prenom = String(record["Prenom"] || "").trim();
+const epci = String(record["EPCI"] || "").trim();
+const commune = String(record["Commune"] || "").trim();
 
 console.log(
 "COMMUNE :",
@@ -500,6 +525,13 @@ alerte);
 contractualisationParCommune[code] = valeur;
 communesInteressees[code]= interessee ;
 communesReseauAlerte[code]= alerte ;
+informationsCommunes[code] = {
+    nom: nom,
+    prenom: prenom,
+    epci: epci,
+    commune: commune
+};
+
  }
 
  });
@@ -710,12 +742,53 @@ fetch(urlCommunes)
 })
 .then(function(data) {
 
- coucheCommunes = L.geoJSON(data, {
+coucheCommunes = L.geoJSON(data, {
 
- style: styleCommune,
-pane: "communesPane" 
+    style: styleCommune,
 
-    }).addTo(map);
+    pane: "communesPane",
+
+    onEachFeature: function(feature, layer) {
+
+        const code = String(
+            feature.properties.INSEE_COMM || ""
+        ).trim();
+
+        layer.on("click", function() {
+
+            const infos = informationsCommunes[code];
+
+            if (!infos) {
+                return;
+            }
+
+            const contenu = `
+
+                <div class="titreCommune">
+                    ${infos.commune}
+                </div>
+
+                <div class="infosCommune">
+
+                    ${infos.nom}<br>
+
+                    ${infos.prenom}<br>
+
+                    ${infos.epci}
+
+                </div>
+
+            `;
+
+            layer.bindPopup(contenu, {
+                className: "popupCommune"
+            }).openPopup();
+
+        });
+
+    }
+
+}).addTo(map);
 
 
 });
