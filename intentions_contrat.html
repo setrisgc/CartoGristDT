@@ -333,6 +333,34 @@ chkContractualisation.addEventListener("change", function() {
 
 });
 
+const chkCommunes_interessees=
+    div.querySelector("#chkCommunes_interessees");
+
+chkCommunes_interessees.addEventListener("change", function() {
+
+    afficherCommunes_interessees =
+        chkCommunes_interessees.checked;
+
+
+    if (communesPoints) {
+
+        communesPoints.eachLayer(function(layer) {
+
+            if (layer.setStyle) {
+
+                layer.setStyle(
+                    styleCommunes_points(layer.feature)
+                );
+
+            }
+
+        });
+
+    }
+
+});
+
+
 
 titre.addEventListener("click", function() {
 
@@ -542,28 +570,57 @@ function styleCommunes_points(feature) {
         feature.properties.INSEE_COMM || ""
     ).trim();
 
-    const interessee =
-        String(communesInteressees[code] || "").trim().toUpperCase();
 
-    if (interessee === "X") {
+    const interessee =
+        String(
+            communesInteressees[code] || ""
+        ).trim().toUpperCase();
+
+
+    /* -----------------------------------------
+       FILTRE COMMUNES INTÉRESSÉES
+       ----------------------------------------- */
+
+    if (
+        afficherCommunesInteressees &&
+        interessee === "X"
+    ) {
 
         return {
-            radius: 3,
+
+            radius: 5,
+
             color: "#ff0000",
+
             weight: 2,
+
             fillColor: "#ff0000",
+
             fillOpacity: 1
+
         };
 
     }
 
+
+    /* -----------------------------------------
+       POINT INVISIBLE
+       ----------------------------------------- */
+
     return {
+
         radius: 0,
+
         color: "#ffffff",
+
         weight: 0,
+
         fillColor: "#ffffff",
+
         fillOpacity: 0
+
     };
+
 }
 
 
