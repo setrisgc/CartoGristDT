@@ -342,21 +342,28 @@ chkCommunes_interessees.addEventListener("change", function() {
         chkCommunes_interessees.checked;
 
 
-    if (communesPoints) {
+if (communesPoints) {
 
-        communesPoints.eachLayer(function(layer) {
+    communesPoints.eachLayer(function(layer) {
 
-            if (layer.setStyle) {
+        const style =
+            styleCommunes_points(layer.feature);
 
-                layer.setStyle(
-                    styleCommunes_points(layer.feature)
-                );
+        if (layer.setStyle) {
 
-            }
+            layer.setStyle(style);
 
-        });
+        }
 
-    }
+        if (layer.setRadius) {
+
+            layer.setRadius(style.radius);
+
+        }
+
+    });
+
+}
 
 });
 
@@ -462,13 +469,24 @@ if (communesPoints) {
 
     communesPoints.eachLayer(function(layer) {
 
+        const style =
+            styleCommunes_points(layer.feature);
+
         if (layer.setStyle) {
 
-            layer.setStyle(
-                styleCommunes_points(layer.feature)
-            );
+            layer.setStyle(style);
 
         }
+
+        if (layer.setRadius) {
+
+            layer.setRadius(style.radius);
+
+        }
+
+    });
+
+}
 
     });
 
