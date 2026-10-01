@@ -267,6 +267,9 @@ map.getPane("communesPointsPane").style.zIndex = 1000;
 map.createPane("communesLabelsPane");
 map.getPane("communesLabelsPane").style.zIndex = 2500;
 
+map.createPane("popupPane");
+map.getPane("popupPane").style.zIndex = 3000;
+
 
 /* =========================================
    BOÎTE DE ZOOM PAR ARRONDISSEMENT
@@ -792,9 +795,10 @@ coucheCommunes = L.geoJSON(data, {
 
 `;
 
-            layer.bindPopup(contenu, {
-                className: "popupCommune"
-            }).openPopup();
+layer.bindPopup(contenu, {
+    className: "popupCommune",
+    pane: "popupPane"
+}).openPopup();
 
         });
 
