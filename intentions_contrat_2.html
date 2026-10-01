@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+
+<html lang="fr"> 
+
+<head> 
+
+<meta charset="UTF-8"> 
+
+<title>Carte des intentions de contractualisations</title> 
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+
+
+html, body {
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
+}
+
+#map {
+ width: 100%;
+ height: 100%;
+}
+
+.labelCommune {
+ background: transparent !important;
+ border: none !important;
+ box-shadow: none !important;
+ color: #555555;
+ font-size: 6px;
+ font-weight: normal;
+ white-space: nowrap;
+ padding: 0;
+ text-align: center;
+ line-height: 20px;
+ pointer-events: none;
+}
+
+/* pour la boite de zoom par arrondissement */
+.zoomPanel {
+    background: white;
+    padding: 8px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.35);
+    font-size: 13px;
+}
+
+/* =========================================
+   LÉGENDE DU PANNEAU
+   ========================================= */
+
+.legendeTitre {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 11px;
+    color: #555555;
+}
+
+.legendeCase {
+    display: block;
+    margin: 4px 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.legendeCase input {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   SOUS-CATÉGORIES CONTRACTUALISATION
+   ========================================= */
+
+.legendeSousCategorie {
+    margin-left: 24px;
+    margin-top: 3px;
+    font-size: 12px;
+}
+
+
+/* =========================================
+   PASTILLES DE COULEUR
+   ========================================= */
+
+.pastille {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 6px;
+    border-radius: 50%;
+    vertical-align: -1px;
+}
+
+.pastillePVD {
+    background: #9842b7;
+}
+
+.pastilleACV {
+    background: #ff9a3b;
+}
+
+.pastilleVA {
+    background: #10df08;
+}
+
+.pastilleInteressees {
+    background: #ff0000;
+}
+
+.pastilleAlerte {
+    background: #00f2fb;
+    border: 2px solid #00f2fb;
+    box-sizing: border-box;
+}
+
+.zoomPanelTitle {
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+}
+
+.zoomArrow {
+    display: inline-block;
+    width: 14px;
+}
+
+.zoomPanelButtons {
+    margin-top: 6px;
+}
+
+.zoomPanel button {
+    display: block;
+    width: 120px;
+    margin: 3px 0 3px 20px;
+    padding: 4px 6px;
+    border: 1px solid #cccccc;
+    background: white;
+    cursor: pointer;
+    border-radius: 3px;
+    text-align: left;
+}
+
+.zoomPanel button:hover {
+    background: #eeeeee;
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+<script>
+
+grist.ready({
+ requiredAccess: "read table"
+});
+
+
+/* =========================================
+   GEOJSON
+   ========================================= */
+
+const urlCommunes =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson";
+
+const urlArrondissements =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/arrondissement.geojson";
+
+const urlCommunesPoints =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson";
+
+
+/* =========================================
+   CARTE
+   ========================================= */
+
+const map = L.map("map", {
+    center: [49.1, -1.3],
+    zoom: 8
+});
+
+
+/* =========================================
+   PANES CARTOGRAPHIQUES
+   ========================================= */
+
+map.createPane("communesPane");
+map.getPane("communesPane").style.zIndex = 350;
+
+
+map.createPane("arrondissementPane");
+map.getPane("arrondissementPane").style.zIndex = 500;
+
+
+map.createPane("communesPointsPane");
+map.getPane("communesPointsPane").style.zIndex = 1000;
+
+
+map.createPane("communesLabelsPane");
+map.getPane("communesLabelsPane").style.zIndex = 1100;
+
+
+/* =========================================
+   BOÎTE DE ZOOM PAR ARRONDISSEMENT
+   ========================================= */
+
+const controleZoom = L.control({
+    position: "topright"
+});
+
+controleZoom.onAdd = function() {
+
+    const div = L.DomUtil.create("div", "zoomPanel");
+
+div.innerHTML = `
+
+    <div class="zoomPanelTitle">
+        <span class="zoomArrow">▶</span> Légende et navigation
+    </div>
+
+
+    <div class="zoomPanelButtons">
+
+
+        <!-- =================================
+             CONTRACTUALISATION
+             ================================= -->
+
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkContractualisation"
+                   checked>
+            Contractualisation
+        </label>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePVD"></span>
+            PVD
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleACV"></span>
+            ACV
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleVA"></span>
+            VA
+        </div>
+
+
+        <!-- =================================
+             COMMUNES INTÉRESSÉES
+             ================================= -->
+
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkCommunes_interessees"
+	checked>
+	<span class="pastille pastilleInteressees"></span> 
+            Communes intéressées
+        </label>
+
+
+        <!-- =================================
+             RÉSEAU D'ALERTE
+             ================================= -->
+
+
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkCommune_reseau_d_alerte"
+checked>
+<span class="pastille pastilleAlerte"></span> 
+            Communes réseau d'alerte
+        </label>
+
+
+        <!-- =================================
+             ZOOM PAR ARRONDISSEMENT
+             ================================= -->
+
+        <div class="legendeTitre">Zoom
+        </div>
+
+
+        <button id="zoomManche">
+            Manche
+        </button>
+
+        <button id="zoomCherbourg">
+            Cherbourg
+        </button>
+
+        <button id="zoomCoutances">
+            Coutances
+        </button>
+
+        <button id="zoomSaintLo">
+            Saint-Lô
+        </button>
+
+        <button id="zoomAvranches">
+            Avranches
+        </button>
+
+    </div>
+`;
+
+    L.DomEvent.disableClickPropagation(div);
+
+    const titre = div.querySelector(".zoomPanelTitle");
+const boutons = div.querySelector(".zoomPanelButtons");
+
+boutons.style.display = "none";
+
+const chkContractualisation =
+    div.querySelector("#chkContractualisation");
+
+chkContractualisation.addEventListener("change", function() {
+
+    afficherContractualisation =
+        chkContractualisation.checked;
+
+    if (coucheCommunes) {
+
+        coucheCommunes.setStyle(styleCommune);
+
+    }
+
+});
+
+const chkCommunes_interessees=
+    div.querySelector("#chkCommunes_interessees");
+
+chkCommunes_interessees.addEventListener("change", function() {
+
+    afficherCommunes_interessees =
+        chkCommunes_interessees.checked;
+
+
+if (communesPoints) {
+
+    communesPoints.eachLayer(function(layer) {
+
+        const style =
+            styleCommunes_points(layer.feature);
+
+        if (layer.setStyle) {
+
+            layer.setStyle(style);
+
+        }
+
+        if (layer.setRadius) {
+
+            layer.setRadius(style.radius);
+
+        }
+
+    });
+
+}
+
+});
+
+const chkCommune_reseau_d_alerte =
+    div.querySelector("#chkCommune_reseau_d_alerte");
+
+chkCommune_reseau_d_alerte.addEventListener("change", function() {
+
+    afficherCommune_reseau_d_alerte =
+        chkCommune_reseau_d_alerte.checked;
+
+    if (coucheCommunes) {
+
+        coucheCommunes.setStyle(styleCommune);
+
+    }
+
+});
+
+
+
+titre.addEventListener("click", function() {
+
+    const fleche = titre.querySelector(".zoomArrow");
+
+    if (boutons.style.display === "none") {
+
+        boutons.style.display = "block";
+        fleche.textContent = "▼";
+
+    } else {
+
+        boutons.style.display = "none";
+        fleche.textContent = "▶";
+
+    }
+
+});
+
+    return div;
+};
+
+controleZoom.addTo(map);
+
+/* =========================================
+ DONNÉES GRIST
+ ========================================= */
+
+let contractualisationParCommune = {};
+let communesInteressees = {};
+let communesReseauAlerte = {};
+
+let coucheCommunes = null;
+let coucheArrondissements = null;
+let communesPoints = null;
+
+
+/* =========================================
+   FILTRES DE LA LÉGENDE
+   ========================================= */
+
+let afficherContractualisation = true;
+let afficherCommunes_interessees = true;
+let afficherCommune_reseau_d_alerte = true;
+
+
+/* =========================================
+ TEST DES DONNÉES GRIST
+ ========================================= */
+
+console.log("TEST API GRIST :", typeof grist);
+
+grist.onRecords(function(records) {
+
+ console.log("NOMBRE DE LIGNES GRIST :", records.length);
+
+contractualisationParCommune = {};
+communesInteressees =  {};
+communesReseauAlerte =  {};
+
+ records.forEach(function(record) {
+	const code = String(record["Code_Commune"] || "").trim();
+	const valeur = String(record["Contractualisation"] || "").trim();
+	const interessee = String(record["Communes_interessees"] || "").trim();
+	const alerte  = String(record["Commune_reseau_d_alerte"] || "").trim();
+
+console.log(
+"COMMUNE :",
+code,
+"VALEUR BRUTE :",
+interessee,
+"TYPE :",
+typeof interessee,
+alerte); 
+
+ if (code) {
+
+contractualisationParCommune[code] = valeur;
+communesInteressees[code]= interessee ;
+communesReseauAlerte[code]= alerte ;
+ }
+
+ });
+
+ console.log(
+ "TABLEAU DES CONTRACTUALISATIONS :",
+contractualisationParCommune,
+communesInteressees,
+communesReseauAlerte
+ );
+
+if (coucheCommunes) {
+
+    coucheCommunes.setStyle(styleCommune);
+
+}
+
+if (communesPoints) {
+
+    communesPoints.eachLayer(function(layer) {
+
+        const style =
+            styleCommunes_points(layer.feature);
+
+        if (layer.setStyle) {
+
+            layer.setStyle(style);
+
+        }
+
+        if (layer.setRadius) {
+
+            layer.setRadius(style.radius);
+
+        }
+
+    });
+
+}
+
+    });
+
+
+
+/* =========================================
+STYLE DES POLYGONES DES COMMUNES
+ ========================================= */
+
+function styleCommune(feature) {
+
+ const code = String(
+ feature.properties.INSEE_COMM || ""
+ ).trim();
+
+/* =========================================
+Coloration en fonction de la contractualisation
+ ========================================= */
+
+const contractualisation =
+    contractualisationParCommune[code] || "";
+
+let couleur = "#ffffff";
+
+
+if (afficherContractualisation) {
+
+    if (contractualisation === "PVD") {
+
+        couleur = "#9842b7";
+
+    }
+    else if (contractualisation === "ACV") {
+
+        couleur = "#ff9a3b";
+
+    }
+    else if (contractualisation === "VA") {
+
+        couleur = "#10df08";
+
+    }
+
+}
+
+
+
+/* =========================================
+Contour si réseau d’alerte
+ ========================================= */
+
+
+ const Commune_reseau_d_alerte =
+String(communesReseauAlerte[code] || ""
+).trim().toUpperCase();
+
+ let couleurContour = "#959595";
+let epaisseurContour=1 ;
+
+ if (
+afficherCommune_reseau_d_alerte && 
+Commune_reseau_d_alerte === "X") {
+
+couleurContour= "#00f2fb";
+epaisseurContour = 3; 
+
+ }
+
+/* =========================================
+Style final de la commune
+ ========================================= */
+
+    return {
+
+        fillColor: couleur,
+
+        fillOpacity: 0.65,
+
+        color: couleurContour,
+
+        weight: epaisseurContour
+
+    };
+
+}
+
+
+
+
+
+
+/* =========================================
+   POINT AU CENTRE DES COMMUNES INTERESSEES
+   ========================================= */
+
+function styleCommunes_points(feature) {
+
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
+
+
+    const interessee =
+        String(
+            communesInteressees[code] || ""
+        ).trim().toUpperCase();
+
+
+    /* -----------------------------------------
+       FILTRE COMMUNES INTÉRESSÉES
+       ----------------------------------------- */
+
+    if (
+        afficherCommunes_interessees &&
+        interessee === "X"
+    ) {
+
+        return {
+
+            radius: 5,
+
+            color: "#ff0000",
+
+            weight: 2,
+
+            fillColor: "#ff0000",
+
+            fillOpacity: 1
+
+        };
+
+    }
+
+
+    /* -----------------------------------------
+       POINT INVISIBLE
+       ----------------------------------------- */
+
+    return {
+
+        radius: 0,
+
+        color: "#ffffff",
+
+        weight: 0,
+
+        fillColor: "#ffffff",
+
+        fillOpacity: 0
+
+    };
+
+}
+
+
+
+/* =========================================
+ COUCHE COMMUNES
+ ========================================= */
+
+fetch(urlCommunes)
+.then(function(response) {
+ return response.json();
+})
+.then(function(data) {
+
+ coucheCommunes = L.geoJSON(data, {
+
+ style: styleCommune,
+pane: "communesPane" 
+
+    }).addTo(map);
+
+
+});
+
+
+/* =========================================
+   POINTS DES COMMUNES
+   ========================================= */
+
+fetch(urlCommunesPoints)
+
+.then(function(response) {
+
+    return response.json();
+
+})
+
+.then(function(data) {
+
+    communesPoints = L.geoJSON(data, {
+
+        pointToLayer: function(feature, latlng) {
+
+            const nom = feature.properties.NOM_COMM || "";
+
+         /* Création du point */
+const point = L.circleMarker(
+    latlng,
+    {
+        ...styleCommunes_points(feature),
+        pane: "communesPointsPane"
+    }
+);
+
+            /* Étiquette de la commune */
+            point.bindTooltip(nom, {
+
+                permanent: true,
+
+                direction: "center",
+
+                className: "labelCommune",
+
+                offset: [0, 0],
+
+                interactive: false,
+	     pane: "communesLabelsPane" 
+
+            });
+
+            return point;
+
+        }
+
+    });
+
+/* Les points sont toujours visibles */
+communesPoints.addTo(map); 
+
+
+
+    /*
+       Affichage des noms uniquement à partir
+       du zoom 10
+    */
+    gererEtiquettesCommunes();
+
+});
+
+
+/* =========================================
+   AFFICHAGE DES ÉTIQUETTES À PARTIR DU ZOOM 10
+   ========================================= */
+
+function gererEtiquettesCommunes() {
+
+    if (!communesPoints) {
+        return;
+    }
+
+    communesPoints.eachLayer(function(layer) {
+
+        if (map.getZoom() >= 10) {
+
+            layer.openTooltip();
+
+        } else {
+
+            layer.closeTooltip();
+
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   ACTUALISATION DES ÉTIQUETTES AU CHANGEMENT
+   DE ZOOM
+   ========================================= */
+
+map.on("zoomend", gererEtiquettesCommunes);
+/* =========================================
+ ARRONDISSEMENTS
+ ========================================= */
+
+
+fetch(urlArrondissements)
+.then(function(response) {
+ return response.json();
+})
+.then(function(data) {
+
+ coucheArrondissements = L.geoJSON(data, {
+pane: "arrondissementPane", 
+        style: {
+            color: "#141f72",
+            weight: 3,
+            fill: false
+        }
+    });
+
+    coucheArrondissements.addTo(map);
+
+
+
+    /* =========================================
+       BOUTONS DE ZOOM
+       ========================================= */
+
+    const limitesArrondissements = {};
+
+
+    /* On récupère l'emprise de chaque arrondissement
+       grâce à INSEE_ARR */
+
+    data.features.forEach(function(feature) {
+
+        const code = String(
+            feature.properties.INSEE_ARR || ""
+        ).trim();
+
+        const couche = L.geoJSON(feature);
+
+        if (code === "1") {
+            limitesArrondissements.avranches =
+                couche.getBounds();
+        }
+
+        else if (code === "2") {
+            limitesArrondissements.cherbourg =
+                couche.getBounds();
+        }
+
+        else if (code === "3") {
+            limitesArrondissements.coutances =
+                couche.getBounds();
+        }
+
+        else if (code === "4") {
+            limitesArrondissements.saintlo =
+                couche.getBounds();
+        }
+
+    });
+
+
+    /* =========================================
+       MANCHE
+       ========================================= */
+
+    document.getElementById("zoomManche")
+        .addEventListener("click", function() {
+
+            map.fitBounds(
+                coucheArrondissements.getBounds(),
+                {
+                    padding: [5, 5]
+                }
+            );
+
+        });
+
+
+    /* =========================================
+       AVRANCHES
+       ========================================= */
+
+    document.getElementById("zoomAvranches")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.avranches) {
+
+                map.fitBounds(
+                    limitesArrondissements.avranches,
+                    {
+                        padding: [5, 5]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       CHERBOURG
+       ========================================= */
+
+    document.getElementById("zoomCherbourg")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.cherbourg) {
+
+                map.fitBounds(
+                    limitesArrondissements.cherbourg,
+                    {
+                        padding: [5, 5]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       COUTANCES
+       ========================================= */
+
+    document.getElementById("zoomCoutances")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.coutances) {
+
+                map.fitBounds(
+                    limitesArrondissements.coutances,
+                    {
+                        padding: [5, 5]
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       SAINT-LÔ
+       ========================================= */
+
+    document.getElementById("zoomSaintLo")
+        .addEventListener("click", function() {
+
+            if (limitesArrondissements.saintlo) {
+
+                map.fitBounds(
+                    limitesArrondissements.saintlo,
+                    {
+                        padding: [5, 5]
+                    }
+                );
+
+            }
+
+        });
+
+});
+
+</script>
+
+</body>
+
+</html>
