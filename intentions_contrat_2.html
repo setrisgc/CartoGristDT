@@ -515,7 +515,7 @@ if (communesPoints) {
 
 }
 
-    });
+ });
 
 
 
@@ -529,40 +529,29 @@ function styleCommune(feature) {
  feature.properties.INSEE_COMM || ""
  ).trim();
 
+
 /* =========================================
-Coloration en fonction de la contractualisation
+commune intéressée
  ========================================= */
 
-const contractualisation =
-    contractualisationParCommune[code] || "";
+const interessee =
+String(
+communesInteressees[code] || ""
+).trim().toUpperCase(); 
 
-let couleur = "#ffffff";
+let couleurFond = "#ffffff";
+let opaciteFond = 0 ;
 
+if ( afficherCommunes_interessees && interessee === "X") {
 
-if (afficherContractualisation) {
-
-    if (contractualisation === "PVD") {
-
-        couleur = "#9842b7";
-
-    }
-    else if (contractualisation === "ACV") {
-
-        couleur = "#ff9a3b";
-
-    }
-    else if (contractualisation === "VA") {
-
-        couleur = "#10df08";
-
-    }
+couleurFond = "#b2df8a" ;
+opaciteFond = 0.7 ;
 
 }
 
 
-
 /* =========================================
-Contour si réseau d’alerte
+commune réseau d’alerte
  ========================================= */
 
 
@@ -582,15 +571,11 @@ epaisseurContour = 3;
 
  }
 
-/* =========================================
-Style final de la commune
- ========================================= */
-
     return {
 
-        fillColor: couleur,
+        fillColor: couleurFond,
 
-        fillOpacity: 0.65,
+        fillOpacity: opaciteFond,
 
         color: couleurContour,
 
@@ -602,11 +587,8 @@ Style final de la commune
 
 
 
-
-
-
 /* =========================================
-   POINT AU CENTRE DES COMMUNES INTERESSEES
+   contractualisation (pastille au centre de la commune)
    ========================================= */
 
 function styleCommunes_points(feature) {
@@ -616,31 +598,60 @@ function styleCommunes_points(feature) {
     ).trim();
 
 
-    const interessee =
+    const contractualisation =
         String(
-            communesInteressees[code] || ""
+            contractualisationParCommune[code] || ""
         ).trim().toUpperCase();
 
 
-    /* -----------------------------------------
-       FILTRE COMMUNES INTÉRESSÉES
-       ----------------------------------------- */
+    /* =========================================
+       COULEUR DE LA PASTILLE
+       ========================================= */
+
+    let couleur = "#ffffff";
+    let afficher = false;
+
 
     if (
         afficherCommunes_interessees &&
         interessee === "X"
     ) {
 
+        afficher = true;
+
+        if (contractualisation === "PVD") {
+
+            couleur = "#9842b7";
+
+        }
+        else if (contractualisation === "ACV") {
+
+            couleur = "#ff9a3b";
+
+        }
+        else if (contractualisation === "VA") {
+
+            couleur = "#ff69b4";
+
+        }
+
+    }
+
+
+    /* =========================================
+       STYLE DE LA PASTILLE
+       ========================================= */
+
+    if (afficher) {
+
         return {
 
-            radius: 5,
+            radius: 6,
 
-            color: "#ff0000",
-
+            color: couleur,
             weight: 2,
 
-            fillColor: "#ff0000",
-
+            fillColor: couleur,
             fillOpacity: 1
 
         };
@@ -648,26 +659,22 @@ function styleCommunes_points(feature) {
     }
 
 
-    /* -----------------------------------------
-       POINT INVISIBLE
-       ----------------------------------------- */
+    /* =========================================
+       PAS DE PASTILLE
+       ========================================= */
 
     return {
 
         radius: 0,
 
         color: "#ffffff",
-
         weight: 0,
 
         fillColor: "#ffffff",
-
         fillOpacity: 0
 
     };
-
 }
-
 
 
 /* =========================================
