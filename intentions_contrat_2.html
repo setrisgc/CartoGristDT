@@ -171,8 +171,8 @@ grist.ready({
 
 
 /* =========================================
-   GEOJSON
-   ========================================= */
+ GEOJSON
+ ========================================= */
 
 const urlCommunes =
 "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson";
@@ -185,13 +185,31 @@ const urlCommunesPoints =
 
 
 /* =========================================
-   CARTE
-   ========================================= */
+ CARTE
+ ========================================= */
 
 const map = L.map("map", {
-    center: [49.1, -1.3],
-    zoom: 8
+ center: [49.1, -1.3],
+ zoom: 8
 });
+
+/* =========================================
+   FOND IGN
+   ========================================= */
+
+const fond = L.tileLayer(
+    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    {
+        maxZoom:22,
+        maxNativeZoom:19,
+		   opacity:0.4,
+        attribution:'© IGN - Géoplateforme'
+    }
+);
+
+fond.addTo(map);
+
+
 
 
 /* =========================================
@@ -566,7 +584,7 @@ let epaisseurContour=1 ;
 afficherCommune_reseau_d_alerte && 
 Commune_reseau_d_alerte === "X") {
 
-couleurContour= "#f7d500";
+couleurContour= "#e31a00;
 epaisseurContour = 3; 
 
  }
@@ -644,7 +662,7 @@ function styleCommunes_points(feature) {
 
         return {
 
-            radius: 3,
+            radius: 4,
 
             color: couleur,
             weight: 2,
