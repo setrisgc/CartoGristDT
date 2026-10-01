@@ -153,35 +153,7 @@ controleZoom.onAdd = function() {
 
     const div = L.DomUtil.create("div", "zoomPanel");
 
-div.innerHTML =
-    <div class="zoomPanelTitle">
-        📍 Zoom par arrondissement
-    </div>
-
-    <div class="zoomPanelButtons">
-
-        <button id="zoomManche">
-            Manche
-        </button>
-
-        <button id="zoomCherbourg">
-            Cherbourg
-        </button>
-
-        <button id="zoomCoutances">
-            Coutances
-        </button>
-
-        <button id="zoomSaintLo">
-            Saint-Lô
-        </button>
-
-        <button id="zoomAvranches">
-            Avranches
-        </button>
-
-    </div>
-;
+div.innerHTML = ` <div class="zoomPanelTitle"> 📍 Zoom par arrondissement </div> <div class="zoomPanelButtons"> <button id="zoomManche"> Manche </button> <button id="zoomCherbourg"> Cherbourg </button> <button id="zoomCoutances"> Coutances </button> <button id="zoomSaintLo"> Saint-Lô </button> <button id="zoomAvranches"> Avranches </button> </div> `; 
 
  L.DomEvent.disableClickPropagation(div);
 
