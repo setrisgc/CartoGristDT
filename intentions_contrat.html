@@ -123,7 +123,7 @@ controleZoom.onAdd = function() {
     const div = L.DomUtil.create("div", "zoomPanel");
 
     div.innerHTML = `
-        <strong>Zoom</strong>
+        <strong>Zoom arrondissement</strong>
 
         <button id="zoomManche">
             Manche
@@ -163,6 +163,7 @@ let communesInteressees = {};
 let communesReseauAlerte = {};
 let coucheCommunes = null;
 let coucheArrondissements = null;
+let communesPoints = null;
 
 
 /* =========================================
@@ -208,37 +209,53 @@ communesReseauAlerte[code]= alerte ;
 contractualisationParCommune,
 communesInteressees,
 communesReseauAlerte
-    );
+ );
 
-    if (coucheCommunes) {
+if (coucheCommunes) {
 
-        coucheCommunes.setStyle(styleCommune);
+    coucheCommunes.setStyle(styleCommune);
 
-    }
+}
 
-});
+if (communesPoints) {
+
+    communesPoints.eachLayer(function(layer) {
+
+        if (layer.setStyle) {
+
+            layer.setStyle(
+                styleCommunes_points(layer.feature)
+            );
+
+        }
+
+    });
+
+}
+
+}); 
 
 /* =========================================
-COLORATION DES COMMUNES
-   ========================================= */
+COLORATION DES COMMUNES EN FONCTION CONTRACTUALISATION
+ ========================================= */
 
 function styleCommune(feature) {
 
-    const code = String(
-        feature.properties.INSEE_COMM || ""
-    ).trim();
+ const code = String(
+ feature.properties.INSEE_COMM || ""
+ ).trim();
 
-    const contractualisation =
-        contractualisationParCommune[code] || "";
+ const contractualisation =
+ contractualisationParCommune[code] || "";
 
-    let couleur = "#ffffff";
+ let couleur = "#ffffff";
 
-    if (contractualisation === "PVD") {
+ if (contractualisation === "PVD") {
 
-        couleur = "#9842b7";
+ couleur = "#9842b7";
 
-    }
-    else if (contractualisation === "ACV") {
+ }
+ else if (contractualisation === "ACV") {
 
         couleur = "#ff9a3b";
 
@@ -262,6 +279,42 @@ function styleCommune(feature) {
     };
 
 }
+
+/* =========================================
+   POINT AU CENTRE DES COMMUNES INTERESSEES
+   ========================================= */
+
+function styleCommunes_points(feature) {
+
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
+
+    const interessee =
+        String(communesInteressees[code] || "").trim().toUpperCase();
+
+    if (interessee === "X") {
+
+        return {
+            radius: 7,
+            color: "#ff0000",
+            weight: 2,
+            fillColor: "#ff0000",
+            fillOpacity: 1
+        };
+
+    }
+
+    return {
+        radius: 0,
+        color: "#ffffff",
+        weight: 0,
+        fillColor: "#ffffff",
+        fillOpacity: 0
+    };
+}
+
+
 
 /* =========================================
    COUCHE COMMUNES
@@ -302,59 +355,81 @@ fetch(urlCommunesPoints)
 
 .then(function(data) {
 
-    const communesPoints = L.geoJSON(data, {
+    communesPoints = L.geoJSON(data, {
 
         pointToLayer: function(feature, latlng) {
 
             const nom = feature.properties.NOM_COMM || "";
 
-            return L.marker(latlng, {
+            /* Création du point */
+            const point = L.circleMarker(
+                latlng,
+                styleCommunes_points(feature)
+            );
 
-                interactive: false,
+            /* Étiquette de la commune */
+            point.bindTooltip(nom, {
 
-                icon: L.divIcon({
+                permanent: true,
 
-                    className: "labelCommune",
+                direction: "center",
 
-                    html: nom,
+                className: "labelCommune",
 
-                    iconSize: [120, 20],
+                offset: [0, 0],
 
-                    iconAnchor: [60, 10]
-
-                })
+                interactive: false
 
             });
+
+            return point;
 
         }
 
     });
 
-
-
-    /* =========================================
-       AFFICHAGE DES ÉTIQUETTES À PARTIR DU ZOOM 10
-       ========================================= */
-
-    function gererEtiquettesCommunes() {
-
-        if (map.getZoom() >= 10) {
-
-            communesPoints.addTo(map);
-
-        } else {
-
-            map.removeLayer(communesPoints);
-
-        }
-
-    }
-
-    map.on("zoomend", gererEtiquettesCommunes);
-
+    /*
+       Affichage des noms uniquement à partir
+       du zoom 10
+    */
     gererEtiquettesCommunes();
 
 });
+
+
+/* =========================================
+   AFFICHAGE DES ÉTIQUETTES À PARTIR DU ZOOM 10
+   ========================================= */
+
+function gererEtiquettesCommunes() {
+
+    /*
+       Tant que la couche n'est pas encore chargée,
+       on ne fait rien
+    */
+    if (!communesPoints) {
+        return;
+    }
+
+    if (map.getZoom() >= 10) {
+
+        communesPoints.addTo(map);
+
+    } else {
+
+        map.removeLayer(communesPoints);
+
+    }
+
+}
+
+
+/* =========================================
+   ACTUALISATION DES ÉTIQUETTES AU CHANGEMENT
+   DE ZOOM
+   ========================================= */
+
+map.on("zoomend", gererEtiquettesCommunes);
 
 
 /* =========================================
