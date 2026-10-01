@@ -153,32 +153,59 @@ controleZoom.onAdd = function() {
 
     const div = L.DomUtil.create("div", "zoomPanel");
 
-div.innerHTML = ` <div class="zoomPanelTitle"> 📍 Zoom par arrondissement </div> <div class="zoomPanelButtons"> <button id="zoomManche"> Manche </button> <button id="zoomCherbourg"> Cherbourg </button> <button id="zoomCoutances"> Coutances </button> <button id="zoomSaintLo"> Saint-Lô </button> <button id="zoomAvranches"> Avranches </button> </div> `; 
+    div.innerHTML = `
+        <div class="zoomPanelTitle">
+            📍 Zoom
+        </div>
 
- L.DomEvent.disableClickPropagation(div);
+        <div class="zoomPanelButtons">
 
-const titre = div.querySelector(".zoomPanelTitle");
-const boutons = div.querySelector(".zoomPanelButtons");
+            <button id="zoomManche">
+                Manche
+            </button>
 
-titre.addEventListener("click", function() {
+            <button id="zoomCherbourg">
+                Cherbourg
+            </button>
 
-    if (boutons.style.display === "none") {
+            <button id="zoomCoutances">
+                Coutances
+            </button>
 
-        boutons.style.display = "block";
+            <button id="zoomSaintLo">
+                Saint-Lô
+            </button>
 
-    } else {
+            <button id="zoomAvranches">
+                Avranches
+            </button>
 
-        boutons.style.display = "none";
+        </div>
+    `;
 
-    }
+    L.DomEvent.disableClickPropagation(div);
 
-});
+    const titre = div.querySelector(".zoomPanelTitle");
+    const boutons = div.querySelector(".zoomPanelButtons");
+
+    titre.addEventListener("click", function() {
+
+        if (boutons.style.display === "none") {
+
+            boutons.style.display = "block";
+
+        } else {
+
+            boutons.style.display = "none";
+
+        }
+
+    });
 
     return div;
 };
 
 controleZoom.addTo(map);
-
 
 /* =========================================
    DONNÉES GRIST
