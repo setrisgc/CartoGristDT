@@ -371,6 +371,22 @@ if (communesPoints) {
 
 });
 
+const chkCommune_reseau_d_alerte =
+    div.querySelector("#chkCommune_reseau_d_alerte");
+
+chkCommune_reseau_d_alerte.addEventListener("change", function() {
+
+    afficherCommune_reseau_d_alerte =
+        chkCommune_reseau_d_alerte.checked;
+
+    if (coucheCommunes) {
+
+        coucheCommunes.setStyle(styleCommune);
+
+    }
+
+});
+
 
 
 titre.addEventListener("click", function() {
@@ -550,7 +566,9 @@ String(communesReseauAlerte[code] || ""
  let couleurContour = "#959595";
 let epaisseurContour=1 ;
 
- if (Commune_reseau_d_alerte === "X") {
+ if (
+afficherCommune_reseau_d_alerte && 
+Commune_reseau_d_alerte === "X") {
 
 couleurContour= "#00f2fb";
 epaisseurContour = 3; 
