@@ -566,7 +566,7 @@ let epaisseurContour=1 ;
 afficherCommune_reseau_d_alerte && 
 Commune_reseau_d_alerte === "X") {
 
-couleurContour= "#00f2fb";
+couleurContour= "#f7d500";
 epaisseurContour = 3; 
 
  }
@@ -598,6 +598,10 @@ function styleCommunes_points(feature) {
     ).trim();
 
 
+    /* =========================================
+       CONTRACTUALISATION
+       ========================================= */
+
     const contractualisation =
         String(
             contractualisationParCommune[code] || ""
@@ -612,34 +616,28 @@ function styleCommunes_points(feature) {
     let afficher = false;
 
 
-    if (
-        afficherCommunes_interessees &&
-        interessee === "X"
-    ) {
+    if (contractualisation === "PVD") {
 
+        couleur = "#9842b7";
         afficher = true;
 
-        if (contractualisation === "PVD") {
+    }
+    else if (contractualisation === "ACV") {
 
-            couleur = "#9842b7";
+        couleur = "#ff9a3b";
+        afficher = true;
 
-        }
-        else if (contractualisation === "ACV") {
+    }
+    else if (contractualisation === "VA") {
 
-            couleur = "#ff9a3b";
-
-        }
-        else if (contractualisation === "VA") {
-
-            couleur = "#ff69b4";
-
-        }
+        couleur = "#ff69b4";
+        afficher = true;
 
     }
 
 
     /* =========================================
-       STYLE DE LA PASTILLE
+       AFFICHAGE DE LA PASTILLE
        ========================================= */
 
     if (afficher) {
@@ -660,7 +658,7 @@ function styleCommunes_points(feature) {
 
 
     /* =========================================
-       PAS DE PASTILLE
+       PAS DE CONTRACTUALISATION
        ========================================= */
 
     return {
