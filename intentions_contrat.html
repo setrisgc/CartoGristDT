@@ -41,16 +41,21 @@ height: 100%;
 
 /* pour la boite de zoom par arrondissement */
 .zoomPanel {
- background: white;
- padding: 8px;
- border-radius: 5px;
- box-shadow: 0 1px 5px rgba(0,0,0,0.35);
- font-size: 13px;
+    background: white;
+    padding: 8px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.35);
+    font-size: 13px;
 }
 
-.zoomPanel strong {
-    display: block;
-    margin-bottom: 6px;
+.zoomPanelTitle {
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+}
+
+.zoomPanelButtons {
+    margin-top: 6px;
 }
 
 .zoomPanel button {
@@ -68,6 +73,7 @@ height: 100%;
 .zoomPanel button:hover {
     background: #eeeeee;
 }
+
 
 </style>
 
@@ -146,8 +152,12 @@ controleZoom.onAdd = function() {
 
     const div = L.DomUtil.create("div", "zoomPanel");
 
-    div.innerHTML = `
-        <strong>Zoom</strong>
+div.innerHTML =
+    <div class="zoomPanelTitle">
+        📍 Zoom par arrondissement
+    </div>
+
+    <div class="zoomPanelButtons">
 
         <button id="zoomManche">
             Manche
@@ -168,9 +178,28 @@ controleZoom.onAdd = function() {
         <button id="zoomAvranches">
             Avranches
         </button>
-    `;
 
-    L.DomEvent.disableClickPropagation(div);
+    </div>
+;
+
+ L.DomEvent.disableClickPropagation(div);
+
+const titre = div.querySelector(".zoomPanelTitle");
+const boutons = div.querySelector(".zoomPanelButtons");
+
+titre.addEventListener("click", function() {
+
+    if (boutons.style.display === "none") {
+
+        boutons.style.display = "block";
+
+    } else {
+
+        boutons.style.display = "none";
+
+    }
+
+});
 
     return div;
 };
