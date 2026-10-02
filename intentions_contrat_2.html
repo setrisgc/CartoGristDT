@@ -569,8 +569,10 @@ informationsCommunes[code] = {
     Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
     Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
     Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-    Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim(),
+Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim(),
 
+
+Observations: String(record["Observations"] || "").trim(),
     Projets_identifies: String(record["Projets_identifies"] || "").trim(),
     Attentes: String(record["Attentes"] || "").trim(),
     Documents_joints: String(record["Documents_joints"] || "").trim()
@@ -946,7 +948,15 @@ onEachFeature: function(feature, layer) {
                 ${infos.Demarche_numerique}<br>
 
                 <strong>Contact :</strong>
-                ${infos.Contact_mail_telephone_}<br><br>
+${infos.Contact_mail_telephone_}<br><br>
+
+
+<strong>Observations :</strong><br>
+
+${afficherTexteLong(
+    "observations_" + code,
+    infos.Observations
+)}
 
 
                 <strong>Projets identifiés :</strong><br>
