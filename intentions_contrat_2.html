@@ -74,6 +74,27 @@ background: #ffffff !important;
     line-height: 1.5;
 }
 
+.texteLong {
+  margin-top: 3px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.lienMore {
+  color: #5555aa;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 5px;
+  font-size: 11px;
+}
+
+.lienMore:hover {
+  text-decoration: underline;
+}
+
+
+
+
 
 /* pour la boite de zoom par arrondissement */
 .zoomPanel {
@@ -548,7 +569,11 @@ informationsCommunes[code] = {
     Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
     Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
     Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-    Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim()
+    Contact_mail_telephone: String(record["Contact_mail_telephone"] || "").trim(),
+
+    Projets_identifies: String(record["Projets_identifies"] || "").trim(),
+    Attentes: String(record["Attentes"] || "").trim(),
+    Documents_joints: String(record["Documents_joints"] || "").trim()
 };
 
  }
@@ -781,7 +806,80 @@ coucheCommunes = L.geoJSON(data, {
                 return;
             }
 
-        const contenu = `
+
+function afficherTexteLong(id, texte, longueur = 250) {
+
+    if (!texte) {
+        return "";
+    }
+
+    // Texte suffisamment court : on affiche tout
+    if (texte.length <= longueur) {
+        return `
+            <div class="texteLong">
+                ${texte}
+            </div>
+        `;
+    }
+
+    // Création de l'aperçu
+    const extrait = texte.substring(0, longueur);
+
+    const positionFinPhrase = Math.max(
+        extrait.lastIndexOf("."),
+        extrait.lastIndexOf("!"),
+        extrait.lastIndexOf("?")
+    );
+
+    let apercu;
+
+    if (positionFinPhrase > 80) {
+        apercu = extrait.substring(0, positionFinPhrase + 1);
+    } else {
+        apercu = extrait.substring(0, extrait.lastIndexOf(" ")) + "...";
+    }
+
+    return `
+        <div class="texteLong" id="${id}">
+            <span class="texteApercu">
+                ${apercu}
+            </span>
+
+            <span class="texteComplet" style="display:none;">
+                ${texte}
+            </span>
+
+            <a href="#" class="lienMore"
+               onclick="event.preventDefault(); afficherPlus('${id}', this);">
+                more
+            </a>
+        </div>
+    `;
+}
+
+function afficherPlus(id, lien) {
+
+    const bloc = document.getElementById(id);
+
+    const apercu = bloc.querySelector(".texteApercu");
+    const complet = bloc.querySelector(".texteComplet");
+
+    if (complet.style.display === "none") {
+
+        apercu.style.display = "none";
+        complet.style.display = "inline";
+        lien.textContent = "less";
+
+    } else {
+
+        apercu.style.display = "inline";
+        complet.style.display = "none";
+        lien.textContent = "more";
+
+    }
+}
+
+const contenu = `
 
     <div class="titreCommune">
         ${infos.commune}
@@ -793,18 +891,45 @@ coucheCommunes = L.geoJSON(data, {
 
         <strong>Prénom :</strong> ${infos.prenom}<br>
 
-<strong>EPCI :</strong> ${infos.epci}<br>
+        <strong>EPCI :</strong> ${infos.epci}<br>
 
-<strong>Priorisation :</strong> ${infos.Priorisation_rencontres}<br>
+        <strong>Priorisation :</strong>
+        ${infos.Priorisation_rencontres}<br>
 
-<strong>Retour questionnaire :</strong> ${infos.Retour_questionnaire_29_mai}<br>
+        <strong>Retour questionnaire :</strong>
+        ${infos.Retour_questionnaire_29_mai}<br>
 
-<strong>Démarche numérique:</strong> ${infos.Demarche_numerique}<br>
+        <strong>Démarche numérique :</strong>
+        ${infos.Demarche_numerique}<br>
 
- <strong>Contact:</strong> ${infos.Contact_mail_telephone_}
+        <strong>Contact :</strong>
+        ${infos.Contact_mail_telephone}<br><br>
+
+
+        <strong>Projets identifiés :</strong><br>
+        ${afficherTexteLong(
+            "projets_" + code,
+            infos.Projets_identifies
+        )}
+
+
+        <strong>Attentes :</strong><br>
+        ${afficherTexteLong(
+            "attentes_" + code,
+            infos.Attentes
+        )}
+
+
+        <strong>Documents joints :</strong><br>
+        ${afficherTexteLong(
+            "documents_" + code,
+            infos.Documents_joints
+        )}
+
     </div>
 
 `;
+
 
 layer.bindPopup(contenu, {
     className: "popupCommune",
