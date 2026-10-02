@@ -416,9 +416,26 @@ chkContractualisation.addEventListener("change", function() {
     afficherContractualisation =
         chkContractualisation.checked;
 
-    if (coucheCommunes) {
+    if (communesPoints) {
 
-        coucheCommunes.setStyle(styleCommune);
+        communesPoints.eachLayer(function(layer) {
+
+            const style =
+                styleCommunes_points(layer.feature);
+
+            if (layer.setStyle) {
+
+                layer.setStyle(style);
+
+            }
+
+            if (layer.setRadius) {
+
+                layer.setRadius(style.radius);
+
+            }
+
+        });
 
     }
 
@@ -432,29 +449,11 @@ chkCommunes_interessees.addEventListener("change", function() {
     afficherCommunes_interessees =
         chkCommunes_interessees.checked;
 
+    if (coucheCommunes) {
 
-if (communesPoints) {
+        coucheCommunes.setStyle(styleCommune);
 
-    communesPoints.eachLayer(function(layer) {
-
-        const style =
-            styleCommunes_points(layer.feature);
-
-        if (layer.setStyle) {
-
-            layer.setStyle(style);
-
-        }
-
-        if (layer.setRadius) {
-
-            layer.setRadius(style.radius);
-
-        }
-
-    });
-
-}
+    }
 
 });
 
@@ -719,24 +718,29 @@ function styleCommunes_points(feature) {
     let afficher = false;
 
 
-    if (contractualisation === "PVD") {
+   if (afficherContractualisation && contractualisation === "PVD") {
 
-        couleur = "#9842b7";
-        afficher = true;
+    couleur = "#9842b7";
 
-    }
-    else if (contractualisation === "ACV") {
+    afficher = true;
 
-        couleur = "#ff9a3b";
-        afficher = true;
+}
 
-    }
-    else if (contractualisation === "VA") {
+else if (afficherContractualisation && contractualisation === "ACV") {
 
-        couleur = "#07b3e3";
-        afficher = true;
+    couleur = "#ff9a3b";
 
-    }
+    afficher = true;
+
+}
+
+else if (afficherContractualisation && contractualisation === "VA") {
+
+    couleur = "#07b3e3";
+
+    afficher = true;
+
+}
 
 
     /* =========================================
