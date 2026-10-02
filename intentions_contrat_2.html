@@ -792,192 +792,206 @@ coucheCommunes = L.geoJSON(data, {
 
     pane: "communesPane",
 
-    onEachFeature: function(feature, layer) {
+onEachFeature: function(feature, layer) {
 
-        const code = String(
-            feature.properties.INSEE_COMM || ""
-        ).trim();
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
 
-        layer.on("click", function() {
+    layer.on("click", function() {
 
-            const infos = informationsCommunes[code];
+        const infos = informationsCommunes[code];
 
-            if (!infos) {
-                return;
+        if (!infos) {
+            return;
+        }
+
+
+        /* =========================================
+           TEXTE COURT / TEXTE COMPLET
+           ========================================= */
+
+        function afficherTexteLong(id, texte, longueur = 100) {
+
+            if (!texte) {
+                return "";
+            }
+
+            /* Texte court : on affiche tout */
+            if (texte.length <= longueur) {
+
+                return `
+                    <div class="texteLong">
+                        ${texte}
+                    </div>
+                `;
+
             }
 
 
-function afficherTexteLong(id, texte, longueur = 100) {
+            /* Texte long : création de l'aperçu */
 
-    if (!texte) {
-        return "";
-    }
+            const extrait = texte.substring(0, longueur);
 
-    // Texte court : on affiche tout
-    if (texte.length <= longueur) {
-        return `
-            <div class="texteLong">
-                ${texte}
+            const positionFinPhrase = Math.max(
+                extrait.lastIndexOf("."),
+                extrait.lastIndexOf("!"),
+                extrait.lastIndexOf("?")
+            );
+
+            let apercu;
+
+
+            if (positionFinPhrase > 40) {
+
+                apercu =
+                    extrait.substring(
+                        0,
+                        positionFinPhrase + 1
+                    );
+
+            } else {
+
+                apercu =
+                    extrait.substring(
+                        0,
+                        extrait.lastIndexOf(" ")
+                    ) + "...";
+
+            }
+
+
+            return `
+                <div class="texteLong">
+
+                    <span class="texteApercu">
+                        ${apercu}
+                    </span>
+
+                    <span
+                        class="texteComplet"
+                        style="display:none;"
+                    >
+                        ${texte}
+                    </span>
+
+                    <a
+                        href="#"
+                        class="lienMore"
+                        onclick="
+                            event.preventDefault();
+
+                            const bloc = this.parentElement;
+
+                            const apercu =
+                                bloc.querySelector('.texteApercu');
+
+                            const complet =
+                                bloc.querySelector('.texteComplet');
+
+                            if (complet.style.display === 'none') {
+
+                                apercu.style.display = 'none';
+                                complet.style.display = 'inline';
+                                this.textContent = 'less';
+
+                            } else {
+
+                                apercu.style.display = 'inline';
+                                complet.style.display = 'none';
+                                this.textContent = 'more';
+
+                            }
+
+                            return false;
+                        "
+                    >
+                        more
+                    </a>
+
+                </div>
+            `;
+
+        }
+
+
+        /* =========================================
+           CONTENU DU POPUP
+           ========================================= */
+
+        const contenu = `
+
+            <div class="titreCommune">
+                ${infos.commune}
             </div>
+
+            <div class="infosCommune">
+
+                <strong>Nom :</strong>
+                ${infos.nom}<br>
+
+                <strong>Prénom :</strong>
+                ${infos.prenom}<br>
+
+                <strong>EPCI :</strong>
+                ${infos.epci}<br>
+
+                <strong>Priorisation :</strong>
+                ${infos.Priorisation_rencontres}<br>
+
+                <strong>Retour questionnaire :</strong>
+                ${infos.Retour_questionnaire_29_mai}<br>
+
+                <strong>Démarche numérique :</strong>
+                ${infos.Demarche_numerique}<br>
+
+                <strong>Contact :</strong>
+                ${infos.Contact_mail_telephone}<br><br>
+
+
+                <strong>Projets identifiés :</strong><br>
+
+                ${afficherTexteLong(
+                    "projets_" + code,
+                    infos.Projets_identifies
+                )}
+
+
+                <strong>Attentes :</strong><br>
+
+                ${afficherTexteLong(
+                    "attentes_" + code,
+                    infos.Attentes
+                )}
+
+
+                <strong>Documents joints :</strong><br>
+
+                ${afficherTexteLong(
+                    "documents_" + code,
+                    infos.Documents_joints
+                )}
+
+            </div>
+
         `;
-    }
 
-    const extrait = texte.substring(0, longueur);
 
-    const positionFinPhrase = Math.max(
-        extrait.lastIndexOf("."),
-        extrait.lastIndexOf("!"),
-        extrait.lastIndexOf("?")
-    );
+        /* =========================================
+           OUVERTURE DU POPUP
+           ========================================= */
 
-    let apercu;
+        layer.bindPopup(contenu, {
 
-    if (positionFinPhrase > 40) {
-        apercu = extrait.substring(0, positionFinPhrase + 1);
-    } else {
-        apercu = extrait.substring(0, extrait.lastIndexOf(" ")) + "...";
-    }
+            className: "popupCommune",
 
-    return `
-        <div class="texteLong" id="${id}">
+            pane: "popupPane"
 
-            <span class="texteApercu">
-                ${apercu}
-            </span>
+        }).openPopup();
 
-            <span class="texteComplet" style="display:none;">
-                ${texte}
-            </span>
+    });
 
-            <a href="#"
-               class="lienMore"
-               onclick="
-                 event.preventDefault();
-
-                 const bloc = this.parentElement;
-                 const apercu = bloc.querySelector('.texteApercu');
-                 const complet = bloc.querySelector('.texteComplet');
-
-                 if (complet.style.display === 'none') {
-
-                     apercu.style.display = 'none';
-                     complet.style.display = 'inline';
-                     this.textContent = 'less';
-
-                 } else {
-
-                     apercu.style.display = 'inline';
-                     complet.style.display = 'none';
-                     this.textContent = 'more';
-
-                 }
-
-                 return false;
-               ">
-                more
-            </a>
-
-        </div>
-    `;
 }
-
-    // Création de l'aperçu
-    const extrait = texte.substring(0, longueur);
-
-    const positionFinPhrase = Math.max(
-        extrait.lastIndexOf("."),
-        extrait.lastIndexOf("!"),
-        extrait.lastIndexOf("?")
-    );
-
-    let apercu;
-
-    if (positionFinPhrase > 80) {
-        apercu = extrait.substring(0, positionFinPhrase + 1);
-    } else {
-        apercu = extrait.substring(0, extrait.lastIndexOf(" ")) + "...";
-    }
-
-    return `
-        <div class="texteLong" id="${id}">
-            <span class="texteApercu">
-                ${apercu}
-            </span>
-
-            <span class="texteComplet" style="display:none;">
-                ${texte}
-            </span>
-
-            <a href="#" class="lienMore"
-               onclick="event.preventDefault(); afficherPlus('${id}', this);">
-                more
-            </a>
-        </div>
-    `;
-}
-
-
-
-const contenu = `
-
-    <div class="titreCommune">
-        ${infos.commune}
-    </div>
-
-    <div class="infosCommune">
-
-        <strong>Nom :</strong> ${infos.nom}<br>
-
-        <strong>Prénom :</strong> ${infos.prenom}<br>
-
-        <strong>EPCI :</strong> ${infos.epci}<br>
-
-        <strong>Priorisation :</strong>
-        ${infos.Priorisation_rencontres}<br>
-
-        <strong>Retour questionnaire :</strong>
-        ${infos.Retour_questionnaire_29_mai}<br>
-
-        <strong>Démarche numérique :</strong>
-        ${infos.Demarche_numerique}<br>
-
-        <strong>Contact :</strong>
-        ${infos.Contact_mail_telephone}<br><br>
-
-
-        <strong>Projets identifiés :</strong><br>
-        ${afficherTexteLong(
-            "projets_" + code,
-            infos.Projets_identifies
-        )}
-
-
-        <strong>Attentes :</strong><br>
-        ${afficherTexteLong(
-            "attentes_" + code,
-            infos.Attentes
-        )}
-
-
-        <strong>Documents joints :</strong><br>
-        ${afficherTexteLong(
-            "documents_" + code,
-            infos.Documents_joints
-        )}
-
-    </div>
-
-`;
-
-
-layer.bindPopup(contenu, {
-    className: "popupCommune",
-    pane: "popupPane"
-}).openPopup();
-
-        });
-
-    }
 
 }).addTo(map);
 
