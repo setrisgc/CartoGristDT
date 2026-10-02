@@ -544,7 +544,11 @@ informationsCommunes[code] = {
     nom: nom,
     prenom: prenom,
     epci: epci,
-    commune: commune
+    commune: commune,
+    Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
+    Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
+    Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
+    Contact_mail_telephone: String(record["Contact_mail_telephone"] || "").trim()
 };
 
  }
