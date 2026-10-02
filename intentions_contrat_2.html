@@ -569,7 +569,7 @@ informationsCommunes[code] = {
     Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
     Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
     Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-    Contact_mail_telephone: String(record["Contact_mail_telephone"] || "").trim(),
+    Contact_mail_telephone: String(record["Contact_mail_telephone_"] || "").trim(),
 
     Projets_identifies: String(record["Projets_identifies"] || "").trim(),
     Attentes: String(record["Attentes"] || "").trim(),
@@ -946,7 +946,7 @@ onEachFeature: function(feature, layer) {
                 ${infos.Demarche_numerique}<br>
 
                 <strong>Contact :</strong>
-                ${infos.Contact_mail_telephone}<br><br>
+                ${infos.Contact_mail_telephone_}<br><br>
 
 
                 <strong>Projets identifiés :</strong><br>
