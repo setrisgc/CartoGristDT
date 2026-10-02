@@ -807,13 +807,13 @@ coucheCommunes = L.geoJSON(data, {
             }
 
 
-function afficherTexteLong(id, texte, longueur = 80) {
+function afficherTexteLong(id, texte, longueur = 100) {
 
     if (!texte) {
         return "";
     }
 
-    // Texte suffisamment court : on affiche tout
+    // Texte court : on affiche tout
     if (texte.length <= longueur) {
         return `
             <div class="texteLong">
@@ -821,6 +821,65 @@ function afficherTexteLong(id, texte, longueur = 80) {
             </div>
         `;
     }
+
+    const extrait = texte.substring(0, longueur);
+
+    const positionFinPhrase = Math.max(
+        extrait.lastIndexOf("."),
+        extrait.lastIndexOf("!"),
+        extrait.lastIndexOf("?")
+    );
+
+    let apercu;
+
+    if (positionFinPhrase > 40) {
+        apercu = extrait.substring(0, positionFinPhrase + 1);
+    } else {
+        apercu = extrait.substring(0, extrait.lastIndexOf(" ")) + "...";
+    }
+
+    return `
+        <div class="texteLong" id="${id}">
+
+            <span class="texteApercu">
+                ${apercu}
+            </span>
+
+            <span class="texteComplet" style="display:none;">
+                ${texte}
+            </span>
+
+            <a href="#"
+               class="lienMore"
+               onclick="
+                 event.preventDefault();
+
+                 const bloc = this.parentElement;
+                 const apercu = bloc.querySelector('.texteApercu');
+                 const complet = bloc.querySelector('.texteComplet');
+
+                 if (complet.style.display === 'none') {
+
+                     apercu.style.display = 'none';
+                     complet.style.display = 'inline';
+                     this.textContent = 'less';
+
+                 } else {
+
+                     apercu.style.display = 'inline';
+                     complet.style.display = 'none';
+                     this.textContent = 'more';
+
+                 }
+
+                 return false;
+               ">
+                more
+            </a>
+
+        </div>
+    `;
+}
 
     // Création de l'aperçu
     const extrait = texte.substring(0, longueur);
@@ -857,27 +916,7 @@ function afficherTexteLong(id, texte, longueur = 80) {
     `;
 }
 
-function afficherPlus(id, lien) {
 
-    const bloc = document.getElementById(id);
-
-    const apercu = bloc.querySelector(".texteApercu");
-    const complet = bloc.querySelector(".texteComplet");
-
-    if (complet.style.display === "none") {
-
-        apercu.style.display = "none";
-        complet.style.display = "inline";
-        lien.textContent = "less";
-
-    } else {
-
-        apercu.style.display = "inline";
-        complet.style.display = "none";
-        lien.textContent = "more";
-
-    }
-}
 
 const contenu = `
 
