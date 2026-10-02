@@ -548,7 +548,7 @@ informationsCommunes[code] = {
     Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
     Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
     Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-    Contact_mail_telephone: String(record["Contact_mail_telephone"] || "").trim()
+    Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim()
 };
 
  }
@@ -801,7 +801,7 @@ coucheCommunes = L.geoJSON(data, {
 
 <strong>Démarche numérique:</strong> ${infos.Demarche_numerique}<br>
 
- <strong>Contact:</strong> ${infos.Contact_mail_telephone}
+ <strong>Contact:</strong> ${infos.Contact_mail_telephone_}
     </div>
 
 `;
