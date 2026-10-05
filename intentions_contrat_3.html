@@ -207,6 +207,19 @@ border-radius: 1px;
 vertical-align: -1px;
 }
 
+/*------------------------------------------- suivi-------------------------------------*/
+.pastilleSuiviRDV {
+    background: #c6e8c0;
+}
+
+.pastilleSuiviElaboration {
+    background: #70c66b;
+}
+
+.pastilleSuiviContrat {
+    background: #198754;
+}
+
 .zoomPanelTitle {
     cursor: pointer;
     font-weight: bold;
@@ -382,7 +395,31 @@ div.innerHTML = `
 checked>
 <span class="pastille pastilleAlerte"></span> 
             Communes réseau d'alerte
-        </label>
+</label>
+
+<label class="legendeCase">
+  <input type="checkbox"
+         id="chkSuiviVisiteContrat"
+         checked>
+  <span class="pastille pastilleSuivi"></span>
+  Suivi visite / élaboration / contrat
+</label>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviRDV"></span>
+  1er RDV réalisé
+</div>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviElaboration"></span>
+  Elaboration en cours
+</div>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviContrat"></span>
+  Contrat
+</div>
+
 
 
         <!-- =================================
@@ -535,10 +572,12 @@ let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
 let informationsCommunes = {};
+let suiviVisiteContrat = {}; 
 
 let coucheCommunes = null;
 let coucheCommunesInteressees = null;
 let coucheReseauAlerte = null;
+let coucheSuiviVisiteContrat = null;
 let coucheArrondissements = null;
 let communesPoints = null; 
 
@@ -548,15 +587,27 @@ let communesPoints = null;
    ========================================= */
 
 let afficherContractualisation = true;
-
-
-
 /* =========================================
  TEST DES DONNÉES GRIST
  ========================================= */
 
 console.log("TEST API GRIST :", typeof grist);
 
+
+function ouiNonOuVide(valeur) {
+
+  const texte = String(valeur || "").trim().toUpperCase();
+
+  if (texte === "X") {
+    return "Oui";
+  }
+
+  if (texte === "") {
+    return "Non";
+  }
+
+  return "";
+}
 grist.onRecords(function(records) {
 
  console.log("NOMBRE DE LIGNES GRIST :", records.length);
@@ -564,12 +615,19 @@ grist.onRecords(function(records) {
 contractualisationParCommune = {};
 communesInteressees =  {};
 communesReseauAlerte =  {};
+suiviVisiteContrat={] ;
 
  records.forEach(function(record) {
 const code = String(record["Code_Commune"] || "").trim();
 const valeur = String(record["Contractualisation"] || "").trim();
-const interessee = String(record["Communes_interessees"] || "").trim();
-const alerte = String(record["Commune_reseau_d_alerte"] || "").trim();
+const interessee =
+  String(record["Communes_interessees"] || "").trim().toUpperCase();
+
+const alerte =
+String(record["Commune_reseau_d_alerte"] || "").trim().toUpperCase();
+
+const suivi =
+  String(record["Suivi_visite_elaboration_contrat_"] || "").trim();
 
 const nom = String(record["Nom"] || "").trim();
 const prenom = String(record["Prenom"] || "").trim();
@@ -590,21 +648,23 @@ alerte);
 contractualisationParCommune[code] = valeur;
 communesInteressees[code]= interessee ;
 communesReseauAlerte[code]= alerte ;
+suiviVisiteContrat[code]= suivi ;
+
 informationsCommunes[code] = {
     nom: nom,
     prenom: prenom,
     epci: epci,
     commune: commune,
     Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
-    Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
-    Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim(),
+  Retour_questionnaire_29_mai:
+  ouiNonOuVide(record["Retour_questionnaire_29_mai"]),
 
+Demarche_numerique:
+  ouiNonOuVide(record["Demarche_numerique"]),
 
-Observations: String(record["Observations"] || "").trim(),
-    Projets_identifies: String(record["Projets_identifies"] || "").trim(),
-    Attentes: String(record["Attentes"] || "").trim(),
-    Documents_joints: String(record["Documents_joints"] || "").trim()
+Contact_sous_prefets_mail_telephone_:
+  ouiNonOuVide(record["Contact_sous_prefets_mail_telephone_"]),
+Observations: String(record["Observations"] || "").trim()
 };
 }
 
@@ -629,6 +689,10 @@ coucheCommunesInteressees.setStyle(styleCommunesInteressees);
 if (coucheReseauAlerte) {
 coucheReseauAlerte.setStyle(styleReseauAlerte);
 } 
+
+if (coucheSuiviVisiteContrat) {
+  coucheSuiviVisiteContrat.setStyle(styleSuiviVisiteContrat);
+}
 
 
 if (communesPoints) {
@@ -739,7 +803,58 @@ function styleReseauAlerte(feature) {
   };
 
 }
+/* =========================================
+STYLE DU SUIVI
+ ========================================= */
+function styleSuiviVisiteContrat(feature) {
 
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
+
+  const suivi =
+    String(
+      suiviVisiteContrat[code] || ""
+    ).trim().toLowerCase();
+
+  // 1er RDV réalisé
+  if (suivi === "1er rdv réalisé") {
+    return {
+      fillColor: "#c6e8c0",
+      fillOpacity: 0.65,
+      color: "transparent",
+      weight: 0
+    };
+  }
+
+  // Elaboration en cours
+  if (suivi === "elaboration en cours") {
+    return {
+      fillColor: "#70c66b",
+      fillOpacity: 0.65,
+      color: "transparent",
+      weight: 0
+    };
+  }
+
+  // Contrat : le mot peut être accompagné d'autres caractères
+  if (suivi.includes("contrat")) {
+    return {
+      fillColor: "#198754",
+      fillOpacity: 0.65,
+      color: "transparent",
+      weight: 0
+    };
+  }
+
+  // Aucun suivi
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
+}
 
 
 
@@ -1006,7 +1121,7 @@ onEachFeature: function(feature, layer) {
                 ${infos.Demarche_numerique}<br>
 
                 <strong>Contact :</strong>
-${infos.Contact_mail_telephone_}<br><br>
+${infos.Contact_sous_prefets_mail_telephone_}<br>
 
 
 <strong>Observations :</strong><br>
@@ -1017,27 +1132,7 @@ ${afficherTexteLong(
 )}
 
 
-                <strong>Projets identifiés :</strong><br>
-
-                ${afficherTexteLong(
-                    "projets_" + code,
-                    infos.Projets_identifies
-                )}
-
-
-                <strong>Attentes :</strong><br>
-
-                ${afficherTexteLong(
-                    "attentes_" + code,
-                    infos.Attentes
-                )}
-
-
-                <strong>Documents joints :</strong><br>
-
-                ${afficherTexteLong(
-                    "documents_" + code,
-                    infos.Documents_joints
+  
                 )}
 
             </div>
@@ -1083,6 +1178,12 @@ coucheReseauAlerte = L.geoJSON(data, {
 
   interactive: false
 
+}).addTo(map);
+/*CREATION DE LA COUCHE SUIVI*/
+coucheSuiviVisiteContrat = L.geoJSON(data, {
+  style: styleSuiviVisiteContrat,
+  pane: "communesInteresseesPane",
+  interactive: false
 }).addTo(map);
 
 
