@@ -471,6 +471,10 @@ chkCommunes_interessees.addEventListener("change", function() {
 
     }
 
+if (coucheSuiviContrat) {
+    coucheSuiviContrat.setStyle(styleSuiviContrat);
+}
+
 });
 
 const chkCommune_reseau_d_alerte =
@@ -522,7 +526,7 @@ let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
 let informationsCommunes = {};
-let CoucheSuiviContrat = null ;
+let coucheSuiviContrat = null ;
 
 let coucheCommunes = null;
 let coucheArrondissements = null;
@@ -664,40 +668,6 @@ function styleCommune(feature) {
  feature.properties.INSEE_COMM || ""
  ).trim();
 
-/* =========================================
-suivi communes
- ========================================= */
-    const suivi =
-        String(
-            informationsCommunes[code]?.Suivi_visite_elaboration_contrat_ || ""
-        ).trim();
-
-    let couleur = "#ffffff";
-    let opacite = 0;
-
-    if (suivi === "1er RDV réalisé") {
-
-        couleur = "#f7f74a";
-        opacite = 0.9;
-
-    } else if (suivi === "Elaboration en cours") {
-
-        couleur = "#b2df8a";
-        opacite = 0.9;
-
-    } else if (suivi.toLowerCase().includes("contrat")) {
-
-        couleur = "#78c679";
-        opacite = 0.9;
-    }
-
-    return {
-        fillColor: couleur,
-        fillOpacity: opacite,
-        color: "#ffffff",
-        weight: 0
-    };
-}
 
 /* =========================================
 commune intéressée
@@ -847,6 +817,52 @@ else if (afficherContractualisation && contractualisation === "VA") {
 
     };
 }
+
+/*
+=========================================
+STYLE DU SUIVI DES CONTRATS
+=========================================
+*/
+
+function styleSuiviContrat(feature) {
+
+    const code = String(
+        feature.properties.INSEE_COMM || ""
+    ).trim();
+
+    const suivi =
+        String(
+            informationsCommunes[code]?.Suivi_visite_elaboration_contrat_ || ""
+        ).trim();
+
+    let couleur = "#ffffff";
+    let opacite = 0;
+
+    if (suivi === "1er RDV réalisé") {
+
+        couleur = "#f7f74a";
+        opacite = 0.9;
+
+    } else if (suivi === "Elaboration en cours") {
+
+        couleur = "#b2df8a";
+        opacite = 0.9;
+
+    } else if (suivi.toLowerCase().includes("contrat")) {
+
+        couleur = "#78c679";
+        opacite = 0.9;
+    }
+
+    return {
+        fillColor: couleur,
+        fillOpacity: opacite,
+        color: "#ffffff",
+        weight: 0
+    };
+}
+
+
 /* =========================================
  COUCHE COMMUNES
  ========================================= */
