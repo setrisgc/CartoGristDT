@@ -301,6 +301,8 @@ const map = L.map("map", {
 map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex = 350;
 
+map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 340; 
+
 map.createPane("communesInteresseesPane");
 map.getPane("communesInteresseesPane").style.zIndex = 400;
 map.createPane("arrondissementPane");
@@ -1179,7 +1181,7 @@ coucheReseauAlerte = L.geoJSON(data, {
 /*CREATION DE LA COUCHE SUIVI*/
 coucheSuiviVisiteContrat = L.geoJSON(data, {
   style: styleSuiviVisiteContrat,
-  pane: "communesInteresseesPane",
+  pane: "suiviVisiteContratPane",
   interactive: false
 }).addTo(map);
 
