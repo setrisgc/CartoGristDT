@@ -188,7 +188,7 @@ display: inline-block;
 width: 14px;
 height: 9px;
 margin-right: 6px;
-background: #b2df8a;
+background: #fecb64;
 border-radius: 1px;
 vertical-align: -1px;
 } 
@@ -287,6 +287,10 @@ const map = L.map("map", {
 
 map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex = 350;
+
+
+map.createPane("suiviContratPane");
+map.getPane("suiviContratPane").style.zIndex = 400;
 
 
 map.createPane("arrondissementPane");
@@ -518,6 +522,7 @@ let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
 let informationsCommunes = {};
+let CoucheSuiviContrat = null ;
 
 let coucheCommunes = null;
 let coucheArrondissements = null;
@@ -576,21 +581,29 @@ informationsCommunes[code] = {
     nom: nom,
     prenom: prenom,
     epci: epci,
-    commune: commune,
+commune: commune,
+Suivi_visite_elaboration_contrat_:
+    String(record["Suivi_visite_elaboration_contrat_"] || "").trim(),
 Retour_questionnaire_29_mai:
-    String(record["Retour_questionnaire_29_mai"] || "").trim().toUpperCase() === "X"
-        ? "oui"
-        : "",
+    String(record["Retour_questionnaire_29_mai"] || "").trim() === ""
+        ? "non"
+        : String(record["Retour_questionnaire_29_mai"]).trim().toUpperCase() === "X"
+            ? "oui"
+            : "",
 
 Demarche_numerique:
-    String(record["Demarche_numerique"] || "").trim().toUpperCase() === "X"
-        ? "oui"
-        : "",
+    String(record["Demarche_numerique"] || "").trim() === ""
+        ? "non"
+        : String(record["Demarche_numerique"]).trim().toUpperCase() === "X"
+            ? "oui"
+            : "",
 
 Contact_sous_prefets_mail_telephone_:
-    String(record["Contact_sous_prefets_mail_telephone_" ] || "").trim().toUpperCase() === "X"
-        ? "oui"
-        : "",
+    String(record["Contact_sous_prefets_mail_telephone_"] || "").trim() === ""
+        ? "non"
+        : String(record["Contact_sous_prefets_mail_telephone_"]).trim().toUpperCase() === "X"
+            ? "oui"
+            : "",
 
     Observations:
         String(record["Observations"] || "").trim()
@@ -651,6 +664,40 @@ function styleCommune(feature) {
  feature.properties.INSEE_COMM || ""
  ).trim();
 
+/* =========================================
+suivi communes
+ ========================================= */
+    const suivi =
+        String(
+            informationsCommunes[code]?.Suivi_visite_elaboration_contrat_ || ""
+        ).trim();
+
+    let couleur = "#ffffff";
+    let opacite = 0;
+
+    if (suivi === "1er RDV réalisé") {
+
+        couleur = "#f7f74a";
+        opacite = 0.9;
+
+    } else if (suivi === "Elaboration en cours") {
+
+        couleur = "#b2df8a";
+        opacite = 0.9;
+
+    } else if (suivi.toLowerCase().includes("contrat")) {
+
+        couleur = "#78c679";
+        opacite = 0.9;
+    }
+
+    return {
+        fillColor: couleur,
+        fillOpacity: opacite,
+        color: "#ffffff",
+        weight: 0
+    };
+}
 
 /* =========================================
 commune intéressée
@@ -666,7 +713,7 @@ let opaciteFond = 0 ;
 
 if ( afficherCommunes_interessees && interessee === "X") {
 
-couleurFond = "#b2df8a" ;
+couleurFond = "#fecb64" ;
 opaciteFond = 0.9 ;
 
 }
@@ -800,8 +847,6 @@ else if (afficherContractualisation && contractualisation === "VA") {
 
     };
 }
-
-
 /* =========================================
  COUCHE COMMUNES
  ========================================= */
@@ -811,6 +856,8 @@ fetch(urlCommunes)
  return response.json();
 })
 .then(function(data) {
+
+/* ---------Couche des communes------------------ */
 
 coucheCommunes = L.geoJSON(data, {
 
@@ -999,6 +1046,13 @@ onEachFeature: function(feature, layer) {
 }
 
 }).addTo(map);
+
+/*COUCHE DU SUIVI DES CONTRATS */
+coucheSuiviContrat = L.geoJSON(data, {
+pane: "suiviContratPane",
+style: styleSuiviContrat });
+coucheSuiviContrat.addTo(map); 
+
 
 
 });
