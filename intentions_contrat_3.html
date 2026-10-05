@@ -81,9 +81,13 @@ background: #ffffff !important;
 }
 
 .texteComplet {
+
     display: block;
+
     max-height: 250px;
+
     overflow-y: auto;
+
     padding-right: 5px;
 
 }
@@ -174,7 +178,7 @@ background: #ffffff !important;
 }
 
 .pastilleVA {
-    background: #fb6199;
+    background: #07b3e3;
 }
 
 /* -----------------communes intéressées-------------------------------------*/
@@ -184,7 +188,7 @@ display: inline-block;
 width: 14px;
 height: 9px;
 margin-right: 6px;
-background: #fecb64;
+background: #b2df8a;
 border-radius: 1px;
 vertical-align: -1px;
 } 
@@ -284,10 +288,8 @@ const map = L.map("map", {
 map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex = 350;
 
-
-map.createPane("suiviContratPane");
-map.getPane("suiviContratPane").style.zIndex = 400;
-
+map.createPane("communesInteresseesPane");
+map.getPane("communesInteresseesPane").style.zIndex = 400;
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
 
@@ -454,51 +456,51 @@ chkContractualisation.addEventListener("change", function() {
 
 });
 
-const chkCommunes_interessees=
+const chkCommunes_interessees =
     div.querySelector("#chkCommunes_interessees");
 
 chkCommunes_interessees.addEventListener("change", function() {
 
-    afficherCommunes_interessees =
-        chkCommunes_interessees.checked;
+    if (coucheCommunesInteressees) {
 
-    if (coucheCommunes) {
-        coucheCommunes.setStyle(styleCommune);
+        if (chkCommunes_interessees.checked) {
+
+            coucheCommunesInteressees.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheCommunesInteressees);
+
+        }
+
     }
 
-if (coucheCommunesInteressees) {
-  coucheCommunesInteressees.setStyle(
-    styleCommunesInteressees
-  );
-}
-
-if (coucheReseauAlerte) {
-  coucheReseauAlerte.setStyle(
-    styleReseauAlerte
-  );
-}
-
-if (coucheSuiviContrat) {
-    coucheSuiviContrat.setStyle(styleSuiviContrat);
-}
-
 });
+
+
 
 const chkCommune_reseau_d_alerte =
     div.querySelector("#chkCommune_reseau_d_alerte");
 
 chkCommune_reseau_d_alerte.addEventListener("change", function() {
 
-    afficherCommune_reseau_d_alerte =
-        chkCommune_reseau_d_alerte.checked;
+    if (coucheReseauAlerte) {
 
-    if (coucheCommunes) {
+        if (chkCommune_reseau_d_alerte.checked) {
 
-        coucheCommunes.setStyle(styleCommune);
+            coucheReseauAlerte.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheReseauAlerte);
+
+        }
 
     }
 
 });
+
+
 
 
 
@@ -530,15 +532,15 @@ controleZoom.addTo(map);
  ========================================= */
 
 let contractualisationParCommune = {};
+let communesInteressees = {};
+let communesReseauAlerte = {};
 let informationsCommunes = {};
 
-let coucheSuiviContrat = null ;
 let coucheCommunes = null;
-let communesInteressees = null ;
-let communesReseauAlerte = null;
+let coucheCommunesInteressees = null;
+let coucheReseauAlerte = null;
 let coucheArrondissements = null;
-let communesPoints = null;
-
+let communesPoints = null; 
 
 
 /* =========================================
@@ -546,8 +548,7 @@ let communesPoints = null;
    ========================================= */
 
 let afficherContractualisation = true;
-let afficherCommunes_interessees = true;
-let afficherCommune_reseau_d_alerte = true;
+
 
 
 /* =========================================
@@ -593,36 +594,19 @@ informationsCommunes[code] = {
     nom: nom,
     prenom: prenom,
     epci: epci,
-commune: commune,
-Suivi_visite_elaboration_contrat_:
-    String(record["Suivi_visite_elaboration_contrat_"] || "").trim(),
-Retour_questionnaire_29_mai:
-    String(record["Retour_questionnaire_29_mai"] || "").trim() === ""
-        ? "non"
-        : String(record["Retour_questionnaire_29_mai"]).trim().toUpperCase() === "X"
-            ? "oui"
-            : "",
+    commune: commune,
+    Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
+    Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
+    Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
+Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim(),
 
-Demarche_numerique:
-    String(record["Demarche_numerique"] || "").trim() === ""
-        ? "non"
-        : String(record["Demarche_numerique"]).trim().toUpperCase() === "X"
-            ? "oui"
-            : "",
 
-Contact_sous_prefets_mail_telephone_:
-    String(record["Contact_sous_prefets_mail_telephone_"] || "").trim() === ""
-        ? "non"
-        : String(record["Contact_sous_prefets_mail_telephone_"]).trim().toUpperCase() === "X"
-            ? "oui"
-            : "",
-
-    Observations:
-        String(record["Observations"] || "").trim()
-
+Observations: String(record["Observations"] || "").trim(),
+    Projets_identifies: String(record["Projets_identifies"] || "").trim(),
+    Attentes: String(record["Attentes"] || "").trim(),
+    Documents_joints: String(record["Documents_joints"] || "").trim()
 };
-
- }
+}
 
  });
 
@@ -634,10 +618,18 @@ communesReseauAlerte
  );
 
 if (coucheCommunes) {
-
-    coucheCommunes.setStyle(styleCommune);
+ coucheCommunes.setStyle(styleCommune);
 
 }
+
+if (coucheCommunesInteressees){
+coucheCommunesInteressees.setStyle(styleCommunesInteressees);
+} 
+
+if (coucheReseauAlerte) {
+coucheReseauAlerte.setStyle(styleReseauAlerte);
+} 
+
 
 if (communesPoints) {
 
@@ -667,7 +659,7 @@ if (communesPoints) {
 
 
 /* =========================================
-STYLE LIMITES GRISES DES COMMUNES
+STYLE DES POLYGONES DES COMMUNES contour gris
  ========================================= */
 
 function styleCommune(feature) {
@@ -678,10 +670,10 @@ function styleCommune(feature) {
     color: "#959595",
     weight: 0.5
   };
-}
 
+}
 /* =========================================
-STYLE DES COMMUNES INTERESSEES ici orange
+STYLE DES COMMUNES INTERESSEES
  ========================================= */
 
 function styleCommunesInteressees(feature) {
@@ -712,11 +704,13 @@ function styleCommunesInteressees(feature) {
     color: "transparent",
     weight: 0
   };
+
 }
 
 /* =========================================
-STYLE DES COMMUNES RESEAU ALERTE ici contour rouge
+STYLE DES COMMUNES RESEAU ALERTE
  ========================================= */
+
 function styleReseauAlerte(feature) {
 
   const code = String(
@@ -743,11 +737,15 @@ function styleReseauAlerte(feature) {
     color: "transparent",
     weight: 0
   };
+
 }
 
+
+
+
 /* =========================================
-STYLE DES CONTRACTUALISATIONS ici pastille au centroide de la commune
- ========================================= */
+   contractualisation (pastille au centre de la commune)
+   ========================================= */
 
 function styleCommunes_points(feature) {
 
@@ -792,7 +790,7 @@ else if (afficherContractualisation && contractualisation === "ACV") {
 
 else if (afficherContractualisation && contractualisation === "VA") {
 
-    couleur = "#fb6199";
+    couleur = "#07b3e3";
 
     afficher = true;
 
@@ -837,50 +835,6 @@ else if (afficherContractualisation && contractualisation === "VA") {
     };
 }
 
-/*
-=========================================
-STYLE DU SUIVI DES CONTRATS
-=========================================
-*/
-
-function styleSuiviContrat(feature) {
-
-    const code = String(
-        feature.properties.INSEE_COMM || ""
-    ).trim();
-
-    const suivi =
-        String(
-            informationsCommunes[code]?.Suivi_visite_elaboration_contrat_ || ""
-        ).trim();
-
-    let couleur = "#ffffff";
-    let opacite = 0;
-
-    if (suivi === "1er RDV réalisé") {
-
-        couleur = "#f7f79b";
-        opacite = 0.9;
-
-    } else if (suivi === "Elaboration en cours") {
-
-        couleur = "#b2df8a";
-        opacite = 0.9;
-
-    } else if (suivi.toLowerCase().includes("contrat")) {
-
-        couleur = "#3cbd34";
-        opacite = 0.9;
-    }
-
-    return {
-        fillColor: couleur,
-        fillOpacity: opacite,
-        color: "#959595",
-        weight: 0.5
-    };
-}
-
 
 /* =========================================
  COUCHE COMMUNES
@@ -891,8 +845,6 @@ fetch(urlCommunes)
  return response.json();
 })
 .then(function(data) {
-
-/* ---------Couche des communes------------------ */
 
 coucheCommunes = L.geoJSON(data, {
 
@@ -1044,20 +996,49 @@ onEachFeature: function(feature, layer) {
                 <strong>EPCI :</strong>
                 ${infos.epci}<br>
 
-            <strong>Retour questionnaire :</strong>
-	${infos.Retour_questionnaire_29_mai}<br>
+                <strong>Priorisation :</strong>
+                ${infos.Priorisation_rencontres}<br>
 
-	<strong>Démarche numérique :</strong>
-	${infos.Demarche_numerique}<br>
+                <strong>Retour questionnaire :</strong>
+                ${infos.Retour_questionnaire_29_mai}<br>
 
-	<strong>Contact :</strong>
-	${infos.Contact_sous_prefets_mail_telephone_}<br><br>
+                <strong>Démarche numérique :</strong>
+                ${infos.Demarche_numerique}<br>
 
-	<strong>Observations :</strong><br>
-	${afficherTexteLong(
-	    "observations_" + code,
-	    infos.Observations
+                <strong>Contact :</strong>
+${infos.Contact_mail_telephone_}<br><br>
+
+
+<strong>Observations :</strong><br>
+
+${afficherTexteLong(
+    "observations_" + code,
+    infos.Observations
 )}
+
+
+                <strong>Projets identifiés :</strong><br>
+
+                ${afficherTexteLong(
+                    "projets_" + code,
+                    infos.Projets_identifies
+                )}
+
+
+                <strong>Attentes :</strong><br>
+
+                ${afficherTexteLong(
+                    "attentes_" + code,
+                    infos.Attentes
+                )}
+
+
+                <strong>Documents joints :</strong><br>
+
+                ${afficherTexteLong(
+                    "documents_" + code,
+                    infos.Documents_joints
+                )}
 
             </div>
 
@@ -1083,26 +1064,26 @@ onEachFeature: function(feature, layer) {
 }).addTo(map);
 
 
+/* CREATION DE LA COUCHE COMMUNES INTERESSEES */
 coucheCommunesInteressees = L.geoJSON(data, {
-  pane: "communesPane",
+
   style: styleCommunesInteressees,
-  interactive: false
-}).addTo(map);
 
+  pane: "communesInteresseesPane",
+
+  interactive: false
+
+}).addTo(map);
+/*CREATION DE LA COUCHE RESEAU ALERTE*/
 coucheReseauAlerte = L.geoJSON(data, {
-  pane: "reseauAlertePane",
+
   style: styleReseauAlerte,
+
+  pane: "reseauAlertePane",
+
   interactive: false
+
 }).addTo(map);
-
-
-
-/*---------------COUCHE DU SUIVI DES CONTRATS ------------------------*/
-coucheSuiviContrat = L.geoJSON(data, {
-pane: "suiviContratPane",
-style: styleSuiviContrat });
-coucheSuiviContrat.addTo(map); 
-
 
 
 });
