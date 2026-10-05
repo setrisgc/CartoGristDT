@@ -81,13 +81,9 @@ background: #ffffff !important;
 }
 
 .texteComplet {
-
     display: block;
-
     max-height: 250px;
-
     overflow-y: auto;
-
     padding-right: 5px;
 
 }
@@ -292,10 +288,11 @@ map.getPane("communesPane").style.zIndex = 350;
 map.createPane("suiviContratPane");
 map.getPane("suiviContratPane").style.zIndex = 400;
 
-
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
 
+map.createPane("reseauAlertePane");
+map.getPane("reseauAlertePane").style.zIndex = 600;
 
 map.createPane("communesPointsPane");
 map.getPane("communesPointsPane").style.zIndex = 1000;
@@ -466,10 +463,20 @@ chkCommunes_interessees.addEventListener("change", function() {
         chkCommunes_interessees.checked;
 
     if (coucheCommunes) {
-
         coucheCommunes.setStyle(styleCommune);
-
     }
+
+if (coucheCommunesInteressees) {
+  coucheCommunesInteressees.setStyle(
+    styleCommunesInteressees
+  );
+}
+
+if (coucheReseauAlerte) {
+  coucheReseauAlerte.setStyle(
+    styleReseauAlerte
+  );
+}
 
 if (coucheSuiviContrat) {
     coucheSuiviContrat.setStyle(styleSuiviContrat);
@@ -523,14 +530,15 @@ controleZoom.addTo(map);
  ========================================= */
 
 let contractualisationParCommune = {};
-let communesInteressees = {};
-let communesReseauAlerte = {};
 let informationsCommunes = {};
-let coucheSuiviContrat = null ;
 
+let coucheSuiviContrat = null ;
 let coucheCommunes = null;
+let communesInteressees = null ;
+let communesReseauAlerte = null;
 let coucheArrondissements = null;
 let communesPoints = null;
+
 
 
 /* =========================================
@@ -659,76 +667,87 @@ if (communesPoints) {
 
 
 /* =========================================
-STYLE DES POLYGONES DES COMMUNES
+STYLE LIMITES GRISES DES COMMUNES
  ========================================= */
 
 function styleCommune(feature) {
 
- const code = String(
- feature.properties.INSEE_COMM || ""
- ).trim();
-
-
-/* =========================================
-commune intéressée
- ========================================= */
-
-const interessee =
-String(
-communesInteressees[code] || ""
-).trim().toUpperCase(); 
-
-let couleurFond = "#ffffff";
-let opaciteFond = 0 ;
-
-if ( afficherCommunes_interessees && interessee === "X") {
-
-couleurFond = "#b0dbf1" ;
-opaciteFond = 0.9 ;
-
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "#959595",
+    weight: 0.5
+  };
 }
 
-
 /* =========================================
-commune réseau d’alerte
+STYLE DES COMMUNES INTERESSEES ici orange
  ========================================= */
 
+function styleCommunesInteressees(feature) {
 
- const Commune_reseau_d_alerte =
-String(communesReseauAlerte[code] || ""
-).trim().toUpperCase();
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
 
- let couleurContour = "#959595";
-let epaisseurContour=0.5 ;
+  const interessee =
+    String(
+      communesInteressees[code] || ""
+    ).trim().toUpperCase();
 
- if (
-afficherCommune_reseau_d_alerte && 
-Commune_reseau_d_alerte === "X") {
-
-couleurContour = "#e31a00";
-epaisseurContour = 4; 
-
- }
+  if (interessee === "X") {
 
     return {
-
-        fillColor: couleurFond,
-
-        fillOpacity: opaciteFond,
-
-        color: couleurContour,
-
-        weight: epaisseurContour
-
+      fillColor: "#fecb64",
+      fillOpacity: 0.65,
+      color: "transparent",
+      weight: 0
     };
 
+  }
+
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
 }
 
+/* =========================================
+STYLE DES COMMUNES RESEAU ALERTE ici contour rouge
+ ========================================= */
+function styleReseauAlerte(feature) {
 
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
+
+  const alerte =
+    String(
+      communesReseauAlerte[code] || ""
+    ).trim().toUpperCase();
+
+  if (alerte === "X") {
+
+    return {
+      fillOpacity: 0,
+      color: "#e31a00",
+      weight: 3
+    };
+
+  }
+
+  return {
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
+}
 
 /* =========================================
-   contractualisation (pastille au centre de la commune)
-   ========================================= */
+STYLE DES CONTRACTUALISATIONS ici pastille au centroide de la commune
+ ========================================= */
 
 function styleCommunes_points(feature) {
 
@@ -857,7 +876,7 @@ function styleSuiviContrat(feature) {
     return {
         fillColor: couleur,
         fillOpacity: opacite,
-        color: "#959595 ",
+        color: "#959595",
         weight: 0.5
     };
 }
@@ -1063,7 +1082,22 @@ onEachFeature: function(feature, layer) {
 
 }).addTo(map);
 
-/*COUCHE DU SUIVI DES CONTRATS */
+
+coucheCommunesInteressees = L.geoJSON(data, {
+  pane: "communesPane",
+  style: styleCommunesInteressees,
+  interactive: false
+}).addTo(map);
+
+coucheReseauAlerte = L.geoJSON(data, {
+  pane: "reseauAlertePane",
+  style: styleReseauAlerte,
+  interactive: false
+}).addTo(map);
+
+
+
+/*---------------COUCHE DU SUIVI DES CONTRATS ------------------------*/
 coucheSuiviContrat = L.geoJSON(data, {
 pane: "suiviContratPane",
 style: styleSuiviContrat });
