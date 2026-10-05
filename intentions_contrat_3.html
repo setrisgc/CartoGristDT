@@ -577,12 +577,20 @@ informationsCommunes[code] = {
     prenom: prenom,
     epci: epci,
     commune: commune,
-    Retour_questionnaire_29_mai:
-        String(record["Retour_questionnaire_29_mai"] || "").trim(),
-    Demarche_numerique:
-        String(record["Demarche_numerique"] || "").trim(),
-    Contact_mail_telephone_:
-        String(record["Contact_mail_telephone_"] || "").trim(),
+Retour_questionnaire_29_mai:
+    String(record["Retour_questionnaire_29_mai"] || "").trim().toUpperCase() === "X"
+        ? "oui"
+        : "",
+
+Demarche_numerique:
+    String(record["Demarche_numerique"] || "").trim().toUpperCase() === "X"
+        ? "oui"
+        : "",
+
+Contact_sous_prefets_mail_telephone_:
+    String(record["Contact_sous_prefets_mail_telephone_" ] || "").trim().toUpperCase() === "X"
+        ? "oui"
+        : "",
 
     Observations:
         String(record["Observations"] || "").trim()
@@ -961,7 +969,7 @@ onEachFeature: function(feature, layer) {
 	${infos.Demarche_numerique}<br>
 
 	<strong>Contact :</strong>
-	${infos.Contact_mail_telephone_}<br><br>
+	${infos.Contact_sous_prefets_mail_telephone_}<br><br>
 
 	<strong>Observations :</strong><br>
 	${afficherTexteLong(
