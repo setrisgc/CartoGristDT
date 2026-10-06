@@ -497,9 +497,11 @@ grist.onRecords(function(records) {
 
     records.forEach(function(record) {
 
-        const code = String(
-            record["Siren_EPCI"] || ""
-        ).trim();
+const code = String(
+    record["Siren_EPCI"] || ""
+)
+.trim()
+.replace(/\s+/g, "");
 
         if (!code) return;
 
@@ -567,9 +569,11 @@ STYLE DES COMMUNES INTERESSEES
 
 function styleEpciInteresses(feature) {
 
-  const code = String(
-    feature.properties.SIREN_EPCI || ""
-  ).trim();
+const code = String(
+  feature.properties.SIREN_EPCI || ""
+)
+.trim()
+.replace(/\s+/g, "");
 
   const interesse =
     String(
@@ -602,9 +606,11 @@ STYLE DU SUIVI
  ========================================= */
 function styleSuiviVisiteContrat(feature) {
 
-  const code = String(
+const code = String(
     feature.properties.SIREN_EPCI || ""
-  ).trim();
+)
+.trim()
+.replace(/\s+/g, "");
 
   const suivi =
     String(
