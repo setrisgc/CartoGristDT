@@ -423,23 +423,6 @@ checked>
 </label>
 
 
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviRDV"></span>
-  1er RDV réalisé
-</div>
-
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviElaboration"></span>
-  Elaboration en cours
-</div>
-
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviContrat"></span>
-  Contrat
-</div>
-
-
-
         <!-- =================================
              ZOOM PAR ARRONDISSEMENT
              ================================= -->
@@ -673,7 +656,6 @@ informationsCommunes[code] = {
     prenom: prenom,
     epci: epci,
     commune: commune,
-    Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
   Retour_questionnaire_29_mai:
   ouiNonOuVide(record["Retour_questionnaire_29_mai"]),
 
@@ -1128,9 +1110,6 @@ onEachFeature: function(feature, layer) {
 
                 <strong>EPCI :</strong>
                 ${infos.epci}<br>
-
-                <strong>Priorisation :</strong>
-                ${infos.Priorisation_rencontres}<br>
 
                 <strong>Retour questionnaire :</strong>
                 ${infos.Retour_questionnaire_29_mai}<br>
