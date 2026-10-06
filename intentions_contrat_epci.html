@@ -564,21 +564,21 @@ const code = String(
            INFORMATIONS POUR LE POPUP EPCI
            ========================================= */
 
-        informationsEpci[code] = {
+informationsEpci[code] = {
+    epci: String(
+        record["Nom_EPCI"] || ""
+    ).trim(),
 
-            epci: String(
-                record["Nom_EPCI"] || ""
-            ).trim(),
+    Demarche_numerique:
+        String(
+            record["Demarche_numerique"] || ""
+        ).trim(),
 
-            Demarche_numerique: ouiNonOuVide(
-                record["Demarche_numerique"]
-            ),
-
-            Contact_sous_prefets_mail_telephone_: ouiNonOuVide(
-                record["Contact_sous_prefets_mail_telephone_"]
-            )
-
-        };
+    Contact_sous_prefets_mail_telephone_:
+        String(
+            record["Contact_sous_prefets_mail_telephone_"] || ""
+        ).trim()
+};
 
     });
 
