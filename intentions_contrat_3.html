@@ -299,7 +299,7 @@ const map = L.map("map", {
    ========================================= */
 
 map.createPane("communesPane");
-map.getPane("communesPane").style.zIndex = 350;
+map.getPane("communesPane").style.zIndex = 460;
 
 map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450; 
 
@@ -494,6 +494,27 @@ chkContractualisation.addEventListener("change", function() {
 
 });
 
+const chkSuiviVisiteContrat =
+    div.querySelector("#chkSuiviVisiteContrat");
+
+chkSuiviVisiteContrat.addEventListener("change", function() {
+
+    if (coucheSuiviVisiteContrat) {
+
+        if (chkSuiviVisiteContrat.checked) {
+
+            coucheSuiviVisiteContrat.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheSuiviVisiteContrat);
+
+        }
+
+    }
+
+});
+
 const chkCommunes_interessees =
     div.querySelector("#chkCommunes_interessees");
 
@@ -616,7 +637,8 @@ grist.onRecords(function(records) {
 contractualisationParCommune = {};
 communesInteressees =  {};
 communesReseauAlerte =  {};
-suiviVisiteContrat={} ;
+suiviVisiteContrat={};
+informationsCommunes={};
 
  records.forEach(function(record) {
 const code = String(record["Code_Commune"] || "").trim();
@@ -647,9 +669,9 @@ alerte);
  if (code) {
 
 contractualisationParCommune[code] = valeur;
-communesInteressees[code]= interessee ;
-communesReseauAlerte[code]= alerte ;
-suiviVisiteContrat[code]= suivi ;
+communesInteressees[code]= interessee;
+communesReseauAlerte[code]= alerte;
+suiviVisiteContrat[code]= suivi;
 
 informationsCommunes[code] = {
     nom: nom,
