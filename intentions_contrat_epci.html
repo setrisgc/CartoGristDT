@@ -167,23 +167,36 @@ vertical-align: -1px;
 }
 
 /* =========================================
-   POPUP DES EPCI
+   STATUTS DANS LES POPUPS EPCI
    ========================================= */
 
-function contenuPopupEpci(feature) {
+.statutPopup {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
 
-    const code = String(
-        feature.properties.SIREN_EPCI || ""
-    )
-    .trim()
-    .replace(/\s+/g, "");
+.statutInteresse {
+    background: #fecb64;
+    color: #000000;
+}
 
-    const infos = informationsEpci[code];
+.statutRDV {
+    background: #c6e8c0;
+    color: #000000;
+}
 
-    if (!infos) {
-        return null;
-    }
+.statutElaboration {
+    background: #70c66b;
+    color: #000000;
+}
 
+.statutContrat {
+    background: #198754;
+    color: #ffffff;
+}
 
     /* =========================================
        EPCI INTÉRESSÉ
@@ -750,7 +763,7 @@ function contenuPopupEpci(feature) {
     let badgeSuivi = "Aucun suivi renseigné";
 
 
-    if (suivi === "1er RDV réalisé") {
+    if (suivi.toLowerCase() === "1er rdv réalisé") {
 
         badgeSuivi =
             `<span class="statutPopup statutRDV">
@@ -806,73 +819,6 @@ function contenuPopupEpci(feature) {
 
     `;
 
-}
-
-
-
-
-    /* =========================================
-       EPCI INTÉRESSÉ
-       ========================================= */
-
-    const interesse =
-        String(
-            EpciInteresses[code] || ""
-        )
-        .trim()
-        .toUpperCase();
-
-
-    const texteInteresse =
-        interesse === "X"
-            ? "Oui"
-            : "Non";
-
-
-    /* =========================================
-       SUIVI
-       ========================================= */
-
-    const suivi =
-        String(
-            suiviVisiteContrat[code] || ""
-        )
-        .trim();
-
-
-    const texteSuivi =
-        suivi !== ""
-            ? suivi
-            : "Aucun suivi renseigné";
-
-
-    /* =========================================
-       CONTENU DU POPUP
-       ========================================= */
-
-    return `
-
-        <div class="titreCommune">
-            ${infos.epci}
-        </div>
-
-        <div class="infosCommune">
-
-            <strong>EPCI intéressé :</strong>
-            ${texteInteresse}<br>
-
-            <strong>Suivi du contrat :</strong>
-            ${texteSuivi}<br>
-
-            <strong>Démarche numérique :</strong>
-            ${infos.Demarche_numerique}<br>
-
-            <strong>Contact sous-préfets :</strong>
-            ${infos.Contact_sous_prefets_mail_telephone_}
-
-        </div>
-
-    `;
 }
 
 
