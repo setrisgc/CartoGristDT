@@ -198,69 +198,7 @@ vertical-align: -1px;
     color: #ffffff;
 }
 
-    /* =========================================
-       EPCI INTÉRESSÉ
-       ========================================= */
 
-    const interesse =
-        String(
-            EpciInteresses[code] || ""
-        )
-        .trim()
-        .toUpperCase();
-
-
-    const texteInteresse =
-        interesse === "X"
-            ? "Oui"
-            : "Non";
-
-
-    /* =========================================
-       SUIVI
-       ========================================= */
-
-    const suivi =
-        String(
-            suiviVisiteContrat[code] || ""
-        )
-        .trim();
-
-
-    const texteSuivi =
-        suivi !== ""
-            ? suivi
-            : "Aucun suivi renseigné";
-
-
-    /* =========================================
-       CONTENU DU POPUP
-       ========================================= */
-
-    return `
-
-        <div class="titreCommune">
-            ${infos.epci}
-        </div>
-
-        <div class="infosCommune">
-
-            <strong>EPCI intéressé :</strong>
-            ${texteInteresse}<br>
-
-            <strong>Suivi du contrat :</strong>
-            ${texteSuivi}<br>
-
-            <strong>Démarche numérique :</strong>
-            ${infos.Demarche_numerique}<br>
-
-            <strong>Contact sous-préfets :</strong>
-            ${infos.Contact_sous_prefets_mail_telephone_}
-
-        </div>
-
-    `;
-}
 
 .zoomPanelTitle {
     cursor: pointer;
