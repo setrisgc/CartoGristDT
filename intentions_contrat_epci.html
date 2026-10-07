@@ -770,6 +770,7 @@ fetch(urlCommunes)
 coucheCommunes = L.geoJSON(data, {
     style: styleCommune,
     pane: "communesPane",
+	interactive: false
 
 }).addTo(map);
 });
