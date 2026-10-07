@@ -141,9 +141,19 @@ margin-right: 6px;
 background: #fecb64;
 border-radius: 1px;
 vertical-align: -1px;
-} 
+}
 
-
+/*limites EPCI*/
+.pastilleLimitesEpci {
+    display: inline-block;
+    width: 14px;
+    height: 9px;
+    margin-right: 6px;
+    border: 2px solid #973287;
+    background: transparent;
+    box-sizing: border-box;
+    vertical-align: -1px;
+}
 /*------------------------------------------- suivi-------------------------------------*/
 .pastilleSuiviRDV {
     background: #c6e8c0;
@@ -350,6 +360,11 @@ div.innerHTML = `
  <span class="pastille pastilleEpciInteresses"></span> 
  EPCI intéressés
  </label>
+
+<div class="legendeSousCategorie">
+  <span class="pastilleLimitesEpci"></span>
+  Limites des EPCI
+</div>
 
 
  <!-- =================================
