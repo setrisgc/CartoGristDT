@@ -825,93 +825,10 @@ fetch(urlCommunes)
 .then(function(data) {
 
 coucheCommunes = L.geoJSON(data, {
-
     style: styleCommune,
-
     pane: "communesPane",
 
-onEachFeature: function(feature, layer) {
-
-    const code = String(
-        feature.properties.INSEE_COMM || ""
-    ).trim();
-
-    layer.on("click", function() {
-
-        const infos = informationsCommunes[code];
-
-        if (!infos) {
-            return;
-        }
-
-
-
-        /* =========================================
-           CONTENU DU POPUP
-           ========================================= */
-
-        const contenu = `
-
-            <div class="titreCommune">
-                ${infos.commune}
-            </div>
-
-            <div class="infosCommune">
-
-                <strong>Nom :</strong>
-                ${infos.nom}<br>
-
-                <strong>Prénom :</strong>
-                ${infos.prenom}<br>
-
-                <strong>EPCI :</strong>
-                ${infos.epci}<br>
-
-                <strong>Retour questionnaire :</strong>
-                ${infos.Retour_questionnaire_29_mai}<br>
-
-                <strong>Démarche numérique :</strong>
-                ${infos.Demarche_numerique}<br>
-
-                <strong>Contact :</strong>
-${infos.Contact_sous_prefets_mail_telephone_}<br>
-
-
-<strong>Observations :</strong><br>
-
-${afficherTexteLong(
-    "observations_" + code,
-    infos.Observations
-)}
-
-
-            </div>
-
-        `;
-
-
-        /* =========================================
-           OUVERTURE DU POPUP
-           ========================================= */
-
-        layer.bindPopup(contenu, {
-
-            className: "popupCommune",
-
-            pane: "popupPane"
-
-        }).openPopup();
-
-    });
-
-}
-
 }).addTo(map);
-
-
-
-
-
 });
 
 
@@ -1017,79 +934,49 @@ map.on("zoomend", gererEtiquettesCommunes);
 
 
 /* =========================================
-   EPCI
+   EPCI SYMBOLOGIE GENERALE CONTOURS VIOLET
    ========================================= */
 
 fetch(urlEpci)
-
 .then(function(response) {
-
     return response.json();
-
 })
 
 .then(function(data) {
-
-
-    /* =========================================
-       CONTOURS DES EPCI
-       ========================================= */
-
 coucheEpci = L.geoJSON(data, {
 
     pane: "epciPane",
-
     style: {
-
-        color: "#6d2461",
+        color: "#973287",
         weight: 2,
         fill: false
-
     },
 
     onEachFeature: function(feature, layer) {
-
         layer.on("click", function() {
-
             const contenu = contenuPopupEpci(feature);
-
             if (!contenu) {
                 return;
             }
-
             layer.bindPopup(contenu, {
-
                 className: "popupCommune",
-
                 pane: "popupPane"
-
             }).openPopup();
-
         });
-
     }
-
 });
 
-
     coucheEpci.addTo(map);
-
-
 
     /* =========================================
        EPCI INTÉRESSÉS
        ========================================= */
 
     coucheEpciInteresses = L.geoJSON(data, {
-
         pane: "epciInteresseesPane",
-
         style: styleEpciInteresses,
-
         interactive: false
-
     });
-
 
     coucheEpciInteresses.addTo(map);
 
@@ -1098,20 +985,14 @@ console.log(
     Object.keys(EpciInteresses).length
 );
 
-
-
     /* =========================================
        SUIVI VISITE / ÉLABORATION / CONTRAT
        ========================================= */
 
     coucheSuiviVisiteContrat = L.geoJSON(data, {
-
         pane: "epciSuiviVisiteContratPane",
-
         style: styleSuiviVisiteContrat,
-
         interactive: false
-
     });
 
 
@@ -1121,15 +1002,11 @@ console.log(
     "Nombre de suivis EPCI dans Grist :",
     Object.keys(suiviVisiteContrat).length
 );
-
 });
 
 
-
-
-
 /* =========================================
- ARRONDISSEMENTS
+ ARRONDISSEMENTS STYLE DES CONTOURS
  ========================================= */
 
 
@@ -1149,8 +1026,6 @@ pane: "arrondissementPane",
     });
 
     coucheArrondissements.addTo(map);
-
-
 
     /* =========================================
        BOUTONS DE ZOOM
