@@ -946,7 +946,6 @@ console.log(
 );
 });
 
-
 /* =========================================
  ARRONDISSEMENTS STYLE DES CONTOURS
  ========================================= */
@@ -959,7 +958,8 @@ fetch(urlArrondissements)
 .then(function(data) {
 
  coucheArrondissements = L.geoJSON(data, {
-pane: "arrondissementPane", 
+pane: "arrondissementPane",
+interactive: false,
         style: {
             color: "#141f72",
             weight: 3,
