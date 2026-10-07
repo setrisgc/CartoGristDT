@@ -495,51 +495,6 @@ grist.onRecords(function(records) {
     suiviVisiteContrat = {};
 informationsEpci = {};
 
-    console.log("===== DIAGNOSTIC EPCI =====");
-
-    const codesInteresses = records
-        .filter(function(record) {
-            return String(
-                record["EPCI_interesses"] || ""
-            )
-            .trim()
-            .toUpperCase() === "X";
-        })
-        .map(function(record) {
-            return String(
-                record["Siren_EPCI"] || ""
-            )
-            .trim()
-            .replace(/\s+/g, "");
-        });
-
-    console.log(
-        "Nombre de lignes avec EPCI_interesses = X :",
-        codesInteresses.length
-    );
-
-    console.log(
-        "SIREN des lignes intéressées :",
-        codesInteresses
-    );
-
-    console.log(
-        "SIREN intéressés uniques :",
-        [...new Set(codesInteresses)]
-    );
-
-
-    records.forEach(function(record) {
-
-const code = String(
-    record["Siren_EPCI"] || ""
-)
-.trim()
-.replace(/\s+/g, "");
-
-        if (!code) return;
-
-
         /* =========================================
            EPCI INTÉRESSÉS
            ========================================= */
