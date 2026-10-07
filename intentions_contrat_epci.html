@@ -768,9 +768,9 @@ fetch(urlCommunes)
 .then(function(data) {
 
 coucheCommunes = L.geoJSON(data, {
-    style: styleCommune,
-    pane: "communesPane",
-	interactive: false
+ style: styleCommune,
+ pane: "communesPane",
+interactive: false
 
 }).addTo(map);
 });
@@ -893,7 +893,8 @@ coucheEpci = L.geoJSON(data, {
     style: {
         color: "#973287",
         weight: 2,
-        fill: false
+fill: true,
+fillOpacity: 0
     },
 
     onEachFeature: function(feature, layer) {
