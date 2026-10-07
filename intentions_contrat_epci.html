@@ -130,15 +130,6 @@ background: #ffffff !important;
   SYMBOLES POUR LEGENDE
    ========================================= */
 
-.pastille {
-    display: inline-block;
-    width: 11px;
-    height: 11px;
-    margin-right: 6px;
-    border-radius: 50%;
-    vertical-align: -1px;
-}
-
 
 /* -----------------EPCI intéressées-------------------------------------*/
 
@@ -329,7 +320,6 @@ div.innerHTML = `
  <input type="checkbox"
  id="chkSuiviVisiteContrat"
  checked>
- <span class="pastille pastilleSuivi"></span>
  Suivi du contrat
 </label>
 
@@ -912,8 +902,7 @@ coucheEpci = L.geoJSON(data, {
                 return;
             }
             layer.bindPopup(contenu, {
-                className: "popupCommune",
-                pane: "popupPane"
+                className: "popupCommune"
             }).openPopup();
         });
     }
