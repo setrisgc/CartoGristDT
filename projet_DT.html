@@ -285,17 +285,12 @@ fetch(urlDt)
 .then(function(data) {
     coucheDt = L.geoJSON(data, {
         style: {
-            color: "#7b3294",
+            color: "#4f608c",
             weight: 3,
             fill: false
         }
-
     }).addTo(map);
-
 });
-
-
-
 
 
 
@@ -381,8 +376,8 @@ fetch(urlArrondissements)
 
     coucheArrondissements = L.geoJSON(data, {
         style: {
-            color: "#141f72",
-            weight: 3,
+            color: "#b300b4",
+            weight: 2,
             fill: false
         }
     });
