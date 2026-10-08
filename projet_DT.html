@@ -1,1 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Carte des intentions de contractualisations</title>
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* =========================================
+   ÉTIQUETTES DES COMMUNES
+   ========================================= */
+
+.labelCommune {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #555555;
+    font-size: 8px;
+    font-weight: normal;
+    white-space: nowrap;
+    padding: 0;
+    text-align: center;
+    line-height: 20px;
+    pointer-events: none;
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="map"></div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<script>
+
+/* =========================================
+   GEOJSON
+   ========================================= */
+
+const urlCommunes =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes.geojson";
+
+const urlArrondissements =
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/arrondissement.geojson";
+
+const urlCommunesPoints = "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson"; 
+
+
+/* =========================================
+   CARTE
+   ========================================= */
+
+const map = L.map("map", {
+
+    center: [49.1, -1.3],
+
+    zoom: 8
+
+});
+
+
+/* =========================================
+   FOND IGN
+   ========================================= */
+
+/* je choisis ici de ne pas l'afficher ---- 
+const fond = L.tileLayer(
+    'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    {
+        maxZoom:22,
+        maxNativeZoom:19,
+		   opacity:0.4,
+        attribution:'© IGN - Géoplateforme'
+    }
+);
+
+fond.addTo(map);
+-----
+*/
+
+/* =========================================
+   COUCHE COMMUNES fetch url va chercher le geojson, response.json transforme le contenu en données javascript puis L.geojson(data)…addTo(map) crée la couche Leaflet et l’affiche sur la carte
+   ========================================= */
+
+fetch(urlCommunes)
+.then(function(response) {
+    return response.json();
+})
+
+.then(function(data) {
+    const communes = L.geoJSON(data, {
+        style: {
+            color: "#b6b6b6",
+            weight: 1,
+            fill: false
+        }
+    });
+    communes.addTo(map);
+
+
+/* =========================================
+   POINTS DES COMMUNES
+   ========================================= */
+
+return fetch(urlCommunesPoints)
+.then(function(response) {
+    return response.json();
+})
+
+.then(function(data) {
+
+
+
+/* ----- Affichage des étiquettes des communes, selon un certain zoom de la carte ----- Le point de communesPoints sert  d’ancrage : iconAnchor: [60, 10] place le centre de la petite zone de texte exactement sur le centroïde. Et on n’affiche plus le symbole du point, seulement le nom.  */
+
+const communesPoints = L.geoJSON(data, {
+    pointToLayer: function(feature, latlng) {
+
+        const nom = feature.properties.NOM_COMM || "";
+
+        return L.marker(latlng, {
+            interactive: false,
+
+            icon: L.divIcon({
+                className: "labelCommune",
+                html: nom,
+                iconSize: [120, 20],
+                iconAnchor: [60, 10]
+            })
+        });
+    }
+});
+
+
+/*---fin--*/
+
+    /* Afficher les étiquettes à partir du zoom 11 
+Cela vérifie le niveau de zoom au chargement de la couche, puis à chaque changement de zoom */
+
+function gererEtiquettesCommunes() {
+
+    if (map.getZoom() >= 11) {
+        communesPoints.addTo(map);
+    } else {
+        map.removeLayer(communesPoints);
+    }
+}
+
+map.on("zoomend", gererEtiquettesCommunes);
+gererEtiquettesCommunes();
+
+
+    /* =========================================
+       UNE FOIS LES POINTS CHARGÉS,
+       ON CHARGE LES ARRONDISSEMENTS
+       ========================================= */
+
+    return fetch(urlArrondissements);
+
+});
+
+})
+
+.then(function(response) {
+
+    return response.json();
+
+})
+
+.then(function(data) {
+
+    const arrondissements = L.geoJSON(data, {
+
+        style: {
+
+            color: "#141f72",
+
+            weight: 3,
+
+            fill: false
+
+        }
+
+    });
+
+
+    arrondissements.addTo(map);
+
+});
+
+
+</script>
+
+</body>
+
+</html>
 
