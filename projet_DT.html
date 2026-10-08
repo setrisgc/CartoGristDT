@@ -278,19 +278,29 @@ LIMITES DES DT il faut demander à Leaflet d’aller chercher limites_DT.geojson
    ========================================= */
 
 fetch(urlDt)
+
 .then(function(response) {
+
     return response.json();
+
 })
 
 .then(function(data) {
+
     coucheDt = L.geoJSON(data, {
+
         style: {
             color: "#4f608c",
             weight: 3,
             fill: false
         }
+
     }).addTo(map);
+
 });
+
+
+
 
 
 
@@ -376,8 +386,8 @@ fetch(urlArrondissements)
 
     coucheArrondissements = L.geoJSON(data, {
         style: {
-            color: "#b300b4",
-            weight: 2,
+            color: "#141f72",
+            weight: 3,
             fill: false
         }
     });
