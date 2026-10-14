@@ -208,27 +208,40 @@ vertical-align: -1px;
 }
 
 /*------------------------------------------- suivi-------------------------------------*/
-.pastilleSuiviRDV {
-    background: #c6e8c0;
+
+/* =========================================
+   PASTILLES DE COULEUR DU SUIVI
+   ========================================= */
+
+.pastilleSuiviPremierRDV{
+    background: #53b3e3;
+}
+
+.pastilleSuiviSecondRDV {
+    background: #a6e5e3;
 }
 
 .pastilleSuiviElaboration {
-    background: #70c66b;
+    background: #f7f766;
 }
 
-.pastilleSuiviContrat {
-    background: #198754;
+.pastilleSuiviFinalise {
+    background: #b4ec52;
+}
+
+.pastilleSuiviSigne {
+    background: #42a439;
 }
 
 .zoomPanelTitle {
-    cursor: pointer;
-    font-weight: bold;
-    user-select: none;
+ cursor: pointer;
+ font-weight: bold;
+ user-select: none;
 }
 
 .zoomArrow {
-    display: inline-block;
-    width: 14px;
+ display: inline-block;
+ width: 14px;
 }
 
 .zoomPanelButtons {
@@ -352,8 +365,13 @@ div.innerHTML = `
 </label>
 
 <div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviRDV"></span>
+  <span class="pastille pastilleSuiviPremierRDV"></span>
   1er RDV réalisé
+</div>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviSecondRDV"></span>
+  2nd RDV réalisé
 </div>
 
 <div class="legendeSousCategorie">
@@ -362,56 +380,61 @@ div.innerHTML = `
 </div>
 
 <div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviContrat"></span>
+ <span class="pastille pastilleSuiviFinalise"></span>
+ Contrat finalisé
+</div>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviSigne"></span>
   Contrat signé
 </div>
 
 
-      <!-- =================================
-             COMMUNES INTÉRESSÉES
-             ================================= -->
+<!-- =================================
+ COMMUNES INTÉRESSÉES
+ ================================= -->
 
-        <label class="legendeCase">
-            <input type="checkbox"
-                   id="chkCommunes_interessees"
-	checked>
-	<span class="pastille pastilleInteressees"></span> 
-            Communes intéressées
-        </label>
-
-
-        <!-- =================================
-             CONTRACTUALISATION
-             ================================= -->
-
-        <label class="legendeCase">
-            <input type="checkbox"
-                   id="chkContractualisation"
-                   checked>
-            Contractualisation
-        </label>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePVD"></span>
-            PVD
-        </div>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastilleACV"></span>
-            ACV
-        </div>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastilleVA"></span>
-            VA
-        </div>
+ <label class="legendeCase">
+ <input type="checkbox"
+ id="chkCommunes_interessees"
+ checked>
+ <span class="pastille pastilleInteressees"></span> 
+ Communes intéressées
+ </label>
 
 
-  
+ <!-- =================================
+ CONTRACTUALISATION
+ ================================= -->
 
-        <!-- =================================
-             RÉSEAU D'ALERTE
-             ================================= -->
+ <label class="legendeCase">
+ <input type="checkbox"
+ id="chkContractualisation"
+ checked>
+ Contractualisation
+ </label>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastillePVD"></span>
+ PVD
+ </div>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastilleACV"></span>
+ ACV
+ </div>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastilleVA"></span>
+ VA
+ </div>
+
+
+ 
+
+ <!-- =================================
+ RÉSEAU D'ALERTE
+ ================================= -->
 
 
         <label class="legendeCase">
@@ -837,39 +860,62 @@ function styleSuiviVisiteContrat(feature) {
   const suivi =
     String(
       suiviVisiteContrat[code] || ""
-    ).trim().toLowerCase();
+    ).trim().toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
   // 1er RDV réalisé
-  if (suivi === "1er rdv réalisé") {
+  if (suivi === "1er rdv réalise") {
     return {
-      fillColor: "#c6e8c0",
+      fillColor: "#53b3e3",
       fillOpacity: 0.8,
       color: "transparent",
       weight: 0
     };
   }
 
-  // Elaboration en cours
-  if (suivi === "elaboration en cours") {
+  // 2nd RDV réalisé
+  if (suivi === "2nd rdv réalise") {
     return {
-      fillColor: "#70c66b",
+      fillColor: "#a6e5e3",
       fillOpacity: 0.8,
       color: "transparent",
       weight: 0
     };
   }
 
-  // Contrat : le mot peut être accompagné d'autres caractères
-  if (suivi.includes("contrat")) {
-    return {
-      fillColor: "#198754",
-      fillOpacity: 0.8,
-      color: "transparent",
-      weight: 0
-    };
-  }
+ // Elaboration en cours
+ if (suivi === "elaboration en cours") {
+ return {
+ fillColor: "#f7f766",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
 
-  // Aucun suivi
+// Contrat finalisé
+ if (suivi === "contrat finalise") {
+ return {
+ fillColor: "#b4ec52",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+ // Contrat signé
+ if (suivi === "contrat signe") {
+ return {
+ fillColor: "#42a439",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+
+  // Aucun suivi renseigné
   return {
     fillColor: "#ffffff",
     fillOpacity: 0,
