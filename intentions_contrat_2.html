@@ -45,7 +45,7 @@ background: #ffffff !important;
 }
 
 .popupCommune {
-    padding: 0 !important;
+ padding: 0 !important;
 }
 
 .popupCommune .leaflet-popup-content-wrapper {
@@ -81,15 +81,10 @@ background: #ffffff !important;
 }
 
 .texteComplet {
-
     display: block;
-
     max-height: 250px;
-
     overflow-y: auto;
-
     padding-right: 5px;
-
 }
 
 .lienMore {
@@ -104,11 +99,9 @@ background: #ffffff !important;
   text-decoration: underline;
 }
 
-
-
-
-
-/* pour la boite de zoom par arrondissement */
+/* ================
+Stlye de la boite de zoom par arrondissement
+================== */
 .zoomPanel {
     background: white;
     padding: 8px;
@@ -188,7 +181,7 @@ display: inline-block;
 width: 14px;
 height: 9px;
 margin-right: 6px;
-background: #b2df8a;
+background: #d7b5d8;
 border-radius: 1px;
 vertical-align: -1px;
 } 
@@ -207,32 +200,74 @@ border-radius: 1px;
 vertical-align: -1px;
 }
 
+/*------------------------------------------- suivi-------------------------------------*/
+
+/* =========================================
+   PASTILLES DE COULEUR DU SUIVI
+   ========================================= */
+
+.pastilleSuiviPremierRDV{
+    background: #fdb14e;
+}
+
+.pastilleSuiviSecondRDV {
+    background: #fed86e;
+}
+
+.pastilleSuiviElaboration {
+    background: #ffff68;
+}
+
+.pastilleSuiviFinalise {
+    background: #99d75c;
+}
+
+.pastilleSuiviSigne {
+    background: #33af2c;
+}
+
 .zoomPanelTitle {
-    cursor: pointer;
-    font-weight: bold;
-    user-select: none;
+ cursor: pointer;
+ font-weight: bold;
+ user-select: none;
 }
 
 .zoomArrow {
-    display: inline-block;
-    width: 14px;
+ display: inline-block;
+ width: 14px;
 }
 
 .zoomPanelButtons {
-    margin-top: 6px;
+margin-top: 6px;
+}
+/* Organisation des boutons en deux colonnes */
+.grilleZoom {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 6px;
+margin-left: 20px;
+margin-top: 6px;
+}
+/* Boutons de zoom */
+.zoomPanel button {
+display: block;
+width: 100%;
+box-sizing: border-box;
+margin: 0;
+padding: 5px 6px;
+border: 1px solid #cccccc;
+background: white;
+cursor: pointer;
+border-radius: 3px;
+text-align: left;
+}
+/* Le bouton Manche occupe toute la largeur */
+.zoomPanel button.zoomManche {
+width: 100%;
+margin: 0;
+box-sizing: border-box;
 }
 
-.zoomPanel button {
-    display: block;
-    width: 120px;
-    margin: 3px 0 3px 20px;
-    padding: 4px 6px;
-    border: 1px solid #cccccc;
-    background: white;
-    cursor: pointer;
-    border-radius: 3px;
-    text-align: left;
-}
 
 .zoomPanel button:hover {
     background: #eeeeee;
@@ -286,12 +321,17 @@ const map = L.map("map", {
    ========================================= */
 
 map.createPane("communesPane");
-map.getPane("communesPane").style.zIndex = 350;
+map.getPane("communesPane").style.zIndex = 460;
 
+map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450; 
 
+map.createPane("communesInteresseesPane");
+map.getPane("communesInteresseesPane").style.zIndex = 400;
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
 
+map.createPane("reseauAlertePane");
+map.getPane("reseauAlertePane").style.zIndex = 480;
 
 map.createPane("communesPointsPane");
 map.getPane("communesPointsPane").style.zIndex = 1000;
@@ -325,52 +365,85 @@ div.innerHTML = `
 
 <div class="zoomPanelButtons">
 
+<label class="legendeCase">
+  <input type="checkbox"
+         id="chkSuiviVisiteContrat"
+         checked>
+  <span class="pastille pastilleSuivi"></span>
+  Suivi du contrat
+</label>
 
-      <!-- =================================
-             COMMUNES INTÉRESSÉES
-             ================================= -->
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviPremierRDV"></span>
+  1er RDV réalisé
+</div>
 
-        <label class="legendeCase">
-            <input type="checkbox"
-                   id="chkCommunes_interessees"
-	checked>
-	<span class="pastille pastilleInteressees"></span> 
-            Communes intéressées
-        </label>
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviSecondRDV"></span>
+  2nd RDV réalisé
+</div>
 
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviElaboration"></span>
+  Elaboration en cours
+</div>
 
-        <!-- =================================
-             CONTRACTUALISATION
-             ================================= -->
+<div class="legendeSousCategorie">
+ <span class="pastille pastilleSuiviFinalise"></span>
+ Contrat finalisé
+</div>
 
-        <label class="legendeCase">
-            <input type="checkbox"
-                   id="chkContractualisation"
-                   checked>
-            Contractualisation
-        </label>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePVD"></span>
-            PVD
-        </div>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastilleACV"></span>
-            ACV
-        </div>
-
-        <div class="legendeSousCategorie">
-            <span class="pastille pastilleVA"></span>
-            VA
-        </div>
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviSigne"></span>
+  Contrat signé
+</div>
 
 
-  
+<!-- =================================
+ COMMUNES INTÉRESSÉES
+ ================================= -->
 
-        <!-- =================================
-             RÉSEAU D'ALERTE
-             ================================= -->
+ <label class="legendeCase">
+ <input type="checkbox"
+ id="chkCommunes_interessees"
+ checked>
+ <span class="pastille pastilleInteressees"></span> 
+ Communes intéressées
+ </label>
+
+
+ <!-- =================================
+ CONTRACTUALISATION
+ ================================= -->
+
+ <label class="legendeCase">
+ <input type="checkbox"
+ id="chkContractualisation"
+ checked>
+ Contractualisation
+ </label>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastillePVD"></span>
+ PVD
+ </div>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastilleACV"></span>
+ ACV
+ </div>
+
+ <div class="legendeSousCategorie">
+ <span class="pastille pastilleVA"></span>
+ VA
+ </div>
+
+
+ 
+
+ <!-- =================================
+ RÉSEAU D'ALERTE
+ ================================= -->
 
 
         <label class="legendeCase">
@@ -379,7 +452,7 @@ div.innerHTML = `
 checked>
 <span class="pastille pastilleAlerte"></span> 
             Communes réseau d'alerte
-        </label>
+</label>
 
 
         <!-- =================================
@@ -390,27 +463,27 @@ checked>
         </div>
 
 
-        <button id="zoomManche">
-            Manche
-        </button>
+        <!-- Bouton Manche sur une ligne entière -->
+<button id="zoomManche" class="zoomManche"> Manche </button>
+<!-- Les quatre autres boutons sur deux colonnes -->
+<div class="grilleZoom">
+<button id="zoomCherbourg">
+    Cherbourg
+</button>
 
-        <button id="zoomCherbourg">
-            Cherbourg
-        </button>
+<button id="zoomCoutances">
+    Coutances
+</button>
 
-        <button id="zoomCoutances">
-            Coutances
-        </button>
+<button id="zoomSaintLo">
+    Saint-Lô
+</button>
 
-        <button id="zoomSaintLo">
-            Saint-Lô
-        </button>
+<button id="zoomAvranches">
+    Avranches
+</button>
+</div>
 
-        <button id="zoomAvranches">
-            Avranches
-        </button>
-
-    </div>
 `;
 
     L.DomEvent.disableClickPropagation(div);
@@ -453,37 +526,72 @@ chkContractualisation.addEventListener("change", function() {
 
 });
 
-const chkCommunes_interessees=
-    div.querySelector("#chkCommunes_interessees");
+const chkSuiviVisiteContrat =
+    div.querySelector("#chkSuiviVisiteContrat");
 
-chkCommunes_interessees.addEventListener("change", function() {
+chkSuiviVisiteContrat.addEventListener("change", function() {
 
-    afficherCommunes_interessees =
-        chkCommunes_interessees.checked;
+    if (coucheSuiviVisiteContrat) {
 
-    if (coucheCommunes) {
+        if (chkSuiviVisiteContrat.checked) {
 
-        coucheCommunes.setStyle(styleCommune);
+            coucheSuiviVisiteContrat.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheSuiviVisiteContrat);
+
+        }
 
     }
 
 });
+
+const chkCommunes_interessees =
+    div.querySelector("#chkCommunes_interessees");
+
+chkCommunes_interessees.addEventListener("change", function() {
+
+    if (coucheCommunesInteressees) {
+
+        if (chkCommunes_interessees.checked) {
+
+            coucheCommunesInteressees.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheCommunesInteressees);
+
+        }
+
+    }
+
+});
+
+
 
 const chkCommune_reseau_d_alerte =
     div.querySelector("#chkCommune_reseau_d_alerte");
 
 chkCommune_reseau_d_alerte.addEventListener("change", function() {
 
-    afficherCommune_reseau_d_alerte =
-        chkCommune_reseau_d_alerte.checked;
+    if (coucheReseauAlerte) {
 
-    if (coucheCommunes) {
+        if (chkCommune_reseau_d_alerte.checked) {
 
-        coucheCommunes.setStyle(styleCommune);
+            coucheReseauAlerte.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheReseauAlerte);
+
+        }
 
     }
 
 });
+
+
 
 
 
@@ -518,10 +626,14 @@ let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
 let informationsCommunes = {};
+let suiviVisiteContrat = {}; 
 
 let coucheCommunes = null;
+let coucheCommunesInteressees = null;
+let coucheReseauAlerte = null;
+let coucheSuiviVisiteContrat = null;
 let coucheArrondissements = null;
-let communesPoints = null;
+let communesPoints = null; 
 
 
 /* =========================================
@@ -529,16 +641,27 @@ let communesPoints = null;
    ========================================= */
 
 let afficherContractualisation = true;
-let afficherCommunes_interessees = true;
-let afficherCommune_reseau_d_alerte = true;
-
-
 /* =========================================
  TEST DES DONNÉES GRIST
  ========================================= */
 
 console.log("TEST API GRIST :", typeof grist);
 
+
+function ouiNonOuVide(valeur) {
+
+  const texte = String(valeur || "").trim().toUpperCase();
+
+  if (texte === "X") {
+    return "Oui";
+  }
+
+  if (texte === "") {
+    return "Non";
+  }
+
+  return "";
+}
 grist.onRecords(function(records) {
 
  console.log("NOMBRE DE LIGNES GRIST :", records.length);
@@ -546,12 +669,20 @@ grist.onRecords(function(records) {
 contractualisationParCommune = {};
 communesInteressees =  {};
 communesReseauAlerte =  {};
+suiviVisiteContrat={};
+informationsCommunes={};
 
  records.forEach(function(record) {
 const code = String(record["Code_Commune"] || "").trim();
 const valeur = String(record["Contractualisation"] || "").trim();
-const interessee = String(record["Communes_interessees"] || "").trim();
-const alerte = String(record["Commune_reseau_d_alerte"] || "").trim();
+const interessee =
+  String(record["Communes_interessees"] || "").trim().toUpperCase();
+
+const alerte =
+String(record["Commune_reseau_d_alerte"] || "").trim().toUpperCase();
+
+const suivi =
+  String(record["Suivi_visite_elaboration_contrat_"] || "").trim();
 
 const nom = String(record["Nom"] || "").trim();
 const prenom = String(record["Prenom"] || "").trim();
@@ -570,26 +701,26 @@ alerte);
  if (code) {
 
 contractualisationParCommune[code] = valeur;
-communesInteressees[code]= interessee ;
-communesReseauAlerte[code]= alerte ;
+communesInteressees[code]= interessee;
+communesReseauAlerte[code]= alerte;
+suiviVisiteContrat[code]= suivi;
+
 informationsCommunes[code] = {
     nom: nom,
     prenom: prenom,
     epci: epci,
     commune: commune,
-    Priorisation_rencontres: String(record["Priorisation_rencontres"] || "").trim(),
-    Retour_questionnaire_29_mai: String(record["Retour_questionnaire_29_mai"] || "").trim(),
-    Demarche_numerique: String(record["Demarche_numerique"] || "").trim(),
-Contact_mail_telephone_: String(record["Contact_mail_telephone_"] || "").trim(),
+  Retour_questionnaire_29_mai:
+  ouiNonOuVide(record["Retour_questionnaire_29_mai"]),
 
+Demarche_numerique:
+  ouiNonOuVide(record["Demarche_numerique"]),
 
-Observations: String(record["Observations"] || "").trim(),
-    Projets_identifies: String(record["Projets_identifies"] || "").trim(),
-    Attentes: String(record["Attentes"] || "").trim(),
-    Documents_joints: String(record["Documents_joints"] || "").trim()
+Contact_sous_prefets_mail_telephone_:
+  ouiNonOuVide(record["Contact_sous_prefets_mail_telephone_"]),
+Observations: String(record["Observations"] || "").trim()
 };
-
- }
+}
 
  });
 
@@ -601,10 +732,22 @@ communesReseauAlerte
  );
 
 if (coucheCommunes) {
-
-    coucheCommunes.setStyle(styleCommune);
+ coucheCommunes.setStyle(styleCommune);
 
 }
+
+if (coucheCommunesInteressees){
+coucheCommunesInteressees.setStyle(styleCommunesInteressees);
+} 
+
+if (coucheReseauAlerte) {
+coucheReseauAlerte.setStyle(styleReseauAlerte);
+} 
+
+if (coucheSuiviVisiteContrat) {
+  coucheSuiviVisiteContrat.setStyle(styleSuiviVisiteContrat);
+}
+
 
 if (communesPoints) {
 
@@ -634,69 +777,159 @@ if (communesPoints) {
 
 
 /* =========================================
-STYLE DES POLYGONES DES COMMUNES
+STYLE DES POLYGONES DES COMMUNES contour gris
  ========================================= */
 
 function styleCommune(feature) {
 
- const code = String(
- feature.properties.INSEE_COMM || ""
- ).trim();
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "#959595",
+    weight: 0.5
+  };
 
-
+}
 /* =========================================
-commune intéressée
+STYLE DES COMMUNES INTERESSEES
  ========================================= */
 
-const interessee =
-String(
-communesInteressees[code] || ""
-).trim().toUpperCase(); 
+function styleCommunesInteressees(feature) {
 
-let couleurFond = "#ffffff";
-let opaciteFond = 0 ;
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
 
-if ( afficherCommunes_interessees && interessee === "X") {
+  const interessee =
+    String(
+      communesInteressees[code] || ""
+    ).trim().toUpperCase();
 
-couleurFond = "#b2df8a" ;
-opaciteFond = 0.9 ;
+  if (interessee === "X") {
+
+    return {
+      fillColor: "#d7b5d8,
+      fillOpacity: 0.8,
+      color: "transparent",
+      weight: 0
+    };
+
+  }
+
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
 
 }
 
-
 /* =========================================
-commune réseau d’alerte
+STYLE DES COMMUNES RESEAU ALERTE
  ========================================= */
 
+function styleReseauAlerte(feature) {
 
- const Commune_reseau_d_alerte =
-String(communesReseauAlerte[code] || ""
-).trim().toUpperCase();
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
 
- let couleurContour = "#959595";
-let epaisseurContour=0.5 ;
+  const alerte =
+    String(
+      communesReseauAlerte[code] || ""
+    ).trim().toUpperCase();
 
- if (
-afficherCommune_reseau_d_alerte && 
-Commune_reseau_d_alerte === "X") {
-
-couleurContour = "#e31a00";
-epaisseurContour = 4; 
-
- }
+  if (alerte === "X") {
 
     return {
-
-        fillColor: couleurFond,
-
-        fillOpacity: opaciteFond,
-
-        color: couleurContour,
-
-        weight: epaisseurContour
-
+      fillOpacity: 0,
+      color: "#e31a00",
+      weight: 2
     };
 
+  }
+
+  return {
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
+
+}
+/* =========================================
+STYLE DU SUIVI
+ ========================================= */
+function styleSuiviVisiteContrat(feature) {
+
+  const code = String(
+    feature.properties.INSEE_COMM || ""
+  ).trim();
+
+  const suivi =
+    String(
+      suiviVisiteContrat[code] || ""
+    ).trim().toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+// 1er RDV réalisé
+ if (suivi === "1er rdv realise") {
+ return {
+ fillColor: "#fdb14e",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+  // 2nd RDV réalisé
+  if (suivi === "2nd rdv realise") {
+    return {
+      fillColor: "#fed86e,
+      fillOpacity: 0.8,
+      color: "transparent",
+      weight: 0
+    };
+  }
+
+ // Elaboration en cours
+ if (suivi === "elaboration en cours") {
+ return {
+ fillColor: "#ffff68",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+// Contrat finalisé
+ if (suivi === "contrat finalise") {
+ return {
+ fillColor: "#99d75c",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+ // Contrat signé
+ if (suivi === "contrat signe") {
+ return {
+ fillColor: "#33af2c",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+
+  // Aucun suivi renseigné
+  return {
+    fillColor: "#ffffff",
+    fillOpacity: 0,
+    color: "transparent",
+    weight: 0
+  };
 }
 
 
@@ -954,9 +1187,6 @@ onEachFeature: function(feature, layer) {
                 <strong>EPCI :</strong>
                 ${infos.epci}<br>
 
-                <strong>Priorisation :</strong>
-                ${infos.Priorisation_rencontres}<br>
-
                 <strong>Retour questionnaire :</strong>
                 ${infos.Retour_questionnaire_29_mai}<br>
 
@@ -964,7 +1194,7 @@ onEachFeature: function(feature, layer) {
                 ${infos.Demarche_numerique}<br>
 
                 <strong>Contact :</strong>
-${infos.Contact_mail_telephone_}<br><br>
+${infos.Contact_sous_prefets_mail_telephone_}<br>
 
 
 <strong>Observations :</strong><br>
@@ -974,29 +1204,6 @@ ${afficherTexteLong(
     infos.Observations
 )}
 
-
-                <strong>Projets identifiés :</strong><br>
-
-                ${afficherTexteLong(
-                    "projets_" + code,
-                    infos.Projets_identifies
-                )}
-
-
-                <strong>Attentes :</strong><br>
-
-                ${afficherTexteLong(
-                    "attentes_" + code,
-                    infos.Attentes
-                )}
-
-
-                <strong>Documents joints :</strong><br>
-
-                ${afficherTexteLong(
-                    "documents_" + code,
-                    infos.Documents_joints
-                )}
 
             </div>
 
@@ -1019,6 +1226,34 @@ ${afficherTexteLong(
 
 }
 
+}).addTo(map);
+
+
+/* CREATION DE LA COUCHE COMMUNES INTERESSEES */
+coucheCommunesInteressees = L.geoJSON(data, {
+
+  style: styleCommunesInteressees,
+
+  pane: "communesInteresseesPane",
+
+  interactive: false
+
+}).addTo(map);
+/*CREATION DE LA COUCHE RESEAU ALERTE*/
+coucheReseauAlerte = L.geoJSON(data, {
+
+  style: styleReseauAlerte,
+
+  pane: "reseauAlertePane",
+
+  interactive: false
+
+}).addTo(map);
+/*CREATION DE LA COUCHE SUIVI*/
+coucheSuiviVisiteContrat = L.geoJSON(data, {
+  style: styleSuiviVisiteContrat,
+  pane: "suiviVisiteContratPane",
+  interactive: false
 }).addTo(map);
 
 
