@@ -710,6 +710,8 @@ informationsCommunes[code] = {
     prenom: prenom,
     epci: epci,
     commune: commune,
+	suivi: suivi,
+	
   Retour_questionnaire_29_mai:
   ouiNonOuVide(record["Retour_questionnaire_29_mai"]),
 
@@ -1028,6 +1030,56 @@ else if (afficherContractualisation && contractualisation === "VA") {
 
 
 /* =========================================
+   BADGE COLORÉ DU STADE DE SUIVI
+   ========================================= */
+
+function creerBadgeSuivi(suivi) {
+
+    const stade = String(suivi || "").trim();
+
+    const stadeNormalise = stade
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    let couleur = "#eeeeee";
+
+    if (stadeNormalise === "1er rdv realise") {
+        couleur = "#fdb14e";
+    }
+    else if (stadeNormalise === "2nd rdv realise") {
+        couleur = "#fed86e";
+    }
+    else if (stadeNormalise === "elaboration en cours") {
+        couleur = "#ffff68";
+    }
+    else if (stadeNormalise === "contrat finalise") {
+        couleur = "#99d75c";
+    }
+    else if (stadeNormalise === "contrat signe") {
+        couleur = "#33af2c";
+    }
+
+    const texte = stade || "Non renseigné";
+
+    return `
+        <span style="
+            display: inline-block;
+            background-color: ${couleur};
+            color: #222222;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 3px;
+            margin-bottom: 5px;
+        ">
+            ${texte}
+        </span>
+    `;
+}
+
+
+/* =========================================
  COUCHE COMMUNES
  ========================================= */
 
@@ -1196,8 +1248,11 @@ onEachFeature: function(feature, layer) {
                 <strong>Contact :</strong>
 ${infos.Contact_sous_prefets_mail_telephone_}<br>
 
+<strong>Stade de suivi du contrat :</strong><br>
+${creerBadgeSuivi(infos.suivi)}<br><br>
 
 <strong>Observations :</strong><br>
+
 
 ${afficherTexteLong(
     "observations_" + code,
