@@ -154,35 +154,43 @@ vertical-align: -1px;
     box-sizing: border-box;
     vertical-align: -1px;
 }
-/*------------------------------------------- suivi-------------------------------------*/
-.pastilleSuiviRDV {
+
+
+/* Forme commune des pastilles de légende */
+.pastille {
     display: inline-block;
     width: 14px;
     height: 9px;
     margin-right: 6px;
-    background: #c6e8c0;
     border-radius: 1px;
     vertical-align: -1px;
+}
+
+
+
+
+/* =========================================
+   PASTILLES DE COULEUR DU SUIVI
+   ========================================= */
+
+.pastilleSuiviPremierRDV{
+    background: #fdb14e;
+}
+
+.pastilleSuiviSecondRDV {
+    background: #fed86e;
 }
 
 .pastilleSuiviElaboration {
-    display: inline-block;
-    width: 14px;
-    height: 9px;
-    margin-right: 6px;
-    background: #70c66b;
-    border-radius: 1px;
-    vertical-align: -1px;
+    background: #ffff68;
 }
 
-.pastilleSuiviContrat {
-    display: inline-block;
-    width: 14px;
-    height: 9px;
-    margin-right: 6px;
-    background: #198754;
-    border-radius: 1px;
-    vertical-align: -1px;
+.pastilleSuiviFinalise {
+    background: #99d75c;
+}
+
+.pastilleSuiviSigne {
+    background: #33af2c;
 }
 
 /* =========================================
@@ -283,7 +291,7 @@ const urlCommunesPoints =
 "https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/communes_points.geojson";
 
 const urlEpci =
-"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/limites_epci.geojson ";
+"https://raw.githubusercontent.com/setrisgc/CartoGristDT/main/limites_epci.geojson";
 
 /* =========================================
  CARTE
@@ -339,31 +347,37 @@ div.innerHTML = `
 
 <div class="zoomPanelButtons">
 
-
-<!-- =================================
- SUIVI EPCI
- ================================= -->
-
 <label class="legendeCase">
- <input type="checkbox"
- id="chkSuiviVisiteContrat"
- checked>
- Suivi du contrat
+  <input type="checkbox"
+         id="chkSuiviVisiteContrat"
+         checked>
+  <span class="pastille pastilleSuivi"></span>
+  Suivi du contrat
 </label>
 
 <div class="legendeSousCategorie">
- <span class="pastille pastilleSuiviRDV"></span>
- 1er RDV réalisé
+  <span class="pastille pastilleSuiviPremierRDV"></span>
+  1er RDV réalisé
 </div>
 
 <div class="legendeSousCategorie">
- <span class="pastille pastilleSuiviElaboration"></span>
- Elaboration en cours
+  <span class="pastille pastilleSuiviSecondRDV"></span>
+  2nd RDV réalisé
 </div>
 
 <div class="legendeSousCategorie">
- <span class="pastille pastilleSuiviContrat"></span>
- Contrat signé
+  <span class="pastille pastilleSuiviElaboration"></span>
+  Elaboration en cours
+</div>
+
+<div class="legendeSousCategorie">
+ <span class="pastille pastilleSuiviFinalise"></span>
+ Contrat finalisé
+</div>
+
+<div class="legendeSousCategorie">
+  <span class="pastille pastilleSuiviSigne"></span>
+  Contrat signé
 </div>
 
 
@@ -622,46 +636,66 @@ function styleSuiviVisiteContrat(feature) {
 
 const code = String(
     feature.properties.SIREN_EPCI || ""
-)
-.trim()
-.replace(/\s+/g, "");
+).trim().replace(/\s+/g, "");
 
   const suivi =
     String(
       suiviVisiteContrat[code] || ""
-    ).trim().toLowerCase();
+    ).trim().toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+// 1er RDV réalisé
+ if (suivi === "1er rdv realise") {
+ return {
+ fillColor: "#fdb14e",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
 
-  // 1er RDV réalisé
-  if (suivi === "1er rdv réalisé") {
+  // 2nd RDV réalisé
+  if (suivi === "2nd rdv realise") {
     return {
-      fillColor: "#c6e8c0",
+      fillColor: "#fed86e",
       fillOpacity: 0.8,
       color: "transparent",
       weight: 0
     };
   }
 
-  // Elaboration en cours
-  if (suivi === "elaboration en cours") {
-    return {
-      fillColor: "#70c66b",
-      fillOpacity: 0.8,
-      color: "transparent",
-      weight: 0
-    };
-  }
+ // Elaboration en cours
+ if (suivi === "elaboration en cours") {
+ return {
+ fillColor: "#ffff68",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
 
-  // Contrat : le mot peut être accompagné d'autres caractères
-  if (suivi.includes("contrat")) {
-    return {
-      fillColor: "#198754",
-      fillOpacity: 0.8,
-      color: "transparent",
-      weight: 0
-    };
-  }
+// Contrat finalisé
+ if (suivi === "contrat finalise") {
+ return {
+ fillColor: "#99d75c",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
 
-  // Aucun suivi
+ // Contrat signé
+ if (suivi === "contrat signe") {
+ return {
+ fillColor: "#33af2c",
+ fillOpacity: 0.8,
+ color: "transparent",
+ weight: 0
+ };
+ }
+
+
+  // Aucun suivi renseigné
   return {
     fillColor: "#ffffff",
     fillOpacity: 0,
@@ -669,6 +703,8 @@ const code = String(
     weight: 0
   };
 }
+
+
 
 /* =========================================
    POPUP DES EPCI
@@ -710,43 +746,54 @@ function contenuPopupEpci(feature) {
     /* =========================================
        SUIVI
        ========================================= */
+function creerBadgeSuivi(suivi) {
 
-    const suivi =
-        String(
-            suiviVisiteContrat[code] || ""
-        )
-        .trim();
+    const stade = String(suivi || "").trim();
 
+    const stadeNormalise = stade
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 
-    let badgeSuivi = "Aucun suivi renseigné";
+    let couleur = "#eeeeee";
 
-
-    if (suivi.toLowerCase() === "1er rdv réalisé") {
-
-        badgeSuivi =
-            `<span class="statutPopup statutRDV">
-                1er RDV réalisé
-            </span>`;
-
+    if (stadeNormalise === "1er rdv realise") {
+        couleur = "#fdb14e";
+    }
+    else if (stadeNormalise === "2nd rdv realise") {
+        couleur = "#fed86e";
+    }
+    else if (stadeNormalise === "elaboration en cours") {
+        couleur = "#ffff68";
+    }
+    else if (stadeNormalise === "contrat finalise") {
+        couleur = "#99d75c";
+    }
+    else if (stadeNormalise === "contrat signe") {
+        couleur = "#33af2c";
     }
 
-    else if (suivi.toLowerCase() === "elaboration en cours") {
+    const texte = stade || "Non renseigné";
 
-        badgeSuivi =
-            `<span class="statutPopup statutElaboration">
-                Elaboration en cours
-            </span>`;
+    return `
+        <span style="
+            display: inline-block;
+            background-color: ${couleur};
+            color: #222222;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 3px;
+            margin-bottom: 5px;
+        ">
+            ${texte}
+        </span>
+    `;
+}
 
-    }
-
-    else if (suivi.toLowerCase().includes("contrat")) {
-
-        badgeSuivi =
-            `<span class="statutPopup statutContrat">
-                ${suivi}
-            </span>`;
-
-    }
+const badgeSuivi = creerBadgeSuivi(
+    suiviVisiteContrat[code]
+);
 
 
     /* =========================================
