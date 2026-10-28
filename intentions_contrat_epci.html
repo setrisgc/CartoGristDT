@@ -168,33 +168,32 @@ vertical-align: -1px;
 
 
 
-
 /* =========================================
-   PASTILLES DE COULEUR DU SUIVI
-   ========================================= */
+ PASTILLES DE COULEUR DU SUIVI
+ ========================================= */
 
 .pastilleSuiviPremierRDV{
-    background: #fdb14e;
+ background: #fdb14e;
 }
 
 .pastilleSuiviSecondRDV {
-    background: #fed86e;
+ background: #fed86e;
 }
 
 .pastilleSuiviElaboration {
-    background: #ffff68;
+ background: #ffff68;
 }
 
 .pastilleSuiviFinalise {
-    background: #99d75c;
+ background: #99d75c;
 }
 
 .pastilleSuiviSigne {
-    background: #33af2c;
+ background: #33af2c;
 }
 
 /* =========================================
-   STATUTS DANS LES POPUPS EPCI
+ STATUTS DANS LES POPUPS EPCI
    ========================================= */
 
 .statutPopup {
@@ -320,6 +319,10 @@ map.getPane("epciPane").style.zIndex = 470;
 
 map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
+
+// Panneau des points des communes
+map.createPane("communesPointsPane");
+map.getPane("communesPointsPane").style.zIndex = 2400;
 
 map.createPane("communesLabelsPane");
 map.getPane("communesLabelsPane").style.zIndex = 2500;
@@ -860,11 +863,14 @@ fetch(urlCommunesPoints)
 
             const nom = feature.properties.NOM_COMM || "";
 
-         /* Création du point */
+/* Création d'un point invisible pour porter le nom */
 const point = L.circleMarker(
     latlng,
     {
-        ...styleCommunes_points(feature),
+        radius: 1,
+        stroke: false,
+        fillOpacity: 0,
+        opacity: 0,
         pane: "communesPointsPane"
     }
 );
