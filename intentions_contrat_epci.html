@@ -976,17 +976,40 @@ fill: true,
 fillOpacity: 0
     },
 
-    onEachFeature: function(feature, layer) {
-        layer.on("click", function() {
-            const contenu = contenuPopupEpci(feature);
-            if (!contenu) {
-                return;
-            }
-            layer.bindPopup(contenu, {
-                className: "popupCommune"
-            }).openPopup();
+onEachFeature: function(feature, layer) {
+
+    // Clic sur un EPCI
+    layer.on("click", function() {
+
+        const contenu = contenuPopupEpci(feature);
+        if (!contenu) return;
+
+        // Colorer temporairement l'EPCI en jaune
+        layer.setStyle({
+            color: "#e6b800",
+            weight: 3,
+            fillColor: "#ffff00",
+            fillOpacity: 0.65
         });
-    }
+
+        // Afficher la popup
+        layer.bindPopup(contenu, {
+            className: "popupCommune"
+        }).openPopup();
+    });
+
+    // À la fermeture de la popup :
+    // retrouver le style initial de l'EPCI
+    layer.on("popupclose", function() {
+        layer.setStyle({
+            color: "#973287",
+            weight: 2,
+            fillOpacity: 0
+        });
+    });
+}
+
+
 });
 
     coucheEpci.addTo(map);
