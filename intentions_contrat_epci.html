@@ -553,17 +553,7 @@ records.forEach(function(record) {
 informationsEpci[code] = {
     epci: String(
         record["Nom_EPCI"] || ""
-    ).trim(),
-
-    Demarche_numerique:
-        String(
-            record["Demarche_numerique"] || ""
-        ).trim(),
-
-    Contact_sous_prefets_mail_telephone_:
-        String(
-            record["Contact_sous_prefets_mail_telephone_"] || ""
-        ).trim()
+    ).trim()
 };
 
     });
@@ -776,12 +766,6 @@ function contenuPopupEpci(feature) {
 
             <strong>Suivi du contrat :</strong>
             ${badgeSuivi}<br>
-
-            <strong>Démarche numérique :</strong>
-            ${infos.Demarche_numerique}<br>
-
-            <strong>Contact sous-préfets :</strong>
-            ${infos.Contact_sous_prefets_mail_telephone_}
 
         </div>
 
