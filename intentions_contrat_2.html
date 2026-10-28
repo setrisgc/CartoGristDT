@@ -710,17 +710,7 @@ informationsCommunes[code] = {
     prenom: prenom,
     epci: epci,
     commune: commune,
-	suivi: suivi,
-	
-  Retour_questionnaire_29_mai:
-  ouiNonOuVide(record["Retour_questionnaire_29_mai"]),
-
-Demarche_numerique:
-  ouiNonOuVide(record["Demarche_numerique"]),
-
-Contact_sous_prefets_mail_telephone_:
-  ouiNonOuVide(record["Contact_sous_prefets_mail_telephone_"]),
-Observations: String(record["Observations"] || "").trim()
+	suivi: suivi
 };
 }
 
@@ -1238,15 +1228,6 @@ onEachFeature: function(feature, layer) {
 
                 <strong>EPCI :</strong>
                 ${infos.epci}<br>
-
-                <strong>Retour questionnaire :</strong>
-                ${infos.Retour_questionnaire_29_mai}<br>
-
-                <strong>Démarche numérique :</strong>
-                ${infos.Demarche_numerique}<br>
-
-                <strong>Contact :</strong>
-${infos.Contact_sous_prefets_mail_telephone_}<br>
 
 <strong>Stade de suivi du contrat :</strong><br>
 ${creerBadgeSuivi(infos.suivi)}<br><br>
