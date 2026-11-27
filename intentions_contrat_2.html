@@ -226,6 +226,38 @@ vertical-align: -1px;
     background: #33af2c;
 }
 
+
+/* =========================================
+   PASTILLES DE COULEUR DU SUIVI PCS
+   ========================================= */
+
+.pastillePCSVert {
+    background: #33af2c;
+}
+
+.pastillePCSJaune {
+    background: #ffff68;
+}
+
+.pastillePCSOrange {
+    background: #fdbb74;
+}
+
+.pastillePCSMarron {
+    background: #a66b45;
+}
+
+.pastillePCSViolet {
+    background: #9842b7;
+}
+
+.pastillePCSRouge {
+    background: #e31a00;
+}
+
+
+
+
 .zoomPanelTitle {
  cursor: pointer;
  font-weight: bold;
@@ -323,7 +355,10 @@ const map = L.map("map", {
 map.createPane("communesPane");
 map.getPane("communesPane").style.zIndex = 460;
 
-map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450; 
+map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450;
+
+map.createPane("suiviPCSPane");
+map.getPane("suiviPCSPane").style.zIndex = 470;
 
 map.createPane("communesInteresseesPane");
 map.getPane("communesInteresseesPane").style.zIndex = 400;
@@ -345,11 +380,11 @@ map.getPane("popupPane").style.zIndex = 3000;
 
 
 /* =========================================
-   BOÎTE DE ZOOM PAR ARRONDISSEMENT
-   ========================================= */
+ BOÎTE DE ZOOM PAR ARRONDISSEMENT
+ ========================================= */
 
 const controleZoom = L.control({
-    position: "topright"
+ position: "topright"
 });
 
 controleZoom.onAdd = function() {
@@ -396,6 +431,47 @@ div.innerHTML = `
 <div class="legendeSousCategorie">
   <span class="pastille pastilleSuiviSigne"></span>
   Contrat signé
+</div>
+
+<!-- =================================
+     SUIVI PCS
+     ================================= -->
+
+
+<label class="legendeCase">
+    <input type="checkbox" id="chkSuiviPCS">
+    <span class="pastille pastillePCSVert"></span>
+    Suivi PCS
+</label>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSVert"></span>
+    À jour (obligatoire et non obligatoire)
+</div>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSJaune"></span>
+    Non obligatoire en cours de réalisation
+</div>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSOrange"></span>
+    Non obligatoire non réalisé
+</div>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSMarron"></span>
+    Obligatoire en cours de réalisation
+</div>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSViolet"></span>
+    Obligatoire non réalisé
+</div>
+
+<div class="legendeSousCategorie">
+    <span class="pastille pastillePCSRouge"></span>
+    Obligatoire prioritaire à finaliser/réaliser
 </div>
 
 
@@ -547,6 +623,32 @@ chkSuiviVisiteContrat.addEventListener("change", function() {
 
 });
 
+/* =========================================
+   ACTIVATION / DESACTIVATION DU SUIVI PCS
+   ========================================= */
+
+const chkSuiviPCS =
+    div.querySelector("#chkSuiviPCS");
+
+chkSuiviPCS.addEventListener("change", function() {
+
+    if (coucheSuiviPCS) {
+
+        if (chkSuiviPCS.checked) {
+
+            coucheSuiviPCS.addTo(map);
+
+        } else {
+
+            map.removeLayer(coucheSuiviPCS);
+
+        }
+
+    }
+
+});
+
+
 const chkCommunes_interessees =
     div.querySelector("#chkCommunes_interessees");
 
@@ -626,14 +728,16 @@ let contractualisationParCommune = {};
 let communesInteressees = {};
 let communesReseauAlerte = {};
 let informationsCommunes = {};
-let suiviVisiteContrat = {}; 
+let suiviVisiteContrat = {};
+let suiviPCS = {};
 
 let coucheCommunes = null;
 let coucheCommunesInteressees = null;
 let coucheReseauAlerte = null;
 let coucheSuiviVisiteContrat = null;
 let coucheArrondissements = null;
-let communesPoints = null; 
+let communesPoints = null;
+let coucheSuiviPCS = null;
 
 
 /* =========================================
@@ -670,6 +774,7 @@ contractualisationParCommune = {};
 communesInteressees =  {};
 communesReseauAlerte =  {};
 suiviVisiteContrat={};
+suiviPCS = {};
 informationsCommunes={};
 
  records.forEach(function(record) {
@@ -684,6 +789,8 @@ String(record["Commune_reseau_d_alerte"] || "").trim().toUpperCase();
 const suivi =
   String(record["Suivi_visite_elaboration_contrat_"] || "").trim();
 
+const pcs =
+    String(record["Suivi_PCS"] || "").trim();
 const nom = String(record["Nom"] || "").trim();
 const prenom = String(record["Prenom"] || "").trim();
 const epci = String(record["EPCI"] || "").trim();
@@ -704,13 +811,14 @@ contractualisationParCommune[code] = valeur;
 communesInteressees[code]= interessee;
 communesReseauAlerte[code]= alerte;
 suiviVisiteContrat[code]= suivi;
+suiviPCS[code] = pcs;
 
 informationsCommunes[code] = {
-    nom: nom,
-    prenom: prenom,
-    epci: epci,
-    commune: commune,
-	suivi: suivi
+ nom: nom,
+ prenom: prenom,
+ epci: epci,
+ commune: commune,
+ suivi: suivi
 };
 }
 
@@ -740,6 +848,9 @@ if (coucheSuiviVisiteContrat) {
   coucheSuiviVisiteContrat.setStyle(styleSuiviVisiteContrat);
 }
 
+if (coucheSuiviPCS) {
+    coucheSuiviPCS.setStyle(styleSuiviPCS);
+}
 
 if (communesPoints) {
 
@@ -924,17 +1035,67 @@ function styleSuiviVisiteContrat(feature) {
   };
 }
 
+/* =========================================
+   STYLE DU SUIVI PCS
+   ========================================= */
+
+function normaliserPCS(valeur) {
+
+    return String(valeur || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+}
+
+
+function styleSuiviPCS(feature) {
+    const code = String(feature.properties.INSEE_COMM || "").trim();
+    const statut = normaliserPCS(suiviPCS[code]);
+
+    const couleursPCS = {
+        "non obligatoire a jour": "#33af2c",
+        "obligatoire a jour": "#33af2c",
+
+        "non obligatoire en cours de realisation": "#ffff68",
+        "non obligatoire non realise": "#fdbb74",
+
+        "obligatoire en cours de realisation": "#a66b45",
+        "obligatoire non realise": "#9842b7",
+
+        "obligatoire prioritaire a finaliser/realiser": "#e31a00"
+    };
+
+    const couleur = couleursPCS[statut];
+
+    if (couleur) {
+        return {
+            fillColor: couleur,
+            fillOpacity: 0.8,
+            color: "transparent",
+            weight: 0
+        };
+    }
+
+    return {
+        fillColor: "#ffffff",
+        fillOpacity: 0,
+        color: "transparent",
+        weight: 0
+    };
+}
 
 
 /* =========================================
-   contractualisation (pastille au centre de la commune)
-   ========================================= */
+ contractualisation (pastille au centre de la commune)
+ ========================================= */
 
 function styleCommunes_points(feature) {
 
-    const code = String(
-        feature.properties.INSEE_COMM || ""
-    ).trim();
+ const code = String(
+ feature.properties.INSEE_COMM || ""
+ ).trim();
 
 
     /* =========================================
@@ -1274,12 +1435,29 @@ coucheReseauAlerte = L.geoJSON(data, {
   interactive: false
 
 }).addTo(map);
+
 /*CREATION DE LA COUCHE SUIVI*/
 coucheSuiviVisiteContrat = L.geoJSON(data, {
-  style: styleSuiviVisiteContrat,
-  pane: "suiviVisiteContratPane",
-  interactive: false
+ style: styleSuiviVisiteContrat,
+ pane: "suiviVisiteContratPane",
+ interactive: false
 }).addTo(map);
+
+
+/* CREATION DE LA COUCHE SUIVI PCS */
+
+coucheSuiviPCS = L.geoJSON(data, {
+
+    style: styleSuiviPCS,
+
+    pane: "suiviPCSPane",
+
+    interactive: false
+
+});
+
+
+
 
 
 });
