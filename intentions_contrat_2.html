@@ -262,7 +262,7 @@ vertical-align: -1px;
 
 
 .pastillePCSMarron {
- background: #810000;
+ background: #5d0000;
 }
 
 .pastillePCSRouge {
@@ -397,12 +397,12 @@ const map = L.map("map", {
    ========================================= */
 
 map.createPane("communesPane");
-map.getPane("communesPane").style.zIndex = 2000;
+map.getPane("communesPane").style.zIndex = 480;
 
 map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450;
 
 map.createPane("suiviPCSPane");
-map.getPane("suiviPCSPane").style.zIndex = 1100;
+map.getPane("suiviPCSPane").style.zIndex = 470;
 
 map.createPane("communesInteresseesPane");
 map.getPane("communesInteresseesPane").style.zIndex = 400;
@@ -1182,7 +1182,7 @@ function styleSuiviPCS(feature) {
         "pcs a jour priorite moderee": "#23c720",
 
         // PCS non réalisé
-        "pcs non realise priorite tres forte": "#810000",
+        "pcs non realise priorite tres forte": "#5d0000",
         "pcs non realise priorite forte": "#c50000",
         "pcs non realise priorite moderee": "#e3453d",
 
@@ -1863,3 +1863,4 @@ pane: "arrondissementPane",
 </body>
 
 </html>
+
