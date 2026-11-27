@@ -434,23 +434,28 @@ div.innerHTML = `
 </div>
 
 <!-- =================================
-     SUIVI PCS
-     ================================= -->
+ SUIVI PCS
+ ================================= -->
 
 
 <label class="legendeCase">
-    <input type="checkbox" id="chkSuiviPCS">
-    Suivi PCS
+ <input type="checkbox" id="chkSuiviPCS">
+ Suivi PCS
 </label>
 
 <div class="legendeSousCategorie">
-    <span class="pastille pastillePCSVert"></span>
-    À jour (obligatoire et non obligatoire)
+ <span class="pastille pastillePCSRouge"></span>
+ Obligatoire prioritaire à finaliser/réaliser
 </div>
 
 <div class="legendeSousCategorie">
-    <span class="pastille pastillePCSJaune"></span>
-    Non obligatoire en cours de réalisation
+ <span class="pastille pastillePCSViolet"></span>
+ Obligatoire non réalisé
+</div>
+
+<div class="legendeSousCategorie">
+ <span class="pastille pastillePCSMarron"></span>
+ Obligatoire en cours de réalisation
 </div>
 
 <div class="legendeSousCategorie">
@@ -458,20 +463,19 @@ div.innerHTML = `
     Non obligatoire non réalisé
 </div>
 
-<div class="legendeSousCategorie">
-    <span class="pastille pastillePCSMarron"></span>
-    Obligatoire en cours de réalisation
-</div>
 
 <div class="legendeSousCategorie">
-    <span class="pastille pastillePCSViolet"></span>
-    Obligatoire non réalisé
+    <span class="pastille pastillePCSJaune"></span>
+    Non obligatoire en cours de réalisation
 </div>
 
+
 <div class="legendeSousCategorie">
-    <span class="pastille pastillePCSRouge"></span>
-    Obligatoire prioritaire à finaliser/réaliser
+    <span class="pastille pastillePCSVert"></span>
+    À jour (obligatoire et non obligatoire)
 </div>
+
+
 
 
 <!-- =================================
