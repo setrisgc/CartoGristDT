@@ -820,7 +820,8 @@ informationsCommunes[code] = {
  prenom: prenom,
  epci: epci,
  commune: commune,
- suivi: suivi
+ suivi: suivi,
+pcs : pcs
 };
 }
 
@@ -1100,18 +1101,18 @@ function styleCommunes_points(feature) {
  ).trim();
 
 
-    /* =========================================
-       CONTRACTUALISATION
-       ========================================= */
+ /* =========================================
+ CONTRACTUALISATION
+ ========================================= */
 
-    const contractualisation =
-        String(
-            contractualisationParCommune[code] || ""
-        ).trim().toUpperCase();
+ const contractualisation =
+ String(
+ contractualisationParCommune[code] || ""
+ ).trim().toUpperCase();
 
 
-    /* =========================================
-       COULEUR DE LA PASTILLE
+ /* =========================================
+ COULEUR DE LA PASTILLE
        ========================================= */
 
     let couleur = "#ffffff";
@@ -1394,6 +1395,11 @@ onEachFeature: function(feature, layer) {
 
 <strong>Stade de suivi du contrat :</strong><br>
 ${creerBadgeSuivi(infos.suivi)}<br><br>
+
+<strong>Suivi du PCS :</strong><br>
+${infos.pcs || "Non renseigné"}<br><br>
+
+
             </div>
         `;
 
@@ -1735,4 +1741,3 @@ pane: "arrondissementPane",
 </body>
 
 </html>
-
