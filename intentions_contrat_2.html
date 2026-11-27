@@ -402,7 +402,7 @@ map.getPane("communesPane").style.zIndex = 480;
 map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450;
 
 map.createPane("suiviPCSPane");
-map.getPane("suiviPCSPane").style.zIndex = 470;
+map.getPane("suiviPCSPane").style.zIndex = 475;
 
 map.createPane("communesInteresseesPane");
 map.getPane("communesInteresseesPane").style.zIndex = 400;
@@ -410,10 +410,10 @@ map.createPane("arrondissementPane");
 map.getPane("arrondissementPane").style.zIndex = 500;
 
 map.createPane("reseauAlertePane");
-map.getPane("reseauAlertePane").style.zIndex = 480;
+map.getPane("reseauAlertePane").style.zIndex = 465;
 
 map.createPane("communesPointsPane");
-map.getPane("communesPointsPane").style.zIndex = 1000;
+map.getPane("communesPointsPane").style.zIndex = 470;
 
 
 map.createPane("communesLabelsPane");
@@ -1197,7 +1197,7 @@ function styleSuiviPCS(feature) {
     if (couleur) {
         return {
             fillColor: couleur,
-            fillOpacity: 0.8,
+            fillOpacity: 1,
             color: "transparent",
             weight: 0
         };
