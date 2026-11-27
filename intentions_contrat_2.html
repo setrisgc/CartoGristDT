@@ -145,6 +145,35 @@ Stlye de la boite de zoom par arrondissement
     font-size: 12px;
 }
 
+/* En-tête de chaque rubrique */
+.legendeEntete {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Petite flèche */
+.legendeToggle {
+    border: none;
+    background: transparent;
+    padding: 2px 4px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #555;
+}
+
+/* Case à cocher dans l'en-tête */
+.legendeEntete .legendeCase {
+    margin: 4px 0;
+}
+
+/* Détails repliés par défaut */
+.legendeDetails {
+    display: none;
+}
+
+
+
 
 /* =========================================
    PASTILLES DE COULEUR
@@ -256,8 +285,6 @@ vertical-align: -1px;
 }
 
 
-
-
 .zoomPanelTitle {
  cursor: pointer;
  font-weight: bold;
@@ -304,7 +331,20 @@ box-sizing: border-box;
 .zoomPanel button:hover {
     background: #eeeeee;
 }
+/* Style particulier des flèches de la légende */
+.zoomPanel button.legendeToggle {
+    display: inline-block;
+    width: auto;
+    padding: 2px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    text-align: center;
+}
 
+.zoomPanel button.legendeToggle:hover {
+    background: transparent;
+}
 
 </style>
 
@@ -400,80 +440,108 @@ div.innerHTML = `
 
 <div class="zoomPanelButtons">
 
-<label class="legendeCase">
-  <input type="checkbox"
-         id="chkSuiviVisiteContrat"
-         checked>
-  Suivi du contrat
-</label>
+<div class="legendeSection">
 
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviPremierRDV"></span>
-  1er RDV réalisé
+    <div class="legendeEntete">
+
+        <button type="button"
+                class="legendeToggle"
+                data-cible="detailsSuiviContrat">
+            ▶
+        </button>
+
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkSuiviVisiteContrat"
+                   checked>
+            Suivi du contrat
+        </label>
+
+    </div>
+
+    <div class="legendeDetails" id="detailsSuiviContrat">
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleSuiviPremierRDV"></span>
+            1er RDV réalisé
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleSuiviSecondRDV"></span>
+            2nd RDV réalisé
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleSuiviElaboration"></span>
+            Elaboration en cours
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleSuiviFinalise"></span>
+            Contrat finalisé
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleSuiviSigne"></span>
+            Contrat signé
+        </div>
+
+    </div>
+
 </div>
 
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviSecondRDV"></span>
-  2nd RDV réalisé
+<div class="legendeSection">
+
+    <div class="legendeEntete">
+
+        <button type="button"
+                class="legendeToggle"
+                data-cible="detailsSuiviPCS">
+            ▶
+        </button>
+
+        <label class="legendeCase">
+            <input type="checkbox" id="chkSuiviPCS">
+            Suivi PCS
+        </label>
+
+    </div>
+
+    <div class="legendeDetails" id="detailsSuiviPCS">
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSRouge"></span>
+            Obligatoire prioritaire à finaliser/réaliser
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSViolet"></span>
+            Obligatoire non réalisé
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSMarron"></span>
+            Obligatoire en cours de réalisation
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSOrange"></span>
+            Non obligatoire non réalisé
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSJaune"></span>
+            Non obligatoire en cours de réalisation
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePCSVert"></span>
+            À jour (obligatoire et non obligatoire)
+        </div>
+
+    </div>
+
 </div>
-
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviElaboration"></span>
-  Elaboration en cours
-</div>
-
-<div class="legendeSousCategorie">
- <span class="pastille pastilleSuiviFinalise"></span>
- Contrat finalisé
-</div>
-
-<div class="legendeSousCategorie">
-  <span class="pastille pastilleSuiviSigne"></span>
-  Contrat signé
-</div>
-
-<!-- =================================
- SUIVI PCS
- ================================= -->
-
-
-<label class="legendeCase">
- <input type="checkbox" id="chkSuiviPCS">
- Suivi PCS
-</label>
-
-<div class="legendeSousCategorie">
- <span class="pastille pastillePCSRouge"></span>
- Obligatoire prioritaire à finaliser/réaliser
-</div>
-
-<div class="legendeSousCategorie">
- <span class="pastille pastillePCSViolet"></span>
- Obligatoire non réalisé
-</div>
-
-<div class="legendeSousCategorie">
- <span class="pastille pastillePCSMarron"></span>
- Obligatoire en cours de réalisation
-</div>
-
-<div class="legendeSousCategorie">
-    <span class="pastille pastillePCSOrange"></span>
-    Non obligatoire non réalisé
-</div>
-
-
-<div class="legendeSousCategorie">
-    <span class="pastille pastillePCSJaune"></span>
-    Non obligatoire en cours de réalisation
-</div>
-
-
-<div class="legendeSousCategorie">
-    <span class="pastille pastillePCSVert"></span>
-    À jour (obligatoire et non obligatoire)
-</div>
-
 
 
 
@@ -494,27 +562,45 @@ div.innerHTML = `
  CONTRACTUALISATION
  ================================= -->
 
- <label class="legendeCase">
- <input type="checkbox"
- id="chkContractualisation"
- checked>
- Contractualisation
- </label>
+<div class="legendeSection">
 
- <div class="legendeSousCategorie">
- <span class="pastille pastillePVD"></span>
- PVD
- </div>
+ <div class="legendeEntete">
 
- <div class="legendeSousCategorie">
- <span class="pastille pastilleACV"></span>
- ACV
- </div>
+        <button type="button"
+                class="legendeToggle"
+                data-cible="detailsContractualisation">
+            ▶
+        </button>
 
- <div class="legendeSousCategorie">
- <span class="pastille pastilleVA"></span>
- VA
- </div>
+        <label class="legendeCase">
+            <input type="checkbox"
+                   id="chkContractualisation"
+                   checked>
+            Contractualisation
+        </label>
+
+    </div>
+
+    <div class="legendeDetails" id="detailsContractualisation">
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastillePVD"></span>
+            PVD
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleACV"></span>
+            ACV
+        </div>
+
+        <div class="legendeSousCategorie">
+            <span class="pastille pastilleVA"></span>
+            VA
+        </div>
+
+    </div>
+
+</div>
 
 
  
@@ -565,6 +651,29 @@ checked>
 `;
 
     L.DomEvent.disableClickPropagation(div);
+
+// Gestion des rubriques repliables de la légende
+div.querySelectorAll(".legendeToggle").forEach(function(fleche) {
+
+    fleche.addEventListener("click", function() {
+
+        // On récupère la rubrique associée à la flèche
+        const cible = div.querySelector(
+            "#" + fleche.getAttribute("data-cible")
+        );
+
+        // On vérifie si la rubrique est déjà ouverte
+        const estOuverte = cible.style.display === "block";
+
+        // On affiche ou on masque les sous-catégories
+        cible.style.display = estOuverte ? "none" : "block";
+
+        // On change le sens de la flèche
+        fleche.textContent = estOuverte ? "▶" : "▼";
+
+    });
+
+});
 
     const titre = div.querySelector(".zoomPanelTitle");
 const boutons = div.querySelector(".zoomPanelButtons");
@@ -1741,4 +1850,3 @@ pane: "arrondissementPane",
 </body>
 
 </html>
-
