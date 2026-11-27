@@ -270,11 +270,11 @@ vertical-align: -1px;
 }
 
 .pastillePCSViolet {
- background: #9842b7;
+ background: #9f65ac;
 }
 
 .pastillePCSBleu {
- background: #17365d;
+ background: #2b4afb;
 }
 
 .pastillePCSOrange {
@@ -397,7 +397,7 @@ const map = L.map("map", {
    ========================================= */
 
 map.createPane("communesPane");
-map.getPane("communesPane").style.zIndex = 460;
+map.getPane("communesPane").style.zIndex = 480;
 
 map.createPane("suiviVisiteContratPane"); map.getPane("suiviVisiteContratPane").style.zIndex = 450;
 
@@ -1184,10 +1184,10 @@ function styleSuiviPCS(feature) {
         // PCS non réalisé
         "pcs non realise priorite tres forte": "#a66b45",
         "pcs non realise priorite forte": "#e31a00",
-        "pcs non realise priorite moderee": "#9842b7",
+        "pcs non realise priorite moderee": "#9f65ac",
 
         // PCS non à jour
-        "pcs non a jour priorite tres forte": "#17365d",
+        "pcs non a jour priorite tres forte": "#2b4afb",
         "pcs non a jour priorite forte": "#fdbb74",
         "pcs non a jour priorite moderee": "#ffff68"
     };
