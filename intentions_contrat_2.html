@@ -255,35 +255,39 @@ vertical-align: -1px;
     background: #33af2c;
 }
 
-
 /* =========================================
-   PASTILLES DE COULEUR DU SUIVI PCS
-   ========================================= */
+ PASTILLES DE COULEUR DU SUIVI PCS
+ ========================================= */
 
-.pastillePCSVert {
-    background: #33af2c;
+
+
+.pastillePCSMarron {
+ background: #a66b45;
 }
 
-.pastillePCSJaune {
-    background: #ffff68;
+.pastillePCSRouge {
+ background: #e31a00;
+}
+
+.pastillePCSViolet {
+ background: #9842b7;
+}
+
+.pastillePCSBleu {
+ background: #17365d;
 }
 
 .pastillePCSOrange {
     background: #fdbb74;
 }
 
-.pastillePCSMarron {
-    background: #a66b45;
+.pastillePCSJaune {
+    background: #ffff68;
 }
 
-.pastillePCSViolet {
-    background: #9842b7;
+.pastillePCSVert {
+    background: #33af2c;
 }
-
-.pastillePCSRouge {
-    background: #e31a00;
-}
-
 
 .zoomPanelTitle {
  cursor: pointer;
@@ -492,57 +496,62 @@ div.innerHTML = `
 
 <div class="legendeSection">
 
-    <div class="legendeEntete">
+ <div class="legendeEntete">
 
-        <button type="button"
-                class="legendeToggle"
-                data-cible="detailsSuiviPCS">
-            ▶
-        </button>
+ <button type="button"
+ class="legendeToggle"
+ data-cible="detailsSuiviPCS">
+ ▶
+ </button>
 
-        <label class="legendeCase">
-            <input type="checkbox" id="chkSuiviPCS">
-            Suivi PCS
-        </label>
+ <label class="legendeCase">
+ <input type="checkbox" id="chkSuiviPCS">
+ Suivi PCS
+ </label>
 
-    </div>
+ </div>
 
-    <div class="legendeDetails" id="detailsSuiviPCS">
+<div class="legendeDetails" id="detailsSuiviPCS">
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSRouge"></span>
-            Obligatoire prioritaire à finaliser/réaliser
-        </div>
+<div class="legendeItem">
+<span class="pastille pastillePCSVert"></span>
+    PCS à jour (toutes priorités)
+</div>
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSViolet"></span>
-            Obligatoire non réalisé
-        </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSMarron"></span>
+    PCS non réalisé – priorité très forte
+</div>
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSMarron"></span>
-            Obligatoire en cours de réalisation
-        </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSRouge"></span>
+    PCS non réalisé – priorité forte
+</div>
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSOrange"></span>
-            Non obligatoire non réalisé
-        </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSViolet"></span>
+    PCS non réalisé – priorité modérée
+</div>
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSJaune"></span>
-            Non obligatoire en cours de réalisation
-        </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSBleu"></span>
+    PCS non à jour – priorité très forte
+</div>
 
-        <div class="legendeSousCategorie">
-            <span class="pastille pastillePCSVert"></span>
-            À jour (obligatoire et non obligatoire)
-        </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSOrange"></span>
+    PCS non à jour – priorité forte
+</div>
 
-    </div>
+<div class="legendeItem">
+    <span class="pastille pastillePCSJaune"></span>
+    PCS non à jour – priorité modérée
+</div>
 
 </div>
 
+ </div>
+ </div>
 
 
 <!-- =================================
@@ -1161,22 +1170,27 @@ function normaliserPCS(valeur) {
         .replace(/\s+/g, " ");
 }
 
-
 function styleSuiviPCS(feature) {
+
     const code = String(feature.properties.INSEE_COMM || "").trim();
     const statut = normaliserPCS(suiviPCS[code]);
 
     const couleursPCS = {
-        "non obligatoire a jour": "#33af2c",
-        "obligatoire a jour": "#33af2c",
 
-        "non obligatoire en cours de realisation": "#ffff68",
-        "non obligatoire non realise": "#fdbb74",
+        // PCS à jour : toujours vert
+        "pcs a jour priorite tres forte": "#33af2c",
+        "pcs a jour priorite forte": "#33af2c",
+        "pcs a jour priorite moderee": "#33af2c",
 
-        "obligatoire en cours de realisation": "#a66b45",
-        "obligatoire non realise": "#9842b7",
+        // PCS non réalisé
+        "pcs non realise priorite tres forte": "#a66b45",
+        "pcs non realise priorite forte": "#e31a00",
+        "pcs non realise priorite moderee": "#9842b7",
 
-        "obligatoire prioritaire a finaliser/realiser": "#e31a00"
+        // PCS non à jour
+        "pcs non a jour priorite tres forte": "#17365d",
+        "pcs non a jour priorite forte": "#fdbb74",
+        "pcs non a jour priorite moderee": "#ffff68"
     };
 
     const couleur = couleursPCS[statut];
